@@ -2,18 +2,16 @@ package com.kma.services.Impl;
 
 import java.io.IOException;
 import java.sql.Date;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.stream.Collectors;
 
-import org.modelmapper.ModelMapper;
+import com.kma.converter.postDTOConverter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.kma.models.fileDTO;
 import com.kma.models.postDTO;
 import com.kma.models.postRequestDTO;
 import com.kma.repository.nhanVienRepo;
@@ -25,7 +23,6 @@ import com.kma.services.fileService;
 import com.kma.services.nhanVienService;
 import com.kma.services.postService;
 import com.kma.services.taiNguyenService;
-import com.kma.utilities.mapUtil;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityNotFoundException;
@@ -50,46 +47,53 @@ public class postServiceImpl implements postService{
 	
 	@Autowired
 	taiNguyenService taiNguyenServ;
-	
+
 	@Autowired
-	ModelMapper modelMapper;
-	
+	postDTOConverter dtoConverter;
+
 	@PersistenceContext
-	private EntityManager entityManager;
-	
+	EntityManager entityManager;
+
 	@Override
 	public List<postDTO> getAllPost(Map<String,Object> params) {
-		postRequestDTO prDTO = new postRequestDTO();
-		
-		if(params.containsKey("title")) {
-			prDTO.setTitle(mapUtil.getObject(params, "title", String.class));
+		// Lấy giá trị từ params
+		String title = (String) params.get("title");
+		String authorName = (String) params.get("author_name");
+
+		// Lấy danh sách id của các nhân viên từ tên
+		List<Integer> idUsers = Optional.ofNullable(authorName)
+				.map(nvServ::findByName)
+				.orElse(Collections.emptyList())
+					.stream()
+					.map(NhanVien::getIdUser)
+					.toList();
+
+		// Tìm kiếm bài viết theo điều kiện
+		List<Post> posts;
+
+		if (idUsers.isEmpty()) {
+			// Không có author_name, chỉ tìm theo title hoặc lấy tất cả nếu title null
+			if (title == null) {
+				posts = postRepo.findAll(); // Lấy toàn bộ bài viết
+			} else {
+				posts = postRepo.findByTitleContaining(title); // Tìm bài viết theo title
+			}
+		} else {
+			// Có author_name, tìm theo title và idUsers
+			posts = idUsers.stream()
+					.flatMap(id -> {
+						if (title == null) {
+							return postRepo.findByNhanVien_idUser(id).stream();	// Tìm bài viết theo danh sánh nhân viên
+						} else {
+							return postRepo.findByTitleContainingAndNhanVien_idUser(title, id).stream(); // Tìm bài viết theo cả title và danh sách nhân viên
+						}
+					})
+					.toList();
 		}
-	
-		if(params.containsKey("author_name")) {
-			String TenNhanVien = mapUtil.getObject(params, "author_name", String.class);
-			
-			List<NhanVien> nvList = nvServ.findByName(TenNhanVien);
-			prDTO.setAuthor_id(nvList.get(0).getId_User());
-		}
-		
-		List<Post> posts = postRepo.getAllPost(prDTO);
-		List<postDTO> DTO = new ArrayList<postDTO>();
-		for(Post items: posts) {
-			postDTO dto = new postDTO();
-			dto.setPost_id(items.getPost_id());
-			dto.setTitle(items.getTitle());
-			dto.setContent(items.getContent());
-			dto.setCreate_at(items.getCreate_at());
-			
-			List<TaiNguyen> tnList = items.getTaiNguyenList();
-			List<fileDTO> fileDTO = fileServ.getListFileDTO(tnList);
-			
-			dto.setFile_dto(fileDTO);
-			dto.setAuthor(items.getNhanVien().getTenNhanVien());
-			
-			DTO.add(dto);
-		}
-		return DTO;
+
+		return posts.stream()
+				.map(i->dtoConverter.convertToPostDTO(i))
+				.collect(Collectors.toList());
 	}
 
 	@Override
@@ -100,7 +104,7 @@ public class postServiceImpl implements postService{
 		if(postRequestDTO.getAuthor_id() == null) {
 			throw new IllegalArgumentException("Invalid Author ID");
 		}
-		
+		// Kiểm tra xem nhân viên có tồn tại không
 		NhanVien nhanVien = nvRepo.findByID(postRequestDTO.getAuthor_id());
 		if(nhanVien == null) {
 			throw new IllegalArgumentException("Invalid Author ID");
@@ -109,10 +113,10 @@ public class postServiceImpl implements postService{
 		Post post = new Post();
 		post.setTitle(postRequestDTO.getTitle());
 		post.setContent(postRequestDTO.getContent());
-		post.setCreate_at(new Date(System.currentTimeMillis()));
+		post.setCreateAt(new Date(System.currentTimeMillis()));
 		
 		post.setNhanVien(nhanVien);
-		
+
 		List<TaiNguyen> tnList = post.getTaiNguyenList();
 		
 		// Upload file và lấy đường dẫn
@@ -123,7 +127,7 @@ public class postServiceImpl implements postService{
 			TaiNguyen resources = new TaiNguyen();
 			resources.setDescription(postRequestDTO.getTitle());
 			resources.setCreate_at(new Date(System.currentTimeMillis()));
-			resources.setFile_code(fileCode);
+			resources.setFileCode(fileCode);
 			
 			//Them post vao list bai viet cua tai nguyen
 			resources.setPost(post);
@@ -133,8 +137,9 @@ public class postServiceImpl implements postService{
 			
 			taiNguyenServ.addTaiNguyen(resources);
 		}
-		
-		postRepo.addPost(post);	
+
+//		postRepo.addPost(post);
+		postRepo.save(post);
 	}
 	
 
@@ -147,7 +152,7 @@ public class postServiceImpl implements postService{
 		if(post != null) {
 			post.setTitle(postRequestDTO.getTitle());
 			post.setContent(postRequestDTO.getContent());
-			post.setCreate_at(new Date(System.currentTimeMillis()));
+			post.setCreateAt(new Date(System.currentTimeMillis()));
 			
 			List<TaiNguyen> tnList = post.getTaiNguyenList();
 			
@@ -160,7 +165,7 @@ public class postServiceImpl implements postService{
 					TaiNguyen resources = new TaiNguyen();
 					resources.setDescription(postRequestDTO.getTitle());
 					resources.setCreate_at(new Date(System.currentTimeMillis()));
-					resources.setFile_code(fileCode);
+					resources.setFileCode(fileCode);
 					
 					//Them post vao list bai viet cua tai nguyen
 					resources.setPost(post);
@@ -179,7 +184,7 @@ public class postServiceImpl implements postService{
 		            if(f != null) {
 		            	
 		            	// Xóa file trên server, xóa tài nguyên khỏi list tài nguyên của bài viết và xóa bản ghi tài nguyên
-		            	fileServ.deleteFile(f.getResource_id());
+		            	fileServ.deleteFile(f.getResourceId());
 			            tnList.remove(f);
 			            entityManager.remove(f);
 		            }
@@ -195,11 +200,11 @@ public class postServiceImpl implements postService{
 	@Override
 	public void deletePost(Integer post_id) {
 		// TODO Auto-generated method stub
-		Post existedPost = postRepo.findByID(post_id);
+		Post existedPost = postRepo.findById(post_id).get();
 		if(existedPost != null) {
 			List<TaiNguyen> tnlist = existedPost.getTaiNguyenList();
 			for(TaiNguyen tn: tnlist) {
-				fileServ.deleteFile(tn.getResource_id());
+				fileServ.deleteFile(tn.getResourceId());
 			}
 			entityManager.remove(existedPost);
 		}else {

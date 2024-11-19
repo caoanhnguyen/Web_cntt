@@ -17,7 +17,7 @@ import jakarta.persistence.Table;
 public class NhanVien {
 	@Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id_User;
+    private Integer idUser;
 
     @Column(name = "MaNhanVien")
     private String maNhanVien;
@@ -90,11 +90,11 @@ public class NhanVien {
 	public void setPosts(List<Post> posts) {
 		this.posts = posts;
 	}
-	public Integer getId_User() {
-		return id_User;
+	public Integer getIdUser() {
+		return idUser;
 	}
-	public void setId_User(Integer id_User) {
-		this.id_User = id_User;
+	public void setIdUser(Integer idUser) {
+		this.idUser = idUser;
 	}
 	public String getMaNhanVien() {
 		return maNhanVien;

@@ -4,11 +4,12 @@ import java.util.List;
 
 import com.kma.models.postRequestDTO;
 import com.kma.repository.entities.Post;
+import org.springframework.data.jpa.repository.JpaRepository;
 
-public interface postRepo {
-	List<Post> getAllPost(postRequestDTO prDTO);
-	
-	void addPost(Post post);
-	
-	Post findByID(Integer post_id);
+public interface postRepo extends JpaRepository<Post, Integer> {
+    List<Post> findByTitleContainingAndNhanVien_idUser(String title, Integer idUser);
+
+    List<Post> findByTitleContaining(String title);
+
+    List<Post> findByNhanVien_idUser(Integer idUser);
 }

@@ -41,8 +41,8 @@ public class fileServImpl implements fileService{
 		List<fileDTO> fileDTO = new ArrayList<>();
 		
 		for(TaiNguyen tn: tnList) {
-			Integer id = tn.getResource_id();
-			String downloadUrl = "/downloadFile/" + tn.getFile_code();
+			Integer id = tn.getResourceId();
+			String downloadUrl = "/downloadFile/" + tn.getFileCode();
 			
 			fileDTO fdto = new fileDTO();
 			fdto.setId(id);
@@ -64,7 +64,7 @@ public class fileServImpl implements fileService{
 		try {
 	        Path dirPath = Paths.get("Files-Upload");
 	        Files.list(dirPath).forEach(file -> {
-	            if (file.getFileName().toString().startsWith(tn.getFile_code())) {
+	            if (file.getFileName().toString().startsWith(tn.getFileCode())) {
 	                try {
 	                    Files.deleteIfExists(file);
 	                } catch (IOException e) {

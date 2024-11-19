@@ -18,19 +18,19 @@ public class TaiNguyen {
 	
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Integer resource_id;
+	private Integer resourceId;
 	
 	@Column(name="description", columnDefinition = "LONGTEXT")
 	private String description;
 	
-	@Column(name="file_code")
-	private String file_code;
+	@Column(name="fileCode")
+	private String fileCode;
 	
-	@Column(name="create_at")
-	private Date create_at;
+	@Column(name="createAt")
+	private Date createAt;
 	
 	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "post_id")
+	@JoinColumn(name = "postId")
 	private Post post;
 	
 	
@@ -40,11 +40,11 @@ public class TaiNguyen {
 	public void setPost(Post post) {
 		this.post = post;
 	}
-	public Integer getResource_id() {
-		return resource_id;
+	public Integer getResourceId() {
+		return resourceId;
 	}
-	public void setResource_id(Integer resource_id) {
-		this.resource_id = resource_id;
+	public void setResourceId(Integer resourceId) {
+		this.resourceId = resourceId;
 	}
 	public String getDescription() {
 		return description;
@@ -52,17 +52,17 @@ public class TaiNguyen {
 	public void setDescription(String description) {
 		this.description = description;
 	}
-	public String getFile_code() {
-		return file_code;
+	public String getFileCode() {
+		return fileCode;
 	}
-	public void setFile_code(String file_code) {
-		this.file_code = file_code;
+	public void setFileCode(String fileCode) {
+		this.fileCode = fileCode;
 	}
-	public Date getCreate_at() {
-		return create_at;
+	public Date getCreateAt() {
+		return createAt;
 	}
-	public void setCreate_at(Date create_at) {
-		this.create_at = create_at;
+	public void setCreate_at(Date createAt) {
+		this.createAt = createAt;
 	}
 	
 	

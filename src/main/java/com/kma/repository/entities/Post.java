@@ -21,7 +21,7 @@ import jakarta.persistence.Table;
 public class Post {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Integer post_id;
+	private Integer postId;
 	
 	@Column(name="title", columnDefinition = "LONGTEXT")
 	private String title;
@@ -29,14 +29,11 @@ public class Post {
 	@Column(name="content", columnDefinition = "LONGTEXT")
 	private String content;
 	
-	@Column(name="create_at")
-	private Date create_at;
-	
-//	@Column(name="author_id")
-//	private Integer author_id;
-	
+	@Column(name="createAt")
+	private Date createAt;
+
 	@ManyToOne(fetch = FetchType.EAGER)
-	@JoinColumn(name = "author_id")
+	@JoinColumn(name = "authorId")
 	private NhanVien nhanVien;
 	
 	@OneToMany(mappedBy = "post", cascade = CascadeType.REMOVE)
@@ -56,10 +53,10 @@ public class Post {
 		this.nhanVien = nhanVien;
 	}
 	public Integer getPost_id() {
-		return post_id;
+		return postId;
 	}
 	public void setPost_id(Integer post_id) {
-		this.post_id = post_id;
+		this.postId = post_id;
 	}
 	public String getTitle() {
 		return title;
@@ -73,19 +70,12 @@ public class Post {
 	public void setContent(String content) {
 		this.content = content;
 	}
-	public Date getCreate_at() {
-		return create_at;
+	public Date getCreateAt() {
+		return createAt;
 	}
-	public void setCreate_at(Date create_at) {
-		this.create_at = create_at;
+	public void setCreateAt(Date createAt) {
+		this.createAt = createAt;
 	}
-
-//	public Integer getAuthor_id() {
-//		return author_id;
-//	}
-//	public void setAuthor_id(Integer author_id) {
-//		this.author_id = author_id;
-//	}
-	
-	
+	public Integer getPostId() { return postId; }
+	public void setPostId(Integer postId) { this.postId = postId; }
 }

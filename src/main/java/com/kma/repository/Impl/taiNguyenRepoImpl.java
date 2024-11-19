@@ -20,7 +20,7 @@ public class taiNguyenRepoImpl implements taiNguyenRepo{
 	public void addTaiNguyen(TaiNguyen resources) {
 		// TODO Auto-generated method stub
 		try {
-			if (resources.getResource_id() == null) { // Kiểm tra nếu ID chưa có nghĩa là đối tượng mới
+			if (resources.getResourceId() == null) { // Kiểm tra nếu ID chưa có nghĩa là đối tượng mới
 		        entityManager.persist(resources); // persist đối tượng mới
 		    } else {
 		        entityManager.merge(resources); // merge nếu đối tượng có ID (trường hợp update)
