@@ -6,6 +6,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import com.kma.converter.postDTOConverter;
+import com.kma.utilities.taiNguyenUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -26,7 +27,6 @@ import com.kma.services.taiNguyenService;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityNotFoundException;
-import jakarta.persistence.PersistenceContext;
 import jakarta.transaction.Transactional;
 
 @Service
@@ -35,24 +35,21 @@ public class postServiceImpl implements postService{
 
 	@Autowired
 	postRepo postRepo;
-	
 	@Autowired
 	nhanVienRepo nvRepo;
-	
 	@Autowired
 	nhanVienService nvServ;
-	
 	@Autowired
 	fileService fileServ;
-	
 	@Autowired
 	taiNguyenService taiNguyenServ;
-
 	@Autowired
 	postDTOConverter dtoConverter;
-
-	@PersistenceContext
+	@Autowired
+	taiNguyenUtil tnUtil;
+	@Autowired
 	EntityManager entityManager;
+
 
 	@Override
 	public List<postDTO> getAllPost(Map<String,Object> params) {
@@ -114,84 +111,65 @@ public class postServiceImpl implements postService{
 		post.setTitle(postRequestDTO.getTitle());
 		post.setContent(postRequestDTO.getContent());
 		post.setCreateAt(new Date(System.currentTimeMillis()));
-		
 		post.setNhanVien(nhanVien);
-
 		List<TaiNguyen> tnList = post.getTaiNguyenList();
 		
 		// Upload file và lấy đường dẫn
 		for (MultipartFile item: files) {
-			
+			// Lưu file và lấy fileCode
 			String fileCode = fileServ.uploadFile(item);
 			// Tạo tài nguyên
-			TaiNguyen resources = new TaiNguyen();
-			resources.setDescription(postRequestDTO.getTitle());
-			resources.setCreate_at(new Date(System.currentTimeMillis()));
-			resources.setFileCode(fileCode);
-			
-			//Them post vao list bai viet cua tai nguyen
-			resources.setPost(post);
-			
-			//Them tai nguyen vao list tai nguyen cua post
+			TaiNguyen resources = tnUtil.createResource(fileCode, post);
+			// Thêm tài nguyên vào list tài nguyên của post
 			tnList.add(resources);
-			
+			// Lưu tài nguyên vào DB
 			taiNguyenServ.addTaiNguyen(resources);
 		}
-
-//		postRepo.addPost(post);
+		post.setTaiNguyenList(tnList);
 		postRepo.save(post);
 	}
 	
 
 	@Override
-	public void updatePost(Integer post_id, postRequestDTO postRequestDTO, List<MultipartFile> files,
-			List<Integer> deleteFileIds) throws IOException {
+	public void updatePost(Integer post_id, postRequestDTO postRequestDTO,
+						   List<MultipartFile> files,
+						   List<Integer> deleteFileIds) throws IOException {
 		// TODO Auto-generated method stub
-		Post post = entityManager.find(Post.class, post_id);
+		Post post = postRepo.findById(post_id).orElse(null);
 		
 		if(post != null) {
 			post.setTitle(postRequestDTO.getTitle());
 			post.setContent(postRequestDTO.getContent());
 			post.setCreateAt(new Date(System.currentTimeMillis()));
-			
 			List<TaiNguyen> tnList = post.getTaiNguyenList();
 			
 			//Xử lí file thêm mới
 			if(files != null && !files.isEmpty()) {
 				for(MultipartFile file: files) {
+					// Lưu file và lấy fileCode
 					String fileCode = fileServ.uploadFile(file);
-					
 					// Tạo tài nguyên
-					TaiNguyen resources = new TaiNguyen();
-					resources.setDescription(postRequestDTO.getTitle());
-					resources.setCreate_at(new Date(System.currentTimeMillis()));
-					resources.setFileCode(fileCode);
-					
-					//Them post vao list bai viet cua tai nguyen
-					resources.setPost(post);
-					
-					//Them tai nguyen vao list tai nguyen cua post
+					TaiNguyen resources = tnUtil.createResource(fileCode, post);
+					// Thêm tài nguyên vào list tài nguyên của post
 					tnList.add(resources);
-					
+					// Lưu tài nguyên vào DB
 					taiNguyenServ.addTaiNguyen(resources);
 				}
 			}
 			//Xử lí các file cần xóa
 		    if (deleteFileIds != null) {
 		        for (Integer fileId : deleteFileIds) {
-		        	
-		            TaiNguyen f = entityManager.find(TaiNguyen.class, fileId);
-		            if(f != null) {
-		            	
+		            TaiNguyen tn = entityManager.find(TaiNguyen.class, fileId);
+		            if(tn != null) {
 		            	// Xóa file trên server, xóa tài nguyên khỏi list tài nguyên của bài viết và xóa bản ghi tài nguyên
-		            	fileServ.deleteFile(f.getResourceId());
-			            tnList.remove(f);
-			            entityManager.remove(f);
+		            	fileServ.deleteFile(tn.getResourceId());
+			            tnList.remove(tn);
+			            entityManager.remove(tn);
 		            }
 		        }
 		    }
 		    post.setTaiNguyenList(tnList);
-			entityManager.merge(post);
+			postRepo.save(post);
 		}else {
 			throw new EntityNotFoundException("Post not found with id: " + post_id);
 		}
@@ -200,19 +178,16 @@ public class postServiceImpl implements postService{
 	@Override
 	public void deletePost(Integer post_id) {
 		// TODO Auto-generated method stub
-		Post existedPost = postRepo.findById(post_id).get();
+		Post existedPost = postRepo.findById(post_id).orElse(null);
 		if(existedPost != null) {
 			List<TaiNguyen> tnlist = existedPost.getTaiNguyenList();
+			// Xóa hết các tài nguyên liên quan đến bài viết
 			for(TaiNguyen tn: tnlist) {
 				fileServ.deleteFile(tn.getResourceId());
 			}
-			entityManager.remove(existedPost);
+			postRepo.delete(existedPost);
 		}else {
 			throw new EntityNotFoundException("Post not found with id: " + post_id);
 		}
 	}
-	
-	
-	
-	
 }
