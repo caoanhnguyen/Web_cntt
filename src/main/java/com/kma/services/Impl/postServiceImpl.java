@@ -46,8 +46,6 @@ public class postServiceImpl implements postService{
 	@Autowired
 	postDTOConverter dtoConverter;
 	@Autowired
-	taiNguyenUtil tnUtil;
-	@Autowired
 	EntityManager entityManager;
 
 
@@ -59,7 +57,7 @@ public class postServiceImpl implements postService{
 
 		// Lấy danh sách id của các nhân viên từ tên
 		List<Integer> idUsers = Optional.ofNullable(authorName)
-				.map(nvServ::findByName)
+				.map(nvRepo::findByTenNhanVienContaining)
 				.orElse(Collections.emptyList())
 					.stream()
 					.map(NhanVien::getIdUser)
@@ -102,7 +100,7 @@ public class postServiceImpl implements postService{
 			throw new IllegalArgumentException("Invalid Author ID");
 		}
 		// Kiểm tra xem nhân viên có tồn tại không
-		NhanVien nhanVien = nvRepo.findByID(postRequestDTO.getAuthor_id());
+		NhanVien nhanVien = nvRepo.findById(postRequestDTO.getAuthor_id()).orElse(null);
 		if(nhanVien == null) {
 			throw new IllegalArgumentException("Invalid Author ID");
 		}
@@ -119,7 +117,7 @@ public class postServiceImpl implements postService{
 			// Lưu file và lấy fileCode
 			String fileCode = fileServ.uploadFile(item);
 			// Tạo tài nguyên
-			TaiNguyen resources = tnUtil.createResource(fileCode, post);
+			TaiNguyen resources = taiNguyenUtil.createResource(fileCode, post);
 			// Thêm tài nguyên vào list tài nguyên của post
 			tnList.add(resources);
 			// Lưu tài nguyên vào DB
@@ -149,7 +147,7 @@ public class postServiceImpl implements postService{
 					// Lưu file và lấy fileCode
 					String fileCode = fileServ.uploadFile(file);
 					// Tạo tài nguyên
-					TaiNguyen resources = tnUtil.createResource(fileCode, post);
+					TaiNguyen resources = taiNguyenUtil.createResource(fileCode, post);
 					// Thêm tài nguyên vào list tài nguyên của post
 					tnList.add(resources);
 					// Lưu tài nguyên vào DB

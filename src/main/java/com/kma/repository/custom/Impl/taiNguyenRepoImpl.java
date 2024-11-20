@@ -1,4 +1,4 @@
-package com.kma.repository.Impl;
+package com.kma.repository.custom.Impl;
 
 import org.springframework.stereotype.Repository;
 

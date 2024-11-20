@@ -1,57 +1,55 @@
 package com.kma.services.Impl;
 
+import com.kma.converter.nhanVienDTOConverter;
+import com.kma.models.nhanVienDTO;
+import com.kma.repository.entities.MonHoc;
+import com.kma.repository.entities.NhanVien;
+import com.kma.repository.monHocRepo;
+import com.kma.repository.nhanVienRepo;
+import com.kma.services.nhanVienService;
+import jakarta.transaction.Transactional;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
-import com.kma.converter.nhanVienDTOConverter;
-import com.kma.models.nhanVienDTO;
-import com.kma.models.nhanVienRequestDTO;
-import com.kma.repository.nhanVienRepo;
-import com.kma.repository.entities.NhanVien;
-import com.kma.services.nhanVienService;
-import com.kma.utilities.mapUtil;
-
 @Service
+@Transactional
 public class nhanVienServImpl implements nhanVienService{
 	@Autowired
 	nhanVienRepo nvRepo;
-	
 	@Autowired
-	nhanVienDTOConverter nvDTOConverter;
-	
-	@Override
-	public String getNameByID(int id) {
-		// TODO Auto-generated method stub
-		String name = nvRepo.getNameByID(id);
-		return name;
-	}
+	monHocRepo mhRepo;
 
 	@Override
 	public List<nhanVienDTO> getAllNhanVien(Map<String, Object> params) {
 		// TODO Auto-generated method stub
-		nhanVienRequestDTO nvRequestDTO = new nhanVienRequestDTO();
-		nvRequestDTO.setTenNhanVien(mapUtil.getObject(params, "name", String.class));
-		nvRequestDTO.setTenMonHoc(mapUtil.getObject(params, "ten_mon", String.class));
-		
-		List<NhanVien> nvList = nvRepo.getAllNhanVien(nvRequestDTO);
-		List<nhanVienDTO> nvDTO = new ArrayList<nhanVienDTO>();
-		for(NhanVien nv: nvList) {
-			nhanVienDTO dto = nvDTOConverter.convertToNhanVienDTO(nv);
-			nvDTO.add(dto);
+		// Lấy giá trị từ params
+		String tenNhanVien = (String) params.get("name");
+		String tenMonHoc = (String) params.get("ten_mon");
+		// Tìm môn học theo tên môn
+		MonHoc mh = mhRepo.findByTenMonHocContaining(tenMonHoc);
+		// Tìm kiếm nhân viên theo điều kiện
+		List<NhanVien> nvList;
+		if(tenNhanVien==null){
+			if(mh==null){
+				nvList = nvRepo.findAll();
+			}else{
+				nvList = mh.getNvList();
+			}
+		}else{
+			if(mh==null){
+				nvList = nvRepo.findByTenNhanVienContaining(tenNhanVien);
+			}else{
+				nvList = nvRepo.findByNameAndMonHoc(tenNhanVien, tenMonHoc);
+			}
 		}
-		
-		return nvDTO;
+
+		return nvList.stream()
+					 .map(nhanVienDTOConverter::convertToNhanVienDTO)
+					 .toList();
 	}
-	
-	@Override
-	public List<NhanVien> findByName(String TenNhanVien){
-		// TODO Auto-generated method stub
-		List<NhanVien> nvList = nvRepo.findByName(TenNhanVien);
-		return nvList;
-	}
-	
+
 }

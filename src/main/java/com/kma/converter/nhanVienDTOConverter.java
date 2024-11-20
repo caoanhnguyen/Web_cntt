@@ -1,13 +1,11 @@
 package com.kma.converter;
-import org.springframework.stereotype.Component;
 
 import com.kma.models.nhanVienDTO;
 import com.kma.repository.entities.NhanVien;
 
-@Component
 public class nhanVienDTOConverter {
 
-    public nhanVienDTO convertToNhanVienDTO(NhanVien nv) {
+    public static nhanVienDTO convertToNhanVienDTO(NhanVien nv) {
 		nhanVienDTO dto = new nhanVienDTO();
 		dto.setTenNhanVien(nv.getTenNhanVien());
 		dto.setNgaySinh(nv.getNgaySinh());

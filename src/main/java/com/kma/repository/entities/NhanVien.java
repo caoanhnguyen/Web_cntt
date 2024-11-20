@@ -4,13 +4,7 @@ import java.sql.Date;
 import java.util.ArrayList;
 import java.util.List;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.OneToMany;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 
 @Entity
 @Table(name="nhan_vien")
@@ -19,71 +13,81 @@ public class NhanVien {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer idUser;
 
-    @Column(name = "MaNhanVien")
+    @Column(name = "maNhanVien")
     private String maNhanVien;
 
-    @Column(name = "TenNhanVien")
+    @Column(name = "tenNhanVien")
     private String tenNhanVien;
 
-    @Column(name = "NgaySinh")
+    @Column(name = "ngaySinh")
     private Date ngaySinh;
 
-    @Column(name = "DienThoai")
+    @Column(name = "dienThoai")
     private String dienThoai;
 
-    @Column(name = "HocVi")
+    @Column(name = "hocVi")
     private String hocVi;
 
-    @Column(name = "CCCD")
+    @Column(name = "cccd")
     private String cccd;
 
-    @Column(name = "NgayCapCCCD")
+    @Column(name = "ngayCapCCCD")
     private Date ngayCapCCCD;
 
-    @Column(name = "NoiCapCCCD")
+    @Column(name = "noiCapCCCD")
     private String noiCapCCCD;
 
-    @Column(name = "DiaChiCCCD")
+    @Column(name = "diaChiCCCD")
     private String diaChiCCCD;
 
-    @Column(name = "DiaChiHienNay")
+    @Column(name = "diaChiHienNay")
     private String diaChiHienNay;
 
-    @Column(name = "ChucVu")
+    @Column(name = "chucVu")
     private String chucVu;
 
-    @Column(name = "NoiCongTac")
+    @Column(name = "noiCongTac")
     private String noiCongTac;
 
-    @Column(name = "MaPhongBan")
+    @Column(name = "maPhongBan")
     private String maPhongBan;
 
-    @Column(name = "MaSoThue")
+    @Column(name = "maSoThue")
     private String maSoThue;
 
-    @Column(name = "SoTaiKhoan")
+    @Column(name = "soTaiKhoan")
     private String soTaiKhoan;
 
-    @Column(name = "NganHang")
+    @Column(name = "nganHang")
     private String nganHang;
 
-    @Column(name = "ChiNhanh")
+    @Column(name = "chiNhanh")
     private String chiNhanh;
 
-    @Column(name = "FileLyLich")
+    @Column(name = "fileLyLich")
     private String fileLyLich;
 
-    @Column(name = "MonGiangDayChinh")
+    @Column(name = "monGiangDayChinh")
     private String monGiangDayChinh;
 
-    @Column(name = "CacMonLienQuan")
-    private String cacMonLienQuan;
+    @Column(name = "avaFileCode")
+    private String AvaFileCode;
     
     //Config relation to Post
     @OneToMany(mappedBy = "nhanVien")
 	private List<Post> posts = new ArrayList<>();
-    
-    
+
+	//Config relation to mon_hoc
+	@ManyToMany(mappedBy = "nvList")
+	private List<MonHoc> monHocList;
+
+	public List<MonHoc> getMonHocList() {
+		return monHocList;
+	}
+
+	public void setMonHocList(List<MonHoc> monHocList) {
+		this.monHocList = monHocList;
+	}
 	public List<Post> getPosts() {
 		return posts;
 	}
@@ -210,13 +214,10 @@ public class NhanVien {
 	public void setMonGiangDayChinh(String monGiangDayChinh) {
 		this.monGiangDayChinh = monGiangDayChinh;
 	}
-	public String getCacMonLienQuan() {
-		return cacMonLienQuan;
+	public String getAvaFileCode() {
+		return AvaFileCode;
 	}
-	public void setCacMonLienQuan(String cacMonLienQuan) {
-		this.cacMonLienQuan = cacMonLienQuan;
+	public void setAvaFileCode(String AvaFileCode) {
+		this.AvaFileCode = AvaFileCode;
 	}
-    
-    
-
 }

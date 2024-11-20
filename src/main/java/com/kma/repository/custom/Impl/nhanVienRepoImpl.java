@@ -1,4 +1,4 @@
-package com.kma.repository.Impl;
+package com.kma.repository.custom.Impl;
 
 import java.util.List;
 
@@ -17,25 +17,25 @@ import jakarta.transaction.Transactional;
 @Transactional
 
 @SuppressWarnings("unchecked")
-public class nhanVienRepoImpl implements nhanVienRepo{
+public class nhanVienRepoImpl{
 	
 	@PersistenceContext
 	private EntityManager entityManager;
 	
-	@Override
+//	@Override
 	public String getNameByID(Integer id) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
-	@Override
+//	@Override
 	public NhanVien findByID(Integer id) {
 		// TODO Auto-generated method stub
 		NhanVien nv = entityManager.find(NhanVien.class, id);
 		return nv;
 	}
 
-	@Override
+//	@Override
 	public List<NhanVien> getAllNhanVien(nhanVienRequestDTO nvRequestDTO) {
 		// TODO Auto-generated method stub
 		//SQL Native
@@ -50,7 +50,7 @@ public class nhanVienRepoImpl implements nhanVienRepo{
 		return query.getResultList();
 	}
 
-	@Override
+//	@Override
 	public List<NhanVien> findByName(String TenNhanVien) {
 		// TODO Auto-generated method stub
 		StringBuilder sql = new StringBuilder("SELECT * FROM nhan_vien nv where 1=1 and nv.TenNhanVien like '%" + TenNhanVien + "%'");
