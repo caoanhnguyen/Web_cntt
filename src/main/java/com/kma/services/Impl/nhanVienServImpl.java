@@ -11,7 +11,6 @@ import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -22,6 +21,8 @@ public class nhanVienServImpl implements nhanVienService{
 	nhanVienRepo nvRepo;
 	@Autowired
 	monHocRepo mhRepo;
+	@Autowired
+	nhanVienDTOConverter nvDTOConverter;
 
 	@Override
 	public List<nhanVienDTO> getAllNhanVien(Map<String, Object> params) {
@@ -30,25 +31,27 @@ public class nhanVienServImpl implements nhanVienService{
 		String tenNhanVien = (String) params.get("name");
 		String tenMonHoc = (String) params.get("ten_mon");
 		// Tìm môn học theo tên môn
-		MonHoc mh = mhRepo.findByTenMonHocContaining(tenMonHoc);
+		List<MonHoc> mhList = mhRepo.findByTenMonHocContaining(tenMonHoc);
 		// Tìm kiếm nhân viên theo điều kiện
 		List<NhanVien> nvList;
 		if(tenNhanVien==null){
-			if(mh==null){
+			if(mhList==null || mhList.isEmpty()){
 				nvList = nvRepo.findAll();
 			}else{
-				nvList = mh.getNvList();
+				nvList = mhList.stream() // Duyệt qua từng môn học trong danh sách
+						.flatMap(mh -> mh.getNvList().stream()) // Lấy danh sách nhân viên liên quan đến từng môn học
+						.distinct() // Loại bỏ trùng lặp nhân viên (nếu có nhân viên dạy nhiều môn)
+						.toList(); // Thu thập thành một danh sách
 			}
 		}else{
-			if(mh==null){
+			if(mhList==null){
 				nvList = nvRepo.findByTenNhanVienContaining(tenNhanVien);
 			}else{
 				nvList = nvRepo.findByNameAndMonHoc(tenNhanVien, tenMonHoc);
 			}
 		}
-
 		return nvList.stream()
-					 .map(nhanVienDTOConverter::convertToNhanVienDTO)
+					 .map(nvDTOConverter::convertToNhanVienDTO)
 					 .toList();
 	}
 

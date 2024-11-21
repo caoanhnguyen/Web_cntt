@@ -5,7 +5,9 @@ import java.sql.Date;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import com.kma.constants.fileDirection;
 import com.kma.converter.postDTOConverter;
+import com.kma.repository.taiNguyenRepo;
 import com.kma.utilities.taiNguyenUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -21,9 +23,7 @@ import com.kma.repository.entities.NhanVien;
 import com.kma.repository.entities.Post;
 import com.kma.repository.entities.TaiNguyen;
 import com.kma.services.fileService;
-import com.kma.services.nhanVienService;
 import com.kma.services.postService;
-import com.kma.services.taiNguyenService;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityNotFoundException;
@@ -32,17 +32,14 @@ import jakarta.transaction.Transactional;
 @Service
 @Transactional
 public class postServiceImpl implements postService{
-
 	@Autowired
 	postRepo postRepo;
 	@Autowired
 	nhanVienRepo nvRepo;
 	@Autowired
-	nhanVienService nvServ;
-	@Autowired
 	fileService fileServ;
 	@Autowired
-	taiNguyenService taiNguyenServ;
+	taiNguyenRepo taiNguyenRepo;
 	@Autowired
 	postDTOConverter dtoConverter;
 	@Autowired
@@ -69,7 +66,7 @@ public class postServiceImpl implements postService{
 		if (idUsers.isEmpty()) {
 			// Không có author_name, chỉ tìm theo title hoặc lấy tất cả nếu title null
 			if (title == null) {
-				posts = postRepo.findAll(); // Lấy toàn bộ bài viết
+				posts = postRepo.findAllByOrderByPostIdDesc(); // Lấy toàn bộ bài viết
 			} else {
 				posts = postRepo.findByTitleContaining(title); // Tìm bài viết theo title
 			}
@@ -115,13 +112,13 @@ public class postServiceImpl implements postService{
 		// Upload file và lấy đường dẫn
 		for (MultipartFile item: files) {
 			// Lưu file và lấy fileCode
-			String fileCode = fileServ.uploadFile(item);
+			String fileCode = fileServ.uploadFile(item, fileDirection.pathForTaiNguyen);
 			// Tạo tài nguyên
 			TaiNguyen resources = taiNguyenUtil.createResource(fileCode, post);
 			// Thêm tài nguyên vào list tài nguyên của post
 			tnList.add(resources);
 			// Lưu tài nguyên vào DB
-			taiNguyenServ.addTaiNguyen(resources);
+			taiNguyenRepo.save(resources);
 		}
 		post.setTaiNguyenList(tnList);
 		postRepo.save(post);
@@ -145,24 +142,24 @@ public class postServiceImpl implements postService{
 			if(files != null && !files.isEmpty()) {
 				for(MultipartFile file: files) {
 					// Lưu file và lấy fileCode
-					String fileCode = fileServ.uploadFile(file);
+					String fileCode = fileServ.uploadFile(file, fileDirection.pathForTaiNguyen);
 					// Tạo tài nguyên
 					TaiNguyen resources = taiNguyenUtil.createResource(fileCode, post);
 					// Thêm tài nguyên vào list tài nguyên của post
 					tnList.add(resources);
 					// Lưu tài nguyên vào DB
-					taiNguyenServ.addTaiNguyen(resources);
+					taiNguyenRepo.save(resources);
 				}
 			}
 			//Xử lí các file cần xóa
 		    if (deleteFileIds != null) {
 		        for (Integer fileId : deleteFileIds) {
-		            TaiNguyen tn = entityManager.find(TaiNguyen.class, fileId);
+		            TaiNguyen tn = taiNguyenRepo.findById(fileId).orElse(null);
 		            if(tn != null) {
 		            	// Xóa file trên server, xóa tài nguyên khỏi list tài nguyên của bài viết và xóa bản ghi tài nguyên
 		            	fileServ.deleteFile(tn.getResourceId());
 			            tnList.remove(tn);
-			            entityManager.remove(tn);
+			            taiNguyenRepo.delete(tn);
 		            }
 		        }
 		    }

@@ -6,7 +6,12 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
+import com.kma.constants.fileDirection;
+import com.kma.repository.entities.TaiLieuMonHoc;
+import com.kma.repository.taiLieuMonHocRepo;
+import com.kma.repository.taiNguyenRepo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
@@ -17,22 +22,22 @@ import com.kma.repository.entities.TaiNguyen;
 import com.kma.services.fileService;
 import com.kma.utilities.fileUploadUtil;
 
-import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityNotFoundException;
 
 @Service
 public class fileServImpl implements fileService{
 	
 	@Autowired
-	EntityManager entityManager;
+	taiNguyenRepo tnRepo;
+	@Autowired
+	taiLieuMonHocRepo tlmhRepo;
 
 	@Override
-	public String uploadFile(MultipartFile multipartFile) throws IOException {
+	public String uploadFile(MultipartFile multipartFile, String fileDirec) throws IOException {
 		// TODO Auto-generated method stub
-		String fileName = StringUtils.cleanPath(multipartFile.getOriginalFilename());
-        String filecode = fileUploadUtil.saveFile(fileName, multipartFile);
-             
-        return filecode;
+		String fileName = StringUtils.cleanPath(Objects.requireNonNull(multipartFile.getOriginalFilename()));
+
+        return fileUploadUtil.saveFile(fileName, multipartFile, fileDirec);
 	}
 
 	@Override
@@ -50,14 +55,31 @@ public class fileServImpl implements fileService{
 			
 			fileDTO.add(fdto);
 		}
+		return fileDTO;
+	}
 
+	@Override
+	public List<fileDTO> getListFileDTOByTL(List<TaiLieuMonHoc> taiLieuMonHocList) {
+		// TODO Auto-generated method stub
+		List<fileDTO> fileDTO = new ArrayList<>();
+
+		for(TaiLieuMonHoc tn: taiLieuMonHocList) {
+			Integer id = tn.getDocId();
+			String downloadUrl = "/downloadDocs/" + tn.getFileCode();
+
+			fileDTO fdto = new fileDTO();
+			fdto.setId(id);
+			fdto.setDownloadUrl(downloadUrl);
+
+			fileDTO.add(fdto);
+		}
 		return fileDTO;
 	}
 
 	@Override
 	public void deleteFile(Integer resources_id) {
 		// TODO Auto-generated method stub
-		TaiNguyen tn = entityManager.find(TaiNguyen.class, resources_id);
+		TaiNguyen tn = tnRepo.findById(resources_id).orElse(null);
 		if(tn==null) {
 			throw new EntityNotFoundException("File not found!");
 		}
@@ -76,7 +98,27 @@ public class fileServImpl implements fileService{
 	        throw new RuntimeException("Error accessing files directory", e);
 	    }
 	}
-	
-	
 
+	@Override
+	public void deleteDoc(Integer docId) {
+		// TODO Auto-generated method stub
+		TaiLieuMonHoc tn = tlmhRepo.findById(docId).orElse(null);
+		if(tn==null) {
+			throw new EntityNotFoundException("Document not found!");
+		}
+		try {
+			Path dirPath = Paths.get(fileDirection.pathForTaiLieuMonHoc);
+			Files.list(dirPath).forEach(file -> {
+				if (file.getFileName().toString().startsWith(tn.getFileCode())) {
+					try {
+						Files.deleteIfExists(file);
+					} catch (IOException e) {
+						throw new RuntimeException("Failed to delete document: " + file.getFileName(), e);
+					}
+				}
+			});
+		} catch (IOException e) {
+			throw new RuntimeException("Error accessing docs directory", e);
+		}
+	}
 }

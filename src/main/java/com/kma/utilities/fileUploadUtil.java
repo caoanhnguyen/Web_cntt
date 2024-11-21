@@ -11,11 +11,10 @@ import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.web.multipart.MultipartFile;
  
 public class fileUploadUtil {
-//	public static final String savedFilePath = "Files-Upload";
 	
-    public static String saveFile(String fileName, MultipartFile multipartFile) throws IOException {
+    public static String saveFile(String fileName, MultipartFile multipartFile, String fileDirec) throws IOException {
     	
-        Path uploadPath = Paths.get("Files-Upload");
+        Path uploadPath = Paths.get(fileDirec);
           
         if (!Files.exists(uploadPath)) {
             Files.createDirectories(uploadPath);

@@ -2,7 +2,6 @@ package com.kma.utilities;
 
 import com.kma.repository.entities.Post;
 import com.kma.repository.entities.TaiNguyen;
-import org.springframework.stereotype.Component;
 import java.sql.Date;
 
 public class taiNguyenUtil {

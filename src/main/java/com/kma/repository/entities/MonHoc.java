@@ -19,7 +19,7 @@ public class MonHoc {
     private String moTa;
 
     @Column(name = "soTinChi")
-    private String soTinChi;
+    private Integer soTinChi;
 
     //Config relation to mon_hoc
     @OneToMany(mappedBy = "monHoc", cascade = CascadeType.REMOVE)
@@ -50,11 +50,11 @@ public class MonHoc {
         this.taiLieuMHList = taiLieuMHList;
     }
 
-    public String getSoTinChi() {
+    public Integer getSoTinChi() {
         return soTinChi;
     }
 
-    public void setSoTinChi(String soTinChi) {
+    public void setSoTinChi(Integer soTinChi) {
         this.soTinChi = soTinChi;
     }
 

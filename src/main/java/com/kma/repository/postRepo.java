@@ -11,4 +11,6 @@ public interface postRepo extends JpaRepository<Post, Integer>, postRepoCustom {
     List<Post> findByTitleContaining(String title);
 
     List<Post> findByNhanVien_idUser(Integer idUser);
+
+    List<Post> findAllByOrderByPostIdDesc();
 }

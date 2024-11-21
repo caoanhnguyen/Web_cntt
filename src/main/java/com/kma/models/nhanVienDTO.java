@@ -1,63 +1,90 @@
 package com.kma.models;
 
+import com.kma.repository.entities.MonHoc;
+
 import java.sql.Date;
+import java.util.List;
 
 public class nhanVienDTO {
-	private String TenNhanVien;
-	private Date NgaySinh;
-	private String SDT;
+	private String tenNhanVien;
+	private Date ngaySinh;
+	private String sdt;
 	private String diaChi;
-	private String PhongBan;
-	private String ChucVu;
-	private String CacMonLienQuan;
-	private String ava_img_code;
-	
+	private String phongBan;
+	private String chucVu;
+	private String monGiangDayChinh;
+	private List<monHocResponseDTO> cacMonLienQuan;
+	private String avaFileCode;
+
 	public String getTenNhanVien() {
-		return TenNhanVien;
+		return tenNhanVien;
 	}
+
 	public void setTenNhanVien(String tenNhanVien) {
-		TenNhanVien = tenNhanVien;
+		this.tenNhanVien = tenNhanVien;
 	}
+
 	public Date getNgaySinh() {
-		return NgaySinh;
+		return ngaySinh;
 	}
+
 	public void setNgaySinh(Date ngaySinh) {
-		NgaySinh = ngaySinh;
+		this.ngaySinh = ngaySinh;
 	}
-	public String getSDT() {
-		return SDT;
+
+	public String getSdt() {
+		return sdt;
 	}
-	public void setSDT(String sDT) {
-		SDT = sDT;
+
+	public void setSdt(String sdt) {
+		this.sdt = sdt;
 	}
+
 	public String getDiaChi() {
 		return diaChi;
 	}
+
 	public void setDiaChi(String diaChi) {
 		this.diaChi = diaChi;
 	}
+
 	public String getPhongBan() {
-		return PhongBan;
+		return phongBan;
 	}
+
 	public void setPhongBan(String phongBan) {
-		PhongBan = phongBan;
+		this.phongBan = phongBan;
 	}
+
 	public String getChucVu() {
-		return ChucVu;
+		return chucVu;
 	}
+
 	public void setChucVu(String chucVu) {
-		ChucVu = chucVu;
+		this.chucVu = chucVu;
 	}
-	public String getCacMonLienQuan() {
-		return CacMonLienQuan;
+
+	public String getMonGiangDayChinh() {
+		return monGiangDayChinh;
 	}
-	public void setCacMonLienQuan(String cacMonLienQuan) {
-		CacMonLienQuan = cacMonLienQuan;
+
+	public void setMonGiangDayChinh(String monGiangDayChinh) {
+		this.monGiangDayChinh = monGiangDayChinh;
 	}
-	public String getAva_img_code() {
-		return ava_img_code;
+
+	public List<monHocResponseDTO> getCacMonLienQuan() {
+		return cacMonLienQuan;
 	}
-	public void setAva_img_code(String ava_img_code) {
-		this.ava_img_code = ava_img_code;
+
+	public void setCacMonLienQuan(List<monHocResponseDTO> cacMonLienQuan) {
+		this.cacMonLienQuan = cacMonLienQuan;
+	}
+
+	public String getAvaFileCode() {
+		return avaFileCode;
+	}
+
+	public void setAvaFileCode(String avaFileCode) {
+		this.avaFileCode = avaFileCode;
 	}
 }

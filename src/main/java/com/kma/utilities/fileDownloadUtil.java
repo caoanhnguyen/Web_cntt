@@ -10,8 +10,8 @@ import org.springframework.core.io.UrlResource;
 public class fileDownloadUtil {
     private Path foundFile;
      
-    public Resource getFileAsResource(String fileCode) throws IOException {
-        Path dirPath = Paths.get("Files-Upload");
+    public Resource getFileAsResource(String fileCode, String fileDirec) throws IOException {
+        Path dirPath = Paths.get(fileDirec);
          
         Files.list(dirPath).forEach(file -> {
             if (file.getFileName().toString().startsWith(fileCode)) {

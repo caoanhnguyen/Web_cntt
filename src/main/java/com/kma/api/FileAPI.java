@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.Objects;
 
+import com.kma.constants.fileDirection;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -20,18 +21,29 @@ import com.kma.utilities.fileDownloadUtil;
 public class FileAPI {
 	@GetMapping("/downloadFile/{fileCode}")
 	public ResponseEntity<?> downloadFile(@PathVariable("fileCode") String fileCode) {
-	    fileDownloadUtil downloadUtil = new fileDownloadUtil();
-	    
-	    Resource resource = null;
-	    try {
-	        resource = downloadUtil.getFileAsResource(fileCode);
-	    } catch (IOException e) {
-	        return ResponseEntity.internalServerError().build();
-	    }
+	    String path = fileDirection.pathForTaiNguyen;
+		return getFileResponse(fileCode, path);
+	}
 
-	    if (resource == null) {
-	        return new ResponseEntity<>("File not found", HttpStatus.NOT_FOUND);
-	    }else{
+	@GetMapping("/downloadDocs/{fileCode}")
+	public ResponseEntity<?> downloadDocs(@PathVariable("fileCode") String fileCode) {
+		String path = fileDirection.pathForTaiLieuMonHoc;
+		return getFileResponse(fileCode, path);
+	}
+
+	private ResponseEntity<?> getFileResponse(String fileCode, String path){
+		fileDownloadUtil downloadUtil = new fileDownloadUtil();
+
+		Resource resource = null;
+		try {
+			resource = downloadUtil.getFileAsResource(fileCode, path);
+		} catch (IOException e) {
+			return ResponseEntity.internalServerError().build();
+		}
+
+		if (resource == null) {
+			return new ResponseEntity<>("File not found", HttpStatus.NOT_FOUND);
+		}else{
 			String contentType = getContentType(Objects.requireNonNull(resource.getFilename())); // Hàm lấy MIME type từ file
 			String encodedFileName = new String(resource.getFilename().getBytes(StandardCharsets.UTF_8), StandardCharsets.ISO_8859_1);
 			String headerValue = "attachment; filename=\"" + encodedFileName + "\"";
