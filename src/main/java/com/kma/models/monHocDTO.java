@@ -8,6 +8,7 @@ public class monHocDTO {
     private String moTa;
     private Integer soTinChi;
     private List<fileDTO> taiLieuMHList;
+    private List<nhanVienResponseDTO> nvList;
 
     public Integer getIdMonHoc() {
         return idMonHoc;
@@ -47,5 +48,13 @@ public class monHocDTO {
 
     public void setTaiLieuMHList(List<fileDTO> taiLieuMHList) {
         this.taiLieuMHList = taiLieuMHList;
+    }
+
+    public List<nhanVienResponseDTO> getNvList() {
+        return nvList;
+    }
+
+    public void setNvList(List<nhanVienResponseDTO> nvList) {
+        this.nvList = nvList;
     }
 }

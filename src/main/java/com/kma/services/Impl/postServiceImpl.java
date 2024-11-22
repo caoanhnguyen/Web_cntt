@@ -157,7 +157,7 @@ public class postServiceImpl implements postService{
 		            TaiNguyen tn = taiNguyenRepo.findById(fileId).orElse(null);
 		            if(tn != null) {
 		            	// Xóa file trên server, xóa tài nguyên khỏi list tài nguyên của bài viết và xóa bản ghi tài nguyên
-		            	fileServ.deleteFile(tn.getResourceId());
+		            	fileServ.deleteFile(tn.getResourceId(), 1);
 			            tnList.remove(tn);
 			            taiNguyenRepo.delete(tn);
 		            }
@@ -178,7 +178,7 @@ public class postServiceImpl implements postService{
 			List<TaiNguyen> tnlist = existedPost.getTaiNguyenList();
 			// Xóa hết các tài nguyên liên quan đến bài viết
 			for(TaiNguyen tn: tnlist) {
-				fileServ.deleteFile(tn.getResourceId());
+				fileServ.deleteFile(tn.getResourceId(), 1);
 			}
 			postRepo.delete(existedPost);
 		}else {

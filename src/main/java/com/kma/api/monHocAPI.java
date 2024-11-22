@@ -55,7 +55,14 @@ public class monHocAPI {
             monHocServ.addMonHoc(files, mhDTO);
             return ResponseEntity.ok("Add successful!");
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An error occurred.");
+            // TODO: handle exception
+            errorResponseDTO errorDTO = new errorResponseDTO();
+            errorDTO.setError(e.getMessage());
+            List<String> details = new ArrayList<>();
+            details.add("An error occurred!");
+            errorDTO.setDetails(details);
+
+            return new ResponseEntity<>(errorDTO, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 

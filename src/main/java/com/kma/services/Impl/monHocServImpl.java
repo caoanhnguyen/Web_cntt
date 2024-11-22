@@ -116,7 +116,7 @@ public class monHocServImpl implements monHocService {
                     TaiLieuMonHoc tlmh = tlmhRepo.findById(fileId).orElse(null);
                     if(tlmh != null) {
                         // Xóa file trên server, xóa tài nguyên khỏi list tài nguyên của bài viết và xóa bản ghi tài nguyên
-                        fileServ.deleteDoc(tlmh.getDocId());
+                        fileServ.deleteFile(tlmh.getDocId(), 2);
                         tnList.remove(tlmh);
                         tlmhRepo.delete(tlmh);
                     }
@@ -137,7 +137,7 @@ public class monHocServImpl implements monHocService {
             List<TaiLieuMonHoc> tnlist = existedMonHoc.getTaiLieuMHList();
             // Xóa hết các tài nguyên liên quan đến bài viết
             for(TaiLieuMonHoc tn: tnlist) {
-                fileServ.deleteDoc(tn.getDocId());
+                fileServ.deleteFile(tn.getDocId(), 2);
             }
             mhRepo.delete(existedMonHoc);
         }else {

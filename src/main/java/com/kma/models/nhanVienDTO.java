@@ -6,6 +6,7 @@ import java.sql.Date;
 import java.util.List;
 
 public class nhanVienDTO {
+	private Integer idUser;
 	private String tenNhanVien;
 	private Date ngaySinh;
 	private String sdt;
@@ -15,6 +16,14 @@ public class nhanVienDTO {
 	private String monGiangDayChinh;
 	private List<monHocResponseDTO> cacMonLienQuan;
 	private String avaFileCode;
+
+	public Integer getIdUser() {
+		return idUser;
+	}
+
+	public void setIdUser(Integer idUser) {
+		this.idUser = idUser;
+	}
 
 	public String getTenNhanVien() {
 		return tenNhanVien;

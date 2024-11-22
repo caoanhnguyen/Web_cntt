@@ -76,49 +76,101 @@ public class fileServImpl implements fileService{
 		return fileDTO;
 	}
 
+//	@Override
+//	public void deleteFile(Integer resources_id) {
+//		// TODO Auto-generated method stub
+//		TaiNguyen tn = tnRepo.findById(resources_id).orElse(null);
+//		if(tn==null) {
+//			throw new EntityNotFoundException("File not found!");
+//		}
+//		try {
+//	        Path dirPath = Paths.get(fileDirection.pathForTaiNguyen);
+//	        Files.list(dirPath).forEach(file -> {
+//	            if (file.getFileName().toString().startsWith(tn.getFileCode())) {
+//	                try {
+//	                    Files.deleteIfExists(file);
+//	                } catch (IOException e) {
+//	                    throw new RuntimeException("Failed to delete file: " + file.getFileName(), e);
+//	                }
+//	            }
+//	        });
+//	    } catch (IOException e) {
+//	        throw new RuntimeException("Error accessing files directory", e);
+//	    }
+//	}
+//
+//	@Override
+//	public void deleteDoc(Integer docId) {
+//		// TODO Auto-generated method stub
+//		TaiLieuMonHoc tn = tlmhRepo.findById(docId).orElse(null);
+//		if(tn==null) {
+//			throw new EntityNotFoundException("Document not found!");
+//		}
+//		try {
+//			Path dirPath = Paths.get(fileDirection.pathForTaiLieuMonHoc);
+//			Files.list(dirPath).forEach(file -> {
+//				if (file.getFileName().toString().startsWith(tn.getFileCode())) {
+//					try {
+//						Files.deleteIfExists(file);
+//					} catch (IOException e) {
+//						throw new RuntimeException("Failed to delete document: " + file.getFileName(), e);
+//					}
+//				}
+//			});
+//		} catch (IOException e) {
+//			throw new RuntimeException("Error accessing docs directory", e);
+//		}
+//	}
 	@Override
-	public void deleteFile(Integer resources_id) {
-		// TODO Auto-generated method stub
-		TaiNguyen tn = tnRepo.findById(resources_id).orElse(null);
-		if(tn==null) {
+	public void deleteFile(Integer fileId, Integer fType) {
+		// Lấy entity và xác định đường dẫn
+		Object entity;
+		String directoryPath = switch (fType) {
+            case 1 -> {
+                entity = tnRepo.findById(fileId).orElse(null);
+                yield fileDirection.pathForTaiNguyen; // Loại tài nguyên
+            }
+            case 2 -> {
+                entity = tlmhRepo.findById(fileId).orElse(null);
+                yield fileDirection.pathForTaiLieuMonHoc; // Loại tài liệu môn học
+            }
+            default -> throw new IllegalArgumentException("Invalid file type!");
+        };
+
+        // Kiểm tra nếu không tìm thấy entity
+		if (entity == null) {
 			throw new EntityNotFoundException("File not found!");
 		}
-		try {
-	        Path dirPath = Paths.get("Files-Upload");
-	        Files.list(dirPath).forEach(file -> {
-	            if (file.getFileName().toString().startsWith(tn.getFileCode())) {
-	                try {
-	                    Files.deleteIfExists(file);
-	                } catch (IOException e) {
-	                    throw new RuntimeException("Failed to delete file: " + file.getFileName(), e);
-	                }
-	            }
-	        });
-	    } catch (IOException e) {
-	        throw new RuntimeException("Error accessing files directory", e);
-	    }
+
+		// Lấy fileCode từ entity
+		String fileCode;
+		if (entity instanceof TaiNguyen) {
+			fileCode = ((TaiNguyen) entity).getFileCode();
+		} else if (entity instanceof TaiLieuMonHoc) {
+			fileCode = ((TaiLieuMonHoc) entity).getFileCode();
+		} else {
+			throw new IllegalStateException("Unexpected entity type!");
+		}
+
+		deleteFromDisk(fileCode, directoryPath);
 	}
 
-	@Override
-	public void deleteDoc(Integer docId) {
-		// TODO Auto-generated method stub
-		TaiLieuMonHoc tn = tlmhRepo.findById(docId).orElse(null);
-		if(tn==null) {
-			throw new EntityNotFoundException("Document not found!");
-		}
+	private void deleteFromDisk(String fileCode, String fileDirec){
+		// Xóa file
 		try {
-			Path dirPath = Paths.get(fileDirection.pathForTaiLieuMonHoc);
+			Path dirPath = Paths.get(fileDirec);
 			Files.list(dirPath).forEach(file -> {
-				if (file.getFileName().toString().startsWith(tn.getFileCode())) {
+				if (file.getFileName().toString().startsWith(fileCode)) {
 					try {
 						Files.deleteIfExists(file);
 					} catch (IOException e) {
-						throw new RuntimeException("Failed to delete document: " + file.getFileName(), e);
+						throw new RuntimeException("Failed to delete file: " + file.getFileName(), e);
 					}
 				}
 			});
 		} catch (IOException e) {
-			throw new RuntimeException("Error accessing docs directory", e);
+			throw new RuntimeException("Error accessing files directory", e);
 		}
 	}
+
 }

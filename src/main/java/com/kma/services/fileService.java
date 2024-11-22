@@ -17,7 +17,5 @@ public interface fileService {
 
 	List<fileDTO> getListFileDTOByTL(List<TaiLieuMonHoc> taiLieuMonHocList);
 	
-	void deleteFile(Integer resources_id);
-
-	void deleteDoc(Integer docId);
+	void deleteFile(Integer fileId, Integer fType);
 }
