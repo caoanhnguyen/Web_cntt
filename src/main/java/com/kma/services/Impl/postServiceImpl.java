@@ -12,8 +12,6 @@ import com.kma.repository.taiNguyenRepo;
 import com.kma.utilities.taiNguyenUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.kma.models.postDTO;
@@ -101,8 +99,8 @@ public class postServiceImpl implements postService{
 	}
 
 	@Override
-	public void addPost(@RequestParam(value = "file", required = false) List<MultipartFile> files,
-						@ModelAttribute postRequestDTO postRequestDTO) throws IOException {
+	public void addPost(List<MultipartFile> files,
+						postRequestDTO postRequestDTO) throws IOException {
 		
 		// Kiểm tra tính hợp lệ của author_id
 		if(postRequestDTO.getAuthor_id() == null) {
@@ -121,16 +119,18 @@ public class postServiceImpl implements postService{
 		post.setNhanVien(nhanVien);
 		List<TaiNguyen> tnList = post.getTaiNguyenList();
 		
-		// Upload file và lấy đường dẫn
-		for (MultipartFile item: files) {
-			// Lưu file và lấy fileCode
-			String fileCode = fileServ.uploadFile(item, fileDirection.pathForTaiNguyen);
-			// Tạo tài nguyên
-			TaiNguyen resources = taiNguyenUtil.createResource(fileCode, post);
-			// Thêm tài nguyên vào list tài nguyên của post
-			tnList.add(resources);
-			// Lưu tài nguyên vào DB
-			taiNguyenRepo.save(resources);
+		// Upload file và lấy đường dẫn nếu cần
+		if(files!=null){
+			for (MultipartFile item: files) {
+				// Lưu file và lấy fileCode
+				String fileCode = fileServ.uploadFile(item, fileDirection.pathForTaiNguyen);
+				// Tạo tài nguyên
+				TaiNguyen resources = taiNguyenUtil.createResource(fileCode, post);
+				// Thêm tài nguyên vào list tài nguyên của post
+				tnList.add(resources);
+				// Lưu tài nguyên vào DB
+				taiNguyenRepo.save(resources);
+			}
 		}
 		post.setTaiNguyenList(tnList);
 		postRepo.save(post);

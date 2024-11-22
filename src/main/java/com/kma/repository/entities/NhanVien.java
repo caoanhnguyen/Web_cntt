@@ -81,6 +81,18 @@ public class NhanVien {
 	@ManyToMany(mappedBy = "nvList")
 	private List<MonHoc> monHocList;
 
+	//Config relation to lop
+	@OneToMany(mappedBy = "chuNhiem", cascade = CascadeType.REMOVE)
+	private List<Lop> lopList = new ArrayList<>();
+
+	public List<Lop> getLopList() {
+		return lopList;
+	}
+
+	public void setLopList(List<Lop> lopList) {
+		this.lopList = lopList;
+	}
+
 	public List<MonHoc> getMonHocList() {
 		return monHocList;
 	}

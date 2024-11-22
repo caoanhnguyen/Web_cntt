@@ -5,9 +5,6 @@ import java.util.List;
 import java.util.Map;
 
 import com.kma.models.postResponseDTO;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.kma.models.postDTO;
@@ -20,13 +17,13 @@ public interface postService {
 
 	List<postDTO> getLatestPosts();
 	
-	void addPost(@RequestParam(value = "file", required = false) List<MultipartFile> files,
-			@ModelAttribute postRequestDTO postRequestDTO) throws IOException;
+	void addPost(List<MultipartFile> files,
+				 postRequestDTO postRequestDTO) throws IOException;
 	
-	void updatePost(@PathVariable Integer post_id, 
-					@ModelAttribute postRequestDTO postRequestDTO,
-					@RequestParam(value = "files", required = false) List<MultipartFile> files,
-		            @RequestParam(value = "deleteFiles", required = false) List<Integer> deleteFileIds) throws IOException;
+	void updatePost(Integer post_id,
+					postRequestDTO postRequestDTO,
+					List<MultipartFile> files,
+		            List<Integer> deleteFileIds) throws IOException;
 	
 	void deletePost(Integer post_id);
 }

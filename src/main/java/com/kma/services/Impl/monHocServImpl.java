@@ -75,16 +75,18 @@ public class monHocServImpl implements monHocService {
         // Tạo môn học để lưu
         MonHoc monHoc = modelMapper.map(mhDTO, MonHoc.class);
         List<TaiLieuMonHoc> taiLieuMonHocList = new ArrayList<>();
-        // Upload file và lấy đường dẫn
-        for (MultipartFile item: files) {
-            // Lưu file và lấy fileCode
-            String fileCode = fileServ.uploadFile(item, fileDirection.pathForTaiLieuMonHoc);
-            // Tạo tài liệu môn học
-            TaiLieuMonHoc tlmh = taiLieuMHUtil.createDoc(fileCode, monHoc);
-            // Thêm tài liệu vào list tài liệu của môn học
-            taiLieuMonHocList.add(tlmh);
-            // Lưu tài liệu vào DB
-            tlmhRepo.save(tlmh);
+        // Upload file và lấy đường dẫn nếu có
+        if(files!=null){
+            for (MultipartFile item: files) {
+                // Lưu file và lấy fileCode
+                String fileCode = fileServ.uploadFile(item, fileDirection.pathForTaiLieuMonHoc);
+                // Tạo tài liệu môn học
+                TaiLieuMonHoc tlmh = taiLieuMHUtil.createDoc(fileCode, monHoc);
+                // Thêm tài liệu vào list tài liệu của môn học
+                taiLieuMonHocList.add(tlmh);
+                // Lưu tài liệu vào DB
+                tlmhRepo.save(tlmh);
+            }
         }
         monHoc.setTaiLieuMHList(taiLieuMonHocList);
         mhRepo.save(monHoc);
