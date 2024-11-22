@@ -7,6 +7,7 @@ import java.util.stream.Collectors;
 
 import com.kma.constants.fileDirection;
 import com.kma.converter.postDTOConverter;
+import com.kma.models.postResponseDTO;
 import com.kma.repository.taiNguyenRepo;
 import com.kma.utilities.taiNguyenUtil;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -49,7 +50,7 @@ public class postServiceImpl implements postService{
 	}
 
 	@Override
-	public List<postDTO> getAllPost(Map<String,Object> params) {
+	public List<postResponseDTO> getAllPost(Map<String,Object> params) {
 		// Lấy giá trị từ params
 		String title = (String) params.get("title");
 		String authorName = (String) params.get("author_name");
@@ -86,7 +87,7 @@ public class postServiceImpl implements postService{
 		}
 
 		return posts.stream()
-				.map(i->dtoConverter.convertToPostDTO(i))
+				.map(i->dtoConverter.convertToPostResDTO(i))
 				.collect(Collectors.toList());
 	}
 

@@ -2,6 +2,8 @@ package com.kma.converter;
 
 import com.kma.models.fileDTO;
 import com.kma.models.postDTO;
+import com.kma.models.postResponseDTO;
+import com.kma.repository.entities.NhanVien;
 import com.kma.repository.entities.Post;
 import com.kma.repository.entities.TaiNguyen;
 import com.kma.services.fileService;
@@ -29,5 +31,13 @@ public class postDTOConverter {
         dto.setAuthor(items.getNhanVien().getTenNhanVien());
 
         return dto;
+    }
+
+    public postResponseDTO convertToPostResDTO(Post item){
+        postResponseDTO postResDTO = modelMapper.map(item, postResponseDTO.class);
+        String authorName = item.getNhanVien().getTenNhanVien();
+
+        postResDTO.setAuthorName(authorName);
+        return postResDTO;
     }
 }

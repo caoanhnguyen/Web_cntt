@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import com.kma.models.postResponseDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -51,7 +52,7 @@ public class PostAPI {
 	@GetMapping(value="/api/posts")
 	public ResponseEntity<Object> getAllPost(@RequestParam Map<String,Object> params){
 		try {
-			List<postDTO> DTO = postServ.getAllPost(params);
+			List<postResponseDTO> DTO = postServ.getAllPost(params);
 			return new ResponseEntity<>(DTO, HttpStatus.OK);
 		} catch (Exception e) {
 			// TODO: handle exception

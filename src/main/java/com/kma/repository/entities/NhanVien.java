@@ -74,7 +74,7 @@ public class NhanVien {
     private String AvaFileCode;
     
     //Config relation to Post
-    @OneToMany(mappedBy = "nhanVien")
+    @OneToMany(mappedBy = "nhanVien", cascade = CascadeType.REMOVE)
 	private List<Post> posts = new ArrayList<>();
 
 	//Config relation to mon_hoc

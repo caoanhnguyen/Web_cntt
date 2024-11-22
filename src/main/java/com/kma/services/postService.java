@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
+import com.kma.models.postResponseDTO;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -15,7 +16,7 @@ import com.kma.models.postRequestDTO;
 public interface postService {
 	postDTO getById(Integer post_id);
 
-	List<postDTO> getAllPost(Map<String,Object> params);
+	List<postResponseDTO> getAllPost(Map<String,Object> params);
 
 	List<postDTO> getLatestPosts();
 	

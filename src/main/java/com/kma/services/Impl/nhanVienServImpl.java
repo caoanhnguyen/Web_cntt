@@ -7,6 +7,7 @@ import com.kma.repository.entities.NhanVien;
 import com.kma.repository.monHocRepo;
 import com.kma.repository.nhanVienRepo;
 import com.kma.services.nhanVienService;
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -61,4 +62,16 @@ public class nhanVienServImpl implements nhanVienService{
 					 .toList();
 	}
 
+
+
+	@Override
+	public void deleteNhanVien(Integer idUser) {
+		// TODO Auto-generated method stub
+		NhanVien existedNV = nvRepo.findById(idUser).orElse(null);
+		if(existedNV != null) {
+			nvRepo.delete(existedNV);
+		}else {
+			throw new EntityNotFoundException("User not found with id: " + idUser);
+		}
+	}
 }
