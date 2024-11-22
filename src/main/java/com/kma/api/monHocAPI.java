@@ -2,7 +2,6 @@ package com.kma.api;
 
 import com.kma.models.errorResponseDTO;
 import com.kma.models.monHocDTO;
-import com.kma.models.postRequestDTO;
 import com.kma.services.monHocService;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,6 +20,23 @@ public class monHocAPI {
 
     @Autowired
     monHocService monHocServ;
+
+    @GetMapping(value = "/api/monhoc/{idUser}")
+    public ResponseEntity<Object> getById(@PathVariable Integer idUser){
+        try {
+            monHocDTO DTO = monHocServ.getById(idUser);
+            return new ResponseEntity<>(DTO, HttpStatus.OK);
+        } catch (Exception e) {
+            // TODO: handle exception
+            errorResponseDTO errorDTO = new errorResponseDTO();
+            errorDTO.setError(e.getMessage());
+            List<String> details = new ArrayList<>();
+            details.add("An error occurred!");
+            errorDTO.setDetails(details);
+
+            return new ResponseEntity<>(errorDTO, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
 
     @GetMapping(value = "/api/monhoc")
     public ResponseEntity<Object> getAllMonHoc(@RequestParam Map<Object,Object> params){
@@ -50,7 +66,7 @@ public class monHocAPI {
 
     @PostMapping(value = "/api/monhoc")
     public ResponseEntity<Object> addMonHoc(@RequestParam(value = "file", required = false) List<MultipartFile> files,
-                                          @ModelAttribute monHocDTO mhDTO) throws IOException {
+                                            @ModelAttribute monHocDTO mhDTO) throws IOException {
         try {
             monHocServ.addMonHoc(files, mhDTO);
             return ResponseEntity.ok("Add successful!");

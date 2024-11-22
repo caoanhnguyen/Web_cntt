@@ -30,7 +30,23 @@ public class PostAPI {
 	
 	@Autowired
 	private postService postServ;
-	
+
+	@GetMapping(value = "/api/posts/{post_id}")
+	public ResponseEntity<Object> getById(@PathVariable Integer post_id){
+		try {
+			postDTO DTO = postServ.getById(post_id);
+			return new ResponseEntity<>(DTO, HttpStatus.OK);
+		} catch (Exception e) {
+			// TODO: handle exception
+			errorResponseDTO errorDTO = new errorResponseDTO();
+			errorDTO.setError(e.getMessage());
+			List<String> details = new ArrayList<>();
+			details.add("An error occurred!");
+			errorDTO.setDetails(details);
+
+			return new ResponseEntity<>(errorDTO, HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	}
 	
 	@GetMapping(value="/api/posts")
 	public ResponseEntity<Object> getAllPost(@RequestParam Map<String,Object> params){
@@ -45,6 +61,23 @@ public class PostAPI {
 			details.add("An error occurred!");
 			errorDTO.setDetails(details);
 			
+			return new ResponseEntity<>(errorDTO, HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	}
+
+	@GetMapping(value = "/api/posts/latest")
+	public ResponseEntity<Object> getLatestPosts() {
+		try {
+			List<postDTO> posts = postServ.getLatestPosts();
+			return ResponseEntity.ok(posts);
+		} catch (Exception e) {
+			// TODO: handle exception
+			errorResponseDTO errorDTO = new errorResponseDTO();
+			errorDTO.setError(e.getMessage());
+			List<String> details = new ArrayList<>();
+			details.add("An error occurred!");
+			errorDTO.setDetails(details);
+
 			return new ResponseEntity<>(errorDTO, HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}

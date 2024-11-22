@@ -13,7 +13,11 @@ import com.kma.models.postDTO;
 import com.kma.models.postRequestDTO;
 
 public interface postService {
+	postDTO getById(Integer post_id);
+
 	List<postDTO> getAllPost(Map<String,Object> params);
+
+	List<postDTO> getLatestPosts();
 	
 	void addPost(@RequestParam(value = "file", required = false) List<MultipartFile> files,
 			@ModelAttribute postRequestDTO postRequestDTO) throws IOException;

@@ -39,6 +39,12 @@ public class monHocServImpl implements monHocService {
     taiLieuMonHocRepo tlmhRepo;
 
     @Override
+    public monHocDTO getById(Integer idMonHoc) {
+        MonHoc monHoc = mhRepo.findById(idMonHoc).orElse(null);
+        return mhDTOConverter.convertToMonHocDTO(monHoc);
+    }
+
+    @Override
     public List<monHocDTO> getAllMonHoc(Map<Object, Object> params) {
         // Lấy giá trị từ params
         String tenMonHoc = (String) params.get("tenMonHoc");

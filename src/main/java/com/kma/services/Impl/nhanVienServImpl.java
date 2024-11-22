@@ -25,6 +25,12 @@ public class nhanVienServImpl implements nhanVienService{
 	nhanVienDTOConverter nvDTOConverter;
 
 	@Override
+	public nhanVienDTO getById(Integer idUser) {
+		NhanVien nv = nvRepo.findById(idUser).orElse(null);
+		return nvDTOConverter.convertToNhanVienDTO(nv);
+	}
+
+	@Override
 	public List<nhanVienDTO> getAllNhanVien(Map<String, Object> params) {
 		// TODO Auto-generated method stub
 		// Lấy giá trị từ params

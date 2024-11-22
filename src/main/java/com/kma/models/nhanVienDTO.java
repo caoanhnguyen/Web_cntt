@@ -1,7 +1,5 @@
 package com.kma.models;
 
-import com.kma.repository.entities.MonHoc;
-
 import java.sql.Date;
 import java.util.List;
 

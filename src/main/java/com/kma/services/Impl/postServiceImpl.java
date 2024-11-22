@@ -25,7 +25,6 @@ import com.kma.repository.entities.TaiNguyen;
 import com.kma.services.fileService;
 import com.kma.services.postService;
 
-import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 
@@ -42,9 +41,12 @@ public class postServiceImpl implements postService{
 	taiNguyenRepo taiNguyenRepo;
 	@Autowired
 	postDTOConverter dtoConverter;
-	@Autowired
-	EntityManager entityManager;
 
+	@Override
+	public postDTO getById(Integer post_id) {
+		Post post = postRepo.findById(post_id).orElse(null);
+        return dtoConverter.convertToPostDTO(post);
+	}
 
 	@Override
 	public List<postDTO> getAllPost(Map<String,Object> params) {
@@ -83,6 +85,15 @@ public class postServiceImpl implements postService{
 					.toList();
 		}
 
+		return posts.stream()
+				.map(i->dtoConverter.convertToPostDTO(i))
+				.collect(Collectors.toList());
+	}
+
+	@Override
+	public List<postDTO> getLatestPosts() {
+		// Tìm kiếm bài viết mới nhất
+		List<Post> posts = postRepo.findTop6ByOrderByPostIdDesc();
 		return posts.stream()
 				.map(i->dtoConverter.convertToPostDTO(i))
 				.collect(Collectors.toList());
