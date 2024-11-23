@@ -13,7 +13,7 @@ import com.kma.models.postRequestDTO;
 public interface postService {
 	postDTO getById(Integer post_id);
 
-	List<postResponseDTO> getAllPost(Map<String,Object> params);
+	List<postResponseDTO> getAllPost(Map<String,Object> params, Integer page, Integer size);
 
 	List<postDTO> getLatestPosts();
 	

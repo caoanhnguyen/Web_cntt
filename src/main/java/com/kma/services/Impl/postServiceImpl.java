@@ -11,6 +11,8 @@ import com.kma.models.postResponseDTO;
 import com.kma.repository.taiNguyenRepo;
 import com.kma.utilities.taiNguyenUtil;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -48,7 +50,7 @@ public class postServiceImpl implements postService{
 	}
 
 	@Override
-	public List<postResponseDTO> getAllPost(Map<String,Object> params) {
+	public List<postResponseDTO> getAllPost(Map<String,Object> params, Integer page, Integer size) {
 		// Lấy giá trị từ params
 		String title = (String) params.get("title");
 		String authorName = (String) params.get("author_name");
@@ -63,22 +65,23 @@ public class postServiceImpl implements postService{
 
 		// Tìm kiếm bài viết theo điều kiện
 		List<Post> posts;
+		Pageable pageable = PageRequest.of(page, size);
 
 		if (idUsers.isEmpty()) {
 			// Không có author_name, chỉ tìm theo title hoặc lấy tất cả nếu title null
 			if (title == null) {
-				posts = postRepo.findAllByOrderByPostIdDesc(); // Lấy toàn bộ bài viết
+				posts = postRepo.findAllByOrderByPostIdDesc(pageable); // Lấy toàn bộ bài viết
 			} else {
-				posts = postRepo.findByTitleContainingOrderByPostIdDesc(title); // Tìm bài viết theo title
+				posts = postRepo.findByTitleContainingOrderByPostIdDesc(title, pageable); // Tìm bài viết theo title
 			}
 		} else {
 			// Có author_name, tìm theo title và idUsers
 			posts = idUsers.stream()
 					.flatMap(id -> {
 						if (title == null) {
-							return postRepo.findByNhanVien_idUserOrderByPostIdDesc(id).stream();	// Tìm bài viết theo danh sánh nhân viên
+							return postRepo.findByNhanVien_idUserOrderByPostIdDesc(id, pageable).stream();	// Tìm bài viết theo danh sánh nhân viên
 						} else {
-							return postRepo.findByTitleContainingAndNhanVien_idUser(title, id).stream(); // Tìm bài viết theo cả title và danh sách nhân viên
+							return postRepo.findByTitleContainingAndNhanVien_idUser(title, id, pageable).stream(); // Tìm bài viết theo cả title và danh sách nhân viên
 						}
 					})
 					.sorted(Comparator.comparing(Post::getPostId).reversed())
