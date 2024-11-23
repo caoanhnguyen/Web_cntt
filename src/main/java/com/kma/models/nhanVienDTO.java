@@ -1,5 +1,7 @@
 package com.kma.models;
 
+import com.kma.repository.entities.PhongBan;
+
 import java.sql.Date;
 import java.util.List;
 
@@ -9,9 +11,9 @@ public class nhanVienDTO {
 	private Date ngaySinh;
 	private String sdt;
 	private String diaChi;
-	private String phongBan;
+	private phongBanResponseDTO phongBan;
 	private String chucVu;
-	private String monGiangDayChinh;
+	private monHocResponseDTO monGiangDayChinh;
 	private List<monHocResponseDTO> cacMonLienQuan;
 	private String avaFileCode;
 
@@ -55,11 +57,11 @@ public class nhanVienDTO {
 		this.diaChi = diaChi;
 	}
 
-	public String getPhongBan() {
+	public phongBanResponseDTO getPhongBan() {
 		return phongBan;
 	}
 
-	public void setPhongBan(String phongBan) {
+	public void setPhongBan(phongBanResponseDTO phongBan) {
 		this.phongBan = phongBan;
 	}
 
@@ -71,11 +73,11 @@ public class nhanVienDTO {
 		this.chucVu = chucVu;
 	}
 
-	public String getMonGiangDayChinh() {
+	public monHocResponseDTO getMonGiangDayChinh() {
 		return monGiangDayChinh;
 	}
 
-	public void setMonGiangDayChinh(String monGiangDayChinh) {
+	public void setMonGiangDayChinh(monHocResponseDTO monGiangDayChinh) {
 		this.monGiangDayChinh = monGiangDayChinh;
 	}
 

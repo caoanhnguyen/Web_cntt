@@ -12,7 +12,5 @@ public interface nhanVienService {
 	
 	List<nhanVienDTO> getAllNhanVien(Map<String, Object> params);
 
-//	void addNhanVien();
-
 	void deleteNhanVien(Integer idUser);
 }

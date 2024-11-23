@@ -2,6 +2,9 @@ package com.kma.repository.entities;
 
 import jakarta.persistence.*;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Entity
 @Table(name="lop")
 public class Lop {
@@ -15,6 +18,9 @@ public class Lop {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "idChuNhiem")
     private NhanVien chuNhiem;
+
+    @OneToMany(mappedBy = "lop", cascade = CascadeType.REMOVE)
+    private List<SinhVien> svList = new ArrayList<>();
 
     public Integer getIdLop() {
         return idLop;
@@ -38,5 +44,13 @@ public class Lop {
 
     public void setChuNhiem(NhanVien chuNhiem) {
         this.chuNhiem = chuNhiem;
+    }
+
+    public List<SinhVien> getSvList() {
+        return svList;
+    }
+
+    public void setSvList(List<SinhVien> svList) {
+        this.svList = svList;
     }
 }

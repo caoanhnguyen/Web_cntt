@@ -49,9 +49,6 @@ public class NhanVien {
     @Column(name = "noiCongTac")
     private String noiCongTac;
 
-    @Column(name = "maPhongBan")
-    private String maPhongBan;
-
     @Column(name = "maSoThue")
     private String maSoThue;
 
@@ -67,15 +64,15 @@ public class NhanVien {
     @Column(name = "fileLyLich")
     private String fileLyLich;
 
-    @Column(name = "monGiangDayChinh")
-    private String monGiangDayChinh;
+    @Column(name = "idMonGiangDayChinh")
+    private Integer idMonGiangDayChinh;
 
     @Column(name = "avaFileCode")
     private String AvaFileCode;
     
     //Config relation to Post
     @OneToMany(mappedBy = "nhanVien", cascade = CascadeType.REMOVE)
-	private List<Post> posts = new ArrayList<>();
+	private List<Post> posts;
 
 	//Config relation to mon_hoc
 	@ManyToMany(mappedBy = "nvList")
@@ -84,6 +81,31 @@ public class NhanVien {
 	//Config relation to lop
 	@OneToMany(mappedBy = "chuNhiem", cascade = CascadeType.REMOVE)
 	private List<Lop> lopList = new ArrayList<>();
+
+	//Config relation to tai_khoan_nguoi_dung
+	@OneToMany(mappedBy = "nhanVien", cascade = CascadeType.REMOVE)
+	private List<TaiKhoanNguoiDung> tkList;
+
+	// Config relation to phong_ban
+	@ManyToOne(fetch = FetchType.EAGER)
+	@JoinColumn(name = "maPhongBan")
+	private PhongBan phongBan;
+
+	public PhongBan getPhongBan() {
+		return phongBan;
+	}
+
+	public void setPhongBan(PhongBan phongBan) {
+		this.phongBan = phongBan;
+	}
+
+	public List<TaiKhoanNguoiDung> getTkList() {
+		return tkList;
+	}
+
+	public void setTkList(List<TaiKhoanNguoiDung> tkList) {
+		this.tkList = tkList;
+	}
 
 	public List<Lop> getLopList() {
 		return lopList;
@@ -184,12 +206,6 @@ public class NhanVien {
 	public void setNoiCongTac(String noiCongTac) {
 		this.noiCongTac = noiCongTac;
 	}
-	public String getMaPhongBan() {
-		return maPhongBan;
-	}
-	public void setMaPhongBan(String maPhongBan) {
-		this.maPhongBan = maPhongBan;
-	}
 	public String getMaSoThue() {
 		return maSoThue;
 	}
@@ -220,12 +236,15 @@ public class NhanVien {
 	public void setFileLyLich(String fileLyLich) {
 		this.fileLyLich = fileLyLich;
 	}
-	public String getMonGiangDayChinh() {
-		return monGiangDayChinh;
+
+	public Integer getIdMonGiangDayChinh() {
+		return idMonGiangDayChinh;
 	}
-	public void setMonGiangDayChinh(String monGiangDayChinh) {
-		this.monGiangDayChinh = monGiangDayChinh;
+
+	public void setIdMonGiangDayChinh(Integer idMonGiangDayChinh) {
+		this.idMonGiangDayChinh = idMonGiangDayChinh;
 	}
+
 	public String getAvaFileCode() {
 		return AvaFileCode;
 	}

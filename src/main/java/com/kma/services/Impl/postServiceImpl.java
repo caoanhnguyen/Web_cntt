@@ -69,18 +69,19 @@ public class postServiceImpl implements postService{
 			if (title == null) {
 				posts = postRepo.findAllByOrderByPostIdDesc(); // Lấy toàn bộ bài viết
 			} else {
-				posts = postRepo.findByTitleContaining(title); // Tìm bài viết theo title
+				posts = postRepo.findByTitleContainingOrderByPostIdDesc(title); // Tìm bài viết theo title
 			}
 		} else {
 			// Có author_name, tìm theo title và idUsers
 			posts = idUsers.stream()
 					.flatMap(id -> {
 						if (title == null) {
-							return postRepo.findByNhanVien_idUser(id).stream();	// Tìm bài viết theo danh sánh nhân viên
+							return postRepo.findByNhanVien_idUserOrderByPostIdDesc(id).stream();	// Tìm bài viết theo danh sánh nhân viên
 						} else {
 							return postRepo.findByTitleContainingAndNhanVien_idUser(title, id).stream(); // Tìm bài viết theo cả title và danh sách nhân viên
 						}
 					})
+					.sorted(Comparator.comparing(Post::getPostId).reversed())
 					.toList();
 		}
 
