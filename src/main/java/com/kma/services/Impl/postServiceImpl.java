@@ -88,7 +88,7 @@ public class postServiceImpl implements postService{
 		);
 	}
 
-	// Tách lấy bài viết từ repository
+	// Lấy bài viết từ repository
 	private Page<Post> fetchPosts(String title, List<Integer> idUsers, Pageable pageable) {
 		if (idUsers.isEmpty()) {
 			// Không có authorName

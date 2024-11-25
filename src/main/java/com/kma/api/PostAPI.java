@@ -49,7 +49,7 @@ public class PostAPI {
 	@GetMapping(value="/api/posts")
 	public ResponseEntity<Object> getAllPost(@RequestParam Map<String,Object> params,
 											 @RequestParam(required = false, defaultValue = "0") int page,
-											 @RequestParam(required = false, defaultValue = "3") int size){
+											 @RequestParam(required = false, defaultValue = "10") int size){
 		try {
 			paginationResponseDTO<postResponseDTO> DTO = postServ.getAllPost(params, page, size);
 			return new ResponseEntity<>(DTO, HttpStatus.OK);

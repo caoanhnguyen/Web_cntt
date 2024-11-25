@@ -1,5 +1,6 @@
 package com.kma.repository.entities;
 
+import com.kma.enums.GioiTinh;
 import jakarta.persistence.*;
 
 import java.sql.Date;
@@ -10,44 +11,44 @@ import java.util.List;
 public class SinhVien {
 
     @Id
-    @Column(name = "MaSinhVien", nullable = false)
+    @Column(name = "maSinhVien", nullable = false)
     private String maSinhVien;
 
-    @Column(name = "TenSinhVien", nullable = false)
+    @Column(name = "tenSinhVien", nullable = false)
     private String tenSinhVien;
 
-    @Column(name = "NgaySinh")
+    @Column(name = "gioiTinh")
+    private GioiTinh gioiTinh;
+
+    @Column(name = "ngaySinh")
     private Date ngaySinh;
 
-    @Column(name = "DienThoai")
+    @Column(name = "dienThoai")
     private String dienThoai;
 
-    @Column(name = "Email")
+    @Column(name = "email")
     private String email;
 
-    @Column(name = "CCCD")
+    @Column(name = "cccd")
     private String cccd;
 
-    @Column(name = "DiaChiHienTai")
+    @Column(name = "diaChiHienTai")
     private String diaChiHienTai;
 
-    @Column(name = "QueQuan")
+    @Column(name = "queQuan")
     private String queQuan;
 
-    @Column(name = "Khoa")
+    @Column(name = "khoa")
     private String khoa;
 
-    @Column(name = "ChucVu")
+    @Column(name = "chucVu")
     private String chucVu;
 
-    @Column(name = "MatKhau")
+    @Column(name = "matKhau")
     private String matKhau;
 
     @Column(name = "avaFileCode")
     private String avaFileCode;
-
-    @Column(name = "MaLop")
-    private String maLop;
 
     //Config relation to Lop
     @ManyToOne(fetch = FetchType.EAGER)
@@ -90,9 +91,7 @@ public class SinhVien {
         this.dienThoai = dienThoai;
     }
 
-    public String getEmail() {
-        return email;
-    }
+    public String getEmail() { return email; }
 
     public void setEmail(String email) {
         this.email = email;
@@ -154,14 +153,6 @@ public class SinhVien {
         this.avaFileCode = avaFileCode;
     }
 
-    public String getMaLop() {
-        return maLop;
-    }
-
-    public void setMaLop(String maLop) {
-        this.maLop = maLop;
-    }
-
     public Lop getLop() {
         return lop;
     }
@@ -177,4 +168,8 @@ public class SinhVien {
     public void setDkskList(List<DangKySuKien> dkskList) {
         this.dkskList = dkskList;
     }
+
+    public GioiTinh getGioiTinh() { return gioiTinh; }
+
+    public void setGioiTinh(GioiTinh gioiTinh) { this.gioiTinh = gioiTinh; }
 }
