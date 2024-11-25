@@ -54,22 +54,14 @@ public class postServiceImpl implements postService{
 	@Override
 	public paginationResponseDTO<postResponseDTO> getAllPost(Map<String, Object> params, Integer page, Integer size) {
 		// Lấy giá trị từ params
-		String title = (String) params.get("title");
-		String authorName = (String) params.get("author_name");
-
-		// Lấy danh sách ID nhân viên từ tên
-		List<Integer> idUsers = Optional.ofNullable(authorName)
-				.map(nvRepo::findByTenNhanVienContaining)
-				.orElse(Collections.emptyList())
-				.stream()
-				.map(NhanVien::getIdUser)
-				.toList();
+		String title = ( params.get("title") != null ? (String) params.get("title") : "");
+		String authorName = ( params.get("authorName") != null ? (String) params.get("authorName") : "");
 
 		// Tạo Pageable
 		Pageable pageable = PageRequest.of(page, size);
 
 		// Lấy dữ liệu từ repository
-		Page<Post> postPage = fetchPosts(title, idUsers, pageable);
+		Page<Post> postPage = postRepo.findByAllCondition(title, authorName, pageable);
 
 		// Chuyển đổi Post sang postResponseDTO
 		List<postResponseDTO> postResDTOList = postPage.getContent().stream()
@@ -86,25 +78,6 @@ public class postServiceImpl implements postService{
 				postPage.getNumber(),
 				postPage.getSize()
 		);
-	}
-
-	// Lấy bài viết từ repository
-	private Page<Post> fetchPosts(String title, List<Integer> idUsers, Pageable pageable) {
-		if (idUsers.isEmpty()) {
-			// Không có authorName
-			if (title == null) {
-				return postRepo.findAllByOrderByPostIdDesc(pageable);
-			} else {
-				return postRepo.findByTitleContainingOrderByPostIdDesc(title, pageable);
-			}
-		} else {
-			// Có authorName
-			if (title == null) {
-				return postRepo.findByNhanVien_idUserInOrderByPostIdDesc(idUsers, pageable);
-			} else {
-				return postRepo.findByTitleContainingAndNhanVien_idUserInOrderByPostIdDesc(title, idUsers, pageable);
-			}
-		}
 	}
 
 	@Override

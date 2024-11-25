@@ -52,9 +52,9 @@ public class sinhVienServImpl implements sinhVienService {
 
     private Page<SinhVien> fetchSinhViens(Map<String, Object> params, Pageable pageable){
         // Lấy giá trị từ params
-        String maSinhVien = ((String) params.get("maSinhVien") != null ? (String) params.get("maSinhVien") : "");
-        String tenSinhVien = ((String) params.get("tenSinhVien") != null ? (String) params.get("tenSinhVien") : "");
-        String tenLop = ((String) params.get("tenLop") != null ? (String) params.get("tenLop") : "");
+        String maSinhVien = (params.get("maSinhVien") != null ? (String) params.get("maSinhVien") : "");
+        String tenSinhVien = (params.get("tenSinhVien") != null ? (String) params.get("tenSinhVien") : "");
+        String tenLop = (params.get("tenLop") != null ? (String) params.get("tenLop") : "");
 
         return svRepo.findByAllCondition(tenSinhVien, maSinhVien, tenLop, pageable);
     }
