@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
+import com.kma.models.paginationResponseDTO;
 import com.kma.models.postResponseDTO;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -13,7 +14,7 @@ import com.kma.models.postRequestDTO;
 public interface postService {
 	postDTO getById(Integer post_id);
 
-	List<postResponseDTO> getAllPost(Map<String,Object> params, Integer page, Integer size);
+	paginationResponseDTO<postResponseDTO> getAllPost(Map<String,Object> params, Integer page, Integer size);
 
 	List<postDTO> getLatestPosts();
 	

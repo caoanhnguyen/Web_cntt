@@ -7,10 +7,12 @@ import java.util.stream.Collectors;
 
 import com.kma.constants.fileDirection;
 import com.kma.converter.postDTOConverter;
+import com.kma.models.paginationResponseDTO;
 import com.kma.models.postResponseDTO;
 import com.kma.repository.taiNguyenRepo;
 import com.kma.utilities.taiNguyenUtil;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -50,47 +52,59 @@ public class postServiceImpl implements postService{
 	}
 
 	@Override
-	public List<postResponseDTO> getAllPost(Map<String,Object> params, Integer page, Integer size) {
+	public paginationResponseDTO<postResponseDTO> getAllPost(Map<String, Object> params, Integer page, Integer size) {
 		// Lấy giá trị từ params
 		String title = (String) params.get("title");
 		String authorName = (String) params.get("author_name");
 
-		// Lấy danh sách id của các nhân viên từ tên
+		// Lấy danh sách ID nhân viên từ tên
 		List<Integer> idUsers = Optional.ofNullable(authorName)
 				.map(nvRepo::findByTenNhanVienContaining)
 				.orElse(Collections.emptyList())
-					.stream()
-					.map(NhanVien::getIdUser)
-					.toList();
+				.stream()
+				.map(NhanVien::getIdUser)
+				.toList();
 
-		// Tìm kiếm bài viết theo điều kiện
-		List<Post> posts;
+		// Tạo Pageable
 		Pageable pageable = PageRequest.of(page, size);
 
+		// Lấy dữ liệu từ repository
+		Page<Post> postPage = fetchPosts(title, idUsers, pageable);
+
+		// Chuyển đổi Post sang postResponseDTO
+		List<postResponseDTO> postResDTOList = postPage.getContent().stream()
+				.map(dtoConverter::convertToPostResDTO)
+				.toList();
+
+		// Đóng gói dữ liệu và meta vào DTO
+		return new paginationResponseDTO<>(
+				postResDTOList,
+				postPage.getTotalPages(),
+				(int) postPage.getTotalElements(),
+				postPage.isFirst(),
+				postPage.isLast(),
+				postPage.getNumber(),
+				postPage.getSize()
+		);
+	}
+
+	// Tách lấy bài viết từ repository
+	private Page<Post> fetchPosts(String title, List<Integer> idUsers, Pageable pageable) {
 		if (idUsers.isEmpty()) {
-			// Không có author_name, chỉ tìm theo title hoặc lấy tất cả nếu title null
+			// Không có authorName
 			if (title == null) {
-				posts = postRepo.findAllByOrderByPostIdDesc(pageable); // Lấy toàn bộ bài viết
+				return postRepo.findAllByOrderByPostIdDesc(pageable);
 			} else {
-				posts = postRepo.findByTitleContainingOrderByPostIdDesc(title, pageable); // Tìm bài viết theo title
+				return postRepo.findByTitleContainingOrderByPostIdDesc(title, pageable);
 			}
 		} else {
-			// Có author_name, tìm theo title và idUsers
-			posts = idUsers.stream()
-					.flatMap(id -> {
-						if (title == null) {
-							return postRepo.findByNhanVien_idUserOrderByPostIdDesc(id, pageable).stream();	// Tìm bài viết theo danh sánh nhân viên
-						} else {
-							return postRepo.findByTitleContainingAndNhanVien_idUser(title, id, pageable).stream(); // Tìm bài viết theo cả title và danh sách nhân viên
-						}
-					})
-					.sorted(Comparator.comparing(Post::getPostId).reversed())
-					.toList();
+			// Có authorName
+			if (title == null) {
+				return postRepo.findByNhanVien_idUserInOrderByPostIdDesc(idUsers, pageable);
+			} else {
+				return postRepo.findByTitleContainingAndNhanVien_idUserInOrderByPostIdDesc(title, idUsers, pageable);
+			}
 		}
-
-		return posts.stream()
-				.map(i->dtoConverter.convertToPostResDTO(i))
-				.collect(Collectors.toList());
 	}
 
 	@Override
