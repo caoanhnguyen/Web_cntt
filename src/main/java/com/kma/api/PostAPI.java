@@ -125,7 +125,7 @@ public class PostAPI {
 		}
 	}
 	
-	@DeleteMapping(value = "api/posts/{post_id}")
+	@DeleteMapping(value = "/api/posts/{post_id}")
 	public ResponseEntity<Object> deletePost(@PathVariable Integer post_id) {
 		try {
 			postServ.deletePost(post_id);

@@ -4,6 +4,7 @@ import com.kma.enums.GioiTinh;
 import jakarta.persistence.*;
 
 import java.sql.Date;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -17,6 +18,7 @@ public class SinhVien {
     @Column(name = "tenSinhVien", nullable = false)
     private String tenSinhVien;
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "gioiTinh")
     private GioiTinh gioiTinh;
 
@@ -29,7 +31,7 @@ public class SinhVien {
     @Column(name = "email")
     private String email;
 
-    @Column(name = "cccd")
+    @Column(name = "cccd", unique = true)
     private String cccd;
 
     @Column(name = "diaChiHienTai")
@@ -38,7 +40,7 @@ public class SinhVien {
     @Column(name = "queQuan")
     private String queQuan;
 
-    @Column(name = "khoa")
+    @Column(name = "khoa", unique = true)
     private String khoa;
 
     @Column(name = "chucVu")
@@ -47,7 +49,7 @@ public class SinhVien {
     @Column(name = "matKhau")
     private String matKhau;
 
-    @Column(name = "avaFileCode")
+    @Column(name = "avaFileCode", unique = true)
     private String avaFileCode;
 
     //Config relation to Lop
@@ -56,8 +58,8 @@ public class SinhVien {
     private Lop lop;
 
     //Config relation to dang_ky_su_kien
-    @OneToMany(mappedBy = "sinhVien", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<DangKySuKien> dkskList;
+    @OneToMany(mappedBy = "sinhVien", cascade = CascadeType.ALL)
+    private List<DangKySuKien> dkskList = new ArrayList<>();
 
     public String getMaSinhVien() {
         return maSinhVien;

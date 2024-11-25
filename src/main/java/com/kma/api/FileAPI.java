@@ -5,6 +5,12 @@ import java.nio.charset.StandardCharsets;
 import java.util.Objects;
 
 import com.kma.constants.fileDirection;
+import com.kma.repository.entities.NhanVien;
+import com.kma.repository.entities.SinhVien;
+import com.kma.repository.nhanVienRepo;
+import com.kma.repository.sinhVienRepo;
+import org.jetbrains.annotations.NotNull;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -19,6 +25,12 @@ import com.kma.utilities.fileDownloadUtil;
 
 @RestController
 public class FileAPI {
+	@Autowired
+	sinhVienRepo svRepo;
+	@Autowired
+	nhanVienRepo nvRepo;
+
+
 	@GetMapping("/downloadFile/{fileCode}")
 	public ResponseEntity<?> downloadFile(@PathVariable("fileCode") String fileCode) {
 	    String path = fileDirection.pathForTaiNguyen;
@@ -29,6 +41,25 @@ public class FileAPI {
 	public ResponseEntity<?> downloadDocs(@PathVariable("fileCode") String fileCode) {
 		String path = fileDirection.pathForTaiLieuMonHoc;
 		return getFileResponse(fileCode, path);
+	}
+
+	@GetMapping("/downloadProfile/{fileCode}")
+	public ResponseEntity<?> downloadProfile(@PathVariable("fileCode") String fileCode) {
+		String directoryPath;
+
+		// Tìm kiếm fileCode trong SinhVien và NhanVien
+		SinhVien sinhVien = svRepo.findByAvaFileCode(fileCode);
+		if (sinhVien != null) {
+			directoryPath = fileDirection.pathForProfile_SV + "/" + sinhVien.getMaSinhVien();
+		} else {
+			NhanVien nhanVien = nvRepo.findByAvaFileCode(fileCode);
+			if (nhanVien != null) {
+				directoryPath = fileDirection.pathForProfile_NV + "/" + nhanVien.getMaNhanVien();
+			} else {
+				return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Không tìm thấy file!");
+			}
+		}
+		return getFileResponse(fileCode, directoryPath);
 	}
 
 	private ResponseEntity<?> getFileResponse(String fileCode, String path){
@@ -57,7 +88,8 @@ public class FileAPI {
 	}
 
 	// Hàm xác định MIME type dựa trên phần mở rộng file
-	private String getContentType(String filename) {
+	@NotNull
+	private String getContentType(@NotNull String filename) {
 		if (filename.endsWith(".jpg") || filename.endsWith(".jpeg")) {
 			return "image/jpeg";
 		} else if (filename.endsWith(".png")) {

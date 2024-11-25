@@ -35,7 +35,7 @@ public class SuKien {
     private List<TaiNguyen> taiNguyenList;
 
     //Config relation to dang_ki_su_kien
-    @OneToMany(mappedBy = "event", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "event", cascade = CascadeType.ALL)
     private List<DangKySuKien> dkskList;
 
     public List<DangKySuKien> getDkskList() {

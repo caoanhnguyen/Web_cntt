@@ -68,7 +68,7 @@ public class NhanVien {
     private Integer idMonGiangDayChinh;
 
     @Column(name = "avaFileCode")
-    private String AvaFileCode;
+    private String avaFileCode;
     
     //Config relation to Post
     @OneToMany(mappedBy = "nhanVien", cascade = CascadeType.REMOVE)
@@ -246,9 +246,9 @@ public class NhanVien {
 	}
 
 	public String getAvaFileCode() {
-		return AvaFileCode;
+		return avaFileCode;
 	}
 	public void setAvaFileCode(String AvaFileCode) {
-		this.AvaFileCode = AvaFileCode;
+		this.avaFileCode = avaFileCode;
 	}
 }

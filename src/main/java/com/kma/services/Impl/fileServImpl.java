@@ -9,7 +9,11 @@ import java.util.List;
 import java.util.Objects;
 
 import com.kma.constants.fileDirection;
+import com.kma.repository.entities.NhanVien;
+import com.kma.repository.entities.SinhVien;
 import com.kma.repository.entities.TaiLieuMonHoc;
+import com.kma.repository.nhanVienRepo;
+import com.kma.repository.sinhVienRepo;
 import com.kma.repository.taiLieuMonHocRepo;
 import com.kma.repository.taiNguyenRepo;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,6 +35,10 @@ public class fileServImpl implements fileService{
 	taiNguyenRepo tnRepo;
 	@Autowired
 	taiLieuMonHocRepo tlmhRepo;
+	@Autowired
+	sinhVienRepo svRepo;
+	@Autowired
+	nhanVienRepo nvRepo;
 
 	@Override
 	public String uploadFile(MultipartFile multipartFile, String fileDirec) throws IOException {
@@ -76,64 +84,27 @@ public class fileServImpl implements fileService{
 		return fileDTO;
 	}
 
-//	@Override
-//	public void deleteFile(Integer resources_id) {
-//		// TODO Auto-generated method stub
-//		TaiNguyen tn = tnRepo.findById(resources_id).orElse(null);
-//		if(tn==null) {
-//			throw new EntityNotFoundException("File not found!");
-//		}
-//		try {
-//	        Path dirPath = Paths.get(fileDirection.pathForTaiNguyen);
-//	        Files.list(dirPath).forEach(file -> {
-//	            if (file.getFileName().toString().startsWith(tn.getFileCode())) {
-//	                try {
-//	                    Files.deleteIfExists(file);
-//	                } catch (IOException e) {
-//	                    throw new RuntimeException("Failed to delete file: " + file.getFileName(), e);
-//	                }
-//	            }
-//	        });
-//	    } catch (IOException e) {
-//	        throw new RuntimeException("Error accessing files directory", e);
-//	    }
-//	}
-//
-//	@Override
-//	public void deleteDoc(Integer docId) {
-//		// TODO Auto-generated method stub
-//		TaiLieuMonHoc tn = tlmhRepo.findById(docId).orElse(null);
-//		if(tn==null) {
-//			throw new EntityNotFoundException("Document not found!");
-//		}
-//		try {
-//			Path dirPath = Paths.get(fileDirection.pathForTaiLieuMonHoc);
-//			Files.list(dirPath).forEach(file -> {
-//				if (file.getFileName().toString().startsWith(tn.getFileCode())) {
-//					try {
-//						Files.deleteIfExists(file);
-//					} catch (IOException e) {
-//						throw new RuntimeException("Failed to delete document: " + file.getFileName(), e);
-//					}
-//				}
-//			});
-//		} catch (IOException e) {
-//			throw new RuntimeException("Error accessing docs directory", e);
-//		}
-//	}
 	@Override
-	public void deleteFile(Integer fileId, Integer fType) {
+	public void deleteFile(Object fileId, Integer fType) {
 		// Lấy entity và xác định đường dẫn
 		Object entity;
 		String directoryPath = switch (fType) {
             case 1 -> {
-                entity = tnRepo.findById(fileId).orElse(null);
+                entity = tnRepo.findById((Integer) fileId).orElse(null);
                 yield fileDirection.pathForTaiNguyen; // Loại tài nguyên
             }
             case 2 -> {
-                entity = tlmhRepo.findById(fileId).orElse(null);
+                entity = tlmhRepo.findById((Integer) fileId).orElse(null);
                 yield fileDirection.pathForTaiLieuMonHoc; // Loại tài liệu môn học
             }
+			case 3 -> {
+				entity = svRepo.findById((String) fileId).orElse(null);
+				yield fileDirection.pathForProfile_SV; // Loại profile SV
+			}
+			case 4 -> {
+				entity = nvRepo.findById((Integer)fileId).orElse(null);
+				yield fileDirection.pathForProfile_NV; // Loại profile NV
+			}
             default -> throw new IllegalArgumentException("Invalid file type!");
         };
 
@@ -148,11 +119,19 @@ public class fileServImpl implements fileService{
 			fileCode = ((TaiNguyen) entity).getFileCode();
 		} else if (entity instanceof TaiLieuMonHoc) {
 			fileCode = ((TaiLieuMonHoc) entity).getFileCode();
+		} else if (entity instanceof SinhVien) {
+			fileCode = ((SinhVien) entity).getAvaFileCode();
+			directoryPath += "/" + ((SinhVien) entity).getMaSinhVien();
+		} else if (entity instanceof NhanVien) {
+			fileCode = ((NhanVien) entity).getAvaFileCode();
+			directoryPath += "/" + ((NhanVien) entity).getMaNhanVien();
 		} else {
 			throw new IllegalStateException("Unexpected entity type!");
 		}
 
-		deleteFromDisk(fileCode, directoryPath);
+		if(fileCode!=null){
+			deleteFromDisk(fileCode, directoryPath);
+		}
 	}
 
 	private void deleteFromDisk(String fileCode, String fileDirec){

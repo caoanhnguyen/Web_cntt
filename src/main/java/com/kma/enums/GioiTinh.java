@@ -1,9 +1,9 @@
 package com.kma.enums;
 
 public enum GioiTinh {
-    MALE("Nam"),
-    FEMALE("Nữ"),
-    OTHER("Khác");
+    NAM("Nam"),
+    NỮ("Nữ"),
+    KHÁC("Khác");
 
     private final String displayName;
 
@@ -13,5 +13,13 @@ public enum GioiTinh {
 
     public String getDisplayName() {
         return displayName;
+    }
+    public static GioiTinh fromDisplayName(String displayName) {
+        for (GioiTinh gender : values()) {
+            if (gender.getDisplayName().equalsIgnoreCase(displayName)) {
+                return gender;
+            }
+        }
+        throw new IllegalArgumentException("Không tìm thấy giá trị phù hợp cho: " + displayName);
     }
 }
