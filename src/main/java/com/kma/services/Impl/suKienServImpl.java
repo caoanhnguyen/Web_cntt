@@ -2,7 +2,6 @@ package com.kma.services.Impl;
 
 import com.kma.constants.fileDirection;
 import com.kma.converter.suKienDTOConverter;
-import com.kma.enums.EventStatus;
 import com.kma.models.paginationResponseDTO;
 import com.kma.models.suKienDTO;
 import com.kma.models.suKienResponseDTO;
@@ -86,7 +85,6 @@ public class suKienServImpl implements suKienService {
     public void addEvent(List<MultipartFile> files, suKienResponseDTO skResDTO) throws IOException {
         // Tạo sự kiện để lưu
         SuKien event = skDTOConverter.convertResDTOToSuKien(skResDTO);
-        event.setStatus(EventStatus.CHƯA);
         List<TaiNguyen> tnList = new ArrayList<>();
 
         // Lưu file nếu cần

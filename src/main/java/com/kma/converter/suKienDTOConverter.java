@@ -1,6 +1,5 @@
 package com.kma.converter;
 
-import com.kma.enums.EventStatus;
 import com.kma.models.fileDTO;
 import com.kma.models.sinhVienResponseDTO;
 import com.kma.models.suKienDTO;
@@ -26,13 +25,11 @@ public class suKienDTOConverter {
 
     public suKienResponseDTO convertToSKResDTO(SuKien sk){
         suKienResponseDTO dto = modelMapper.map(sk, suKienResponseDTO.class);
-        dto.setStatus(sk.getStatus().getDisplayName());
         return dto;
     }
 
     public suKienDTO convertToSKDTO(SuKien sk){
         suKienDTO dto = modelMapper.map(sk, suKienDTO.class);
-        dto.setStatus(sk.getStatus().getDisplayName());
 
         // Lấy danh sách tài nguyên liên quan
         List<fileDTO> fileDTOList = fileServ.getListFileDTO(sk.getTaiNguyenList());
@@ -49,7 +46,6 @@ public class suKienDTOConverter {
     public SuKien convertResDTOToSuKien(suKienResponseDTO skResDTO){
         SuKien event = modelMapper.map(skResDTO, SuKien.class);
         event.setCreateAt(new Date(System.currentTimeMillis()));
-        event.setStatus(EventStatus.fromDisplayName(skResDTO.getStatus()));
 
         return event;
     }
