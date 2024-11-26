@@ -1,0 +1,87 @@
+package com.kma.models;
+
+import java.sql.Date;
+
+public class suKienResponseDTO {
+    private Integer eventId;
+    private String eventName;
+    private String description;
+    private Date startAt;
+    private Date endAt;
+    private String location;
+    private Date createAt;
+    private String organizedBy;
+    private String status;
+
+    public Integer getEventId() {
+        return eventId;
+    }
+
+    public void setEventId(Integer eventId) {
+        this.eventId = eventId;
+    }
+
+    public String getEventName() {
+        return eventName;
+    }
+
+    public void setEventName(String eventName) {
+        this.eventName = eventName;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public Date getStartAt() {
+        return startAt;
+    }
+
+    public void setStartAt(Date startAt) {
+        this.startAt = startAt;
+    }
+
+    public Date getEndAt() {
+        return endAt;
+    }
+
+    public void setEndAt(Date endAt) {
+        this.endAt = endAt;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
+
+    public String getLocation() {
+        return location;
+    }
+
+    public void setLocation(String location) {
+        this.location = location;
+    }
+
+    public Date getCreateAt() {
+        return createAt;
+    }
+
+    public void setCreateAt(Date createAt) {
+        this.createAt = createAt;
+    }
+
+    public String getOrganizedBy() {
+        return organizedBy;
+    }
+
+    public void setOrganizedBy(String organizedBy) {
+        this.organizedBy = organizedBy;
+    }
+}

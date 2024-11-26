@@ -65,9 +65,7 @@ public class TaiNguyen {
 	public Date getCreateAt() {
 		return createAt;
 	}
-	public void setCreate_at(Date createAt) {
-		this.createAt = createAt;
-	}
-	
-	
+	public void setCreateAt(Date createAt) { this.createAt = createAt; }
+	public SuKien getEvent() { return event; }
+	public void setEvent(SuKien event) { this.event = event; }
 }

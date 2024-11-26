@@ -1,18 +1,27 @@
 package com.kma.utilities;
 
 import com.kma.repository.entities.Post;
+import com.kma.repository.entities.SuKien;
 import com.kma.repository.entities.TaiNguyen;
 import java.sql.Date;
 
 public class taiNguyenUtil {
 
-    public static TaiNguyen createResource(String fileCode, Post post) {
+    public static TaiNguyen createResource(String fileCode, Object object) {
         try {
             TaiNguyen resource = new TaiNguyen();
-            resource.setDescription(post.getTitle());
-            resource.setCreate_at(new Date(System.currentTimeMillis()));
-            resource.setFileCode(fileCode);
-            resource.setPost(post);
+            if(object instanceof Post){
+                resource.setDescription(((Post) object).getTitle());
+                resource.setCreateAt(new Date(System.currentTimeMillis()));
+                resource.setFileCode(fileCode);
+                resource.setPost((Post) object);
+            }
+            if(object instanceof SuKien){
+                resource.setDescription(((SuKien) object).getDescription());
+                resource.setCreateAt(new Date(System.currentTimeMillis()));
+                resource.setFileCode(fileCode);
+                resource.setEvent((SuKien) object);
+            }
 
             return resource;
         } catch (Exception e) {

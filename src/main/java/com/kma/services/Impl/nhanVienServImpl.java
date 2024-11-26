@@ -28,7 +28,9 @@ public class nhanVienServImpl implements nhanVienService{
 	@Override
 	public nhanVienDTO getById(Integer idUser) {
 		NhanVien nv = nvRepo.findById(idUser).orElse(null);
-		return nvDTOConverter.convertToNhanVienDTO(nv);
+		if(nv!=null)
+			return nvDTOConverter.convertToNhanVienDTO(nv);
+		throw new EntityNotFoundException("Employee not found with id: " + idUser);
 	}
 
 	@Override

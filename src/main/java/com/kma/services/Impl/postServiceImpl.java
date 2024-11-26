@@ -48,7 +48,9 @@ public class postServiceImpl implements postService{
 	@Override
 	public postDTO getById(Integer post_id) {
 		Post post = postRepo.findById(post_id).orElse(null);
-        return dtoConverter.convertToPostDTO(post);
+		if(post!=null)
+        	return dtoConverter.convertToPostDTO(post);
+		throw new EntityNotFoundException("Post not found with id: " + post_id);
 	}
 
 	@Override

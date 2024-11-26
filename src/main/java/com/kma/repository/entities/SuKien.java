@@ -1,5 +1,6 @@
 package com.kma.repository.entities;
 
+import com.kma.enums.EventStatus;
 import jakarta.persistence.*;
 
 import java.sql.Date;
@@ -18,8 +19,11 @@ public class SuKien {
     @Column(name="description", columnDefinition = "LONGTEXT")
     private String description;
 
-    @Column(name="time")
-    private Date time;
+    @Column(name="startAt")
+    private Date startAt;
+
+    @Column(name="endAt")
+    private Date endAt;
 
     @Column(name="location")
     private String location;
@@ -29,6 +33,10 @@ public class SuKien {
 
     @Column(name="createAt")
     private Date createAt;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "status")
+    private EventStatus status;
 
     //Config relation to tai_nguyen
     @OneToMany(mappedBy = "event", cascade = CascadeType.REMOVE)
@@ -78,12 +86,28 @@ public class SuKien {
         this.location = location;
     }
 
-    public Date getTime() {
-        return time;
+    public Date getStartAt() {
+        return startAt;
     }
 
-    public void setTime(Date time) {
-        this.time = time;
+    public void setStartAt(Date startAt) {
+        this.startAt = startAt;
+    }
+
+    public Date getEndAt() {
+        return endAt;
+    }
+
+    public void setEndAt(Date endAt) {
+        this.endAt = endAt;
+    }
+
+    public EventStatus getStatus() {
+        return status;
+    }
+
+    public void setStatus(EventStatus status) {
+        this.status = status;
     }
 
     public String getDescription() {

@@ -1,8 +1,7 @@
 package com.kma.api;
 
-import com.kma.models.errorResponseDTO;
-import com.kma.models.monHocDTO;
-import com.kma.services.monHocService;
+import com.kma.models.*;
+import com.kma.services.suKienService;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -10,28 +9,45 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
 @RestController
-public class monHocAPI {
-
+public class suKienAPI {
     @Autowired
-    monHocService monHocServ;
+    suKienService skServ;
 
-    @GetMapping(value = "/api/monhoc/{idUser}")
-    public ResponseEntity<Object> getById(@PathVariable Integer idUser){
+    @GetMapping(value = "/api/sukien")
+    public ResponseEntity<Object> getAllSuKien(@RequestParam Map<String,Object> params,
+                                               @RequestParam(required = false, defaultValue = "0") int page,
+                                               @RequestParam(required = false, defaultValue = "10") int size){
         try {
-            monHocDTO DTO = monHocServ.getById(idUser);
+            paginationResponseDTO<suKienResponseDTO> DTO =skServ.getAllEvent(params, page, size);
+            return new ResponseEntity<>(DTO, HttpStatus.OK);
+        } catch (Exception e) {
+            // TODO: handle exception
+            errorResponseDTO errorDTO = new errorResponseDTO();
+            errorDTO.setError(e.getMessage());
+            List<String> details = new ArrayList<>();
+            details.add("An error occurred!");
+            errorDTO.setDetails(details);
+
+            return new ResponseEntity<>(errorDTO, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @GetMapping(value = "/api/sukien/{eventId}")
+    public ResponseEntity<Object> findById(@PathVariable Integer eventId){
+        try {
+            suKienDTO DTO = skServ.findById(eventId);
             return new ResponseEntity<>(DTO, HttpStatus.OK);
         } catch (EntityNotFoundException e) {
             // TODO: handle exception
             errorResponseDTO errorDTO = new errorResponseDTO();
             errorDTO.setError(e.getMessage());
             List<String> details = new ArrayList<>();
-            details.add("Subject not found!");
+            details.add("Event not found!");
             errorDTO.setDetails(details);
 
             return new ResponseEntity<>(errorDTO, HttpStatus.NOT_FOUND);
@@ -47,65 +63,41 @@ public class monHocAPI {
         }
     }
 
-    @GetMapping(value = "/api/monhoc")
-    public ResponseEntity<Object> getAllMonHoc(@RequestParam Map<Object,Object> params){
+    @PostMapping(value = "/api/sukien")
+    public ResponseEntity<Object> addEvent(@RequestParam(value = "file", required = false) List<MultipartFile> files,
+                                          @ModelAttribute suKienResponseDTO skResDTO) {
         try {
-            List<monHocDTO> DTO = monHocServ.getAllMonHoc(params);
-            return new ResponseEntity<>(DTO, HttpStatus.OK);
-        } catch (NumberFormatException e) {
-            // TODO: handle exception
-            errorResponseDTO errorDTO = new errorResponseDTO();
-            errorDTO.setError(e.getMessage());
-            List<String> details = new ArrayList<>();
-            details.add("Điền sai số tín chỉ!");
-            errorDTO.setDetails(details);
-
-            return new ResponseEntity<>(errorDTO, HttpStatus.NOT_FOUND);
-        } catch (Exception e) {
-            // TODO: handle exception
-            errorResponseDTO errorDTO = new errorResponseDTO();
-            errorDTO.setError(e.getMessage());
-            List<String> details = new ArrayList<>();
-            details.add("An error occurred!");
-            errorDTO.setDetails(details);
-
-            return new ResponseEntity<>(errorDTO, HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-    }
-
-    @PostMapping(value = "/api/monhoc")
-    public ResponseEntity<Object> addMonHoc(@RequestParam(value = "file", required = false) List<MultipartFile> files,
-                                            @ModelAttribute monHocDTO mhDTO) throws IOException {
-        try {
-            monHocServ.addMonHoc(files, mhDTO);
+            skServ.addEvent(files, skResDTO);
             return ResponseEntity.ok("Add successful!");
-        } catch (Exception e) {
+        } catch (IllegalArgumentException e) {
             // TODO: handle exception
             errorResponseDTO errorDTO = new errorResponseDTO();
             errorDTO.setError(e.getMessage());
             List<String> details = new ArrayList<>();
-            details.add("An error occurred!");
+            details.add("Event not exist!");
             errorDTO.setDetails(details);
 
-            return new ResponseEntity<>(errorDTO, HttpStatus.INTERNAL_SERVER_ERROR);
+            return new ResponseEntity<>(errorDTO, HttpStatus.NOT_FOUND);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An error occurred.");
         }
     }
 
-    @PutMapping(value = "/api/monhoc/{idMonHoc}")
-    public ResponseEntity<Object> updatePost(@PathVariable Integer idMonHoc,
-                                             @ModelAttribute monHocDTO monHocDTO,
+    @PutMapping(value = "/api/sukien/{eventId}")
+    public ResponseEntity<Object> updatePost(@PathVariable Integer eventId,
+                                             @ModelAttribute suKienResponseDTO skResDTO,
                                              @RequestParam(value = "file", required = false) List<MultipartFile> files,
                                              @RequestParam(value = "deleteFileIds", required = false) List<Integer> deleteFileIds) {
 
         try {
-            monHocServ.updateMonHoc(idMonHoc,monHocDTO, files, deleteFileIds);
+            skServ.updateEvent(eventId, skResDTO, files, deleteFileIds);
             return ResponseEntity.ok("Update successful!");
         } catch (EntityNotFoundException e) {
             // TODO: handle exception
             errorResponseDTO errorDTO = new errorResponseDTO();
             errorDTO.setError(e.getMessage());
             List<String> details = new ArrayList<>();
-            details.add("Subject not found!");
+            details.add("Event not found!");
             errorDTO.setDetails(details);
 
             return new ResponseEntity<>(errorDTO, HttpStatus.NOT_FOUND);
@@ -114,17 +106,17 @@ public class monHocAPI {
         }
     }
 
-    @DeleteMapping(value = "api/monhoc/{idMonHoc}")
-    public ResponseEntity<Object> deleteMonHoc(@PathVariable Integer idMonHoc) {
+    @DeleteMapping(value = "/api/sukien/{eventId}")
+    public ResponseEntity<Object> deletePost(@PathVariable Integer eventId) {
         try {
-            monHocServ.deleteMonHoc(idMonHoc);
+            skServ.deleteEvent(eventId);
             return ResponseEntity.ok("Delete successful!");
         } catch (EntityNotFoundException e) {
             // TODO: handle exception
             errorResponseDTO errorDTO = new errorResponseDTO();
             errorDTO.setError(e.getMessage());
             List<String> details = new ArrayList<>();
-            details.add("Subject not found!");
+            details.add("Event not found!");
             errorDTO.setDetails(details);
 
             return new ResponseEntity<>(errorDTO, HttpStatus.NOT_FOUND);
@@ -132,5 +124,4 @@ public class monHocAPI {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An error occurred.");
         }
     }
-
 }

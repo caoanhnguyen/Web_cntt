@@ -26,6 +26,15 @@ public class NhanVienAPI {
 		try {
 			nhanVienDTO DTO = nvServ.getById(idUser);
 			return new ResponseEntity<>(DTO, HttpStatus.OK);
+		} catch (EntityNotFoundException e) {
+			// TODO: handle exception
+			errorResponseDTO errorDTO = new errorResponseDTO();
+			errorDTO.setError(e.getMessage());
+			List<String> details = new ArrayList<>();
+			details.add("Employee not found!");
+			errorDTO.setDetails(details);
+
+			return new ResponseEntity<>(errorDTO, HttpStatus.NOT_FOUND);
 		} catch (Exception e) {
 			// TODO: handle exception
 			errorResponseDTO errorDTO = new errorResponseDTO();

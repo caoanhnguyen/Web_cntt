@@ -14,6 +14,9 @@ public class DangKySuKien {
     @Column(name = "regisDate")
     private Date regisDate;
 
+    @Column(name = "status")
+    private Integer status;
+
     // Config relation to sinh_vien
     @ManyToOne
     @JoinColumn(name = "maSinhVien", nullable = false)
@@ -39,6 +42,10 @@ public class DangKySuKien {
     public void setRegisDate(Date regisDate) {
         this.regisDate = regisDate;
     }
+
+    public Integer getStatus() { return status; }
+
+    public void setStatus(Integer status) { this.status = status; }
 
     public SinhVien getSinhVien() {
         return sinhVien;

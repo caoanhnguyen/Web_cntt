@@ -41,7 +41,9 @@ public class monHocServImpl implements monHocService {
     @Override
     public monHocDTO getById(Integer idMonHoc) {
         MonHoc monHoc = mhRepo.findById(idMonHoc).orElse(null);
-        return mhDTOConverter.convertToMonHocDTO(monHoc);
+        if(monHoc!=null)
+            return mhDTOConverter.convertToMonHocDTO(monHoc);
+        throw new EntityNotFoundException("Subject not found with id: " + idMonHoc);
     }
 
     @Override

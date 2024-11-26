@@ -34,6 +34,15 @@ public class PostAPI {
 		try {
 			postDTO DTO = postServ.getById(post_id);
 			return new ResponseEntity<>(DTO, HttpStatus.OK);
+		} catch (EntityNotFoundException e) {
+			// TODO: handle exception
+			errorResponseDTO errorDTO = new errorResponseDTO();
+			errorDTO.setError(e.getMessage());
+			List<String> details = new ArrayList<>();
+			details.add("Post not found!");
+			errorDTO.setDetails(details);
+
+			return new ResponseEntity<>(errorDTO, HttpStatus.NOT_FOUND);
 		} catch (Exception e) {
 			// TODO: handle exception
 			errorResponseDTO errorDTO = new errorResponseDTO();
