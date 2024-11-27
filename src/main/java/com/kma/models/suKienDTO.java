@@ -12,7 +12,6 @@ public class suKienDTO {
     private String location;
     private Date createAt;
     private String organizedBy;
-    private String status;
     private List<fileDTO> fileDTOList;
     private List<sinhVienResponseDTO> sinhVienThamGia;
 
@@ -45,7 +44,7 @@ public class suKienDTO {
     }
 
     public void setStartAt(Date startAt) {
-        this.startAt = startAt;
+        this.startAt = startAt; 
     }
 
     public Date getEndAt() {
@@ -54,14 +53,6 @@ public class suKienDTO {
 
     public void setEndAt(Date endAt) {
         this.endAt = endAt;
-    }
-
-    public String getStatus() {
-        return status;
-    }
-
-    public void setStatus(String status) {
-        this.status = status;
     }
 
     public String getLocation() {

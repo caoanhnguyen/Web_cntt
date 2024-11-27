@@ -24,8 +24,7 @@ public class suKienDTOConverter {
     sinhVienDTOConverter svDTOConverter;
 
     public suKienResponseDTO convertToSKResDTO(SuKien sk){
-        suKienResponseDTO dto = modelMapper.map(sk, suKienResponseDTO.class);
-        return dto;
+        return modelMapper.map(sk, suKienResponseDTO.class);
     }
 
     public suKienDTO convertToSKDTO(SuKien sk){

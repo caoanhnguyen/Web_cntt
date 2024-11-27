@@ -11,7 +11,6 @@ public class suKienResponseDTO {
     private String location;
     private Date createAt;
     private String organizedBy;
-    private String status;
 
     public Integer getEventId() {
         return eventId;
@@ -51,14 +50,6 @@ public class suKienResponseDTO {
 
     public void setEndAt(Date endAt) {
         this.endAt = endAt;
-    }
-
-    public String getStatus() {
-        return status;
-    }
-
-    public void setStatus(String status) {
-        this.status = status;
     }
 
     public String getLocation() {
