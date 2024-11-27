@@ -52,6 +52,11 @@ public class SinhVien {
     @Column(name = "avaFileCode", unique = true)
     private String avaFileCode;
 
+    // Config relation to user_account
+    @OneToOne
+    @JoinColumn(name = "userAccountId")
+    private UserAccount userAccount;
+
     //Config relation to Lop
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "idLop")
@@ -77,6 +82,14 @@ public class SinhVien {
         this.tenSinhVien = tenSinhVien;
     }
 
+    public GioiTinh getGioiTinh() {
+        return gioiTinh;
+    }
+
+    public void setGioiTinh(GioiTinh gioiTinh) {
+        this.gioiTinh = gioiTinh;
+    }
+
     public Date getNgaySinh() {
         return ngaySinh;
     }
@@ -93,7 +106,9 @@ public class SinhVien {
         this.dienThoai = dienThoai;
     }
 
-    public String getEmail() { return email; }
+    public String getEmail() {
+        return email;
+    }
 
     public void setEmail(String email) {
         this.email = email;
@@ -155,6 +170,14 @@ public class SinhVien {
         this.avaFileCode = avaFileCode;
     }
 
+    public UserAccount getUserAccount() {
+        return userAccount;
+    }
+
+    public void setUserAccount(UserAccount userAccount) {
+        this.userAccount = userAccount;
+    }
+
     public Lop getLop() {
         return lop;
     }
@@ -170,8 +193,4 @@ public class SinhVien {
     public void setDkskList(List<DangKySuKien> dkskList) {
         this.dkskList = dkskList;
     }
-
-    public GioiTinh getGioiTinh() { return gioiTinh; }
-
-    public void setGioiTinh(GioiTinh gioiTinh) { this.gioiTinh = gioiTinh; }
 }

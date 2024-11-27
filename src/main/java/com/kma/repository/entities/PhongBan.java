@@ -17,10 +17,6 @@ public class PhongBan {
     @Column(name="ghiChu", columnDefinition = "LONGTEXT")
     private String ghiChu;
 
-    //Config relation to roles
-    @OneToMany(mappedBy = "phongBan", cascade = CascadeType.REMOVE)
-    private List<Role> rolesList;
-
     //Config relation to nhan_vien
     @OneToMany(mappedBy = "phongBan", cascade = CascadeType.REMOVE)
     private List<NhanVien> nvList;
@@ -47,14 +43,6 @@ public class PhongBan {
 
     public void setGhiChu(String ghiChu) {
         this.ghiChu = ghiChu;
-    }
-
-    public List<Role> getRolesList() {
-        return rolesList;
-    }
-
-    public void setRolesList(List<Role> rolesList) {
-        this.rolesList = rolesList;
     }
 
     public List<NhanVien> getNvList() {

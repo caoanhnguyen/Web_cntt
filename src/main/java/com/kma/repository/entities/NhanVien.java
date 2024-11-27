@@ -82,157 +82,156 @@ public class NhanVien {
 	@OneToMany(mappedBy = "chuNhiem", cascade = CascadeType.REMOVE)
 	private List<Lop> lopList = new ArrayList<>();
 
-	//Config relation to tai_khoan_nguoi_dung
-	@OneToMany(mappedBy = "nhanVien", cascade = CascadeType.REMOVE)
-	private List<TaiKhoanNguoiDung> tkList;
+	// Config relation to user_account
+	@OneToOne
+	@JoinColumn(name = "userAccountId")
+	private UserAccount userAccount;
 
 	// Config relation to phong_ban
 	@ManyToOne(fetch = FetchType.EAGER)
 	@JoinColumn(name = "maPhongBan")
 	private PhongBan phongBan;
 
-	public PhongBan getPhongBan() {
-		return phongBan;
-	}
-
-	public void setPhongBan(PhongBan phongBan) {
-		this.phongBan = phongBan;
-	}
-
-	public List<TaiKhoanNguoiDung> getTkList() {
-		return tkList;
-	}
-
-	public void setTkList(List<TaiKhoanNguoiDung> tkList) {
-		this.tkList = tkList;
-	}
-
-	public List<Lop> getLopList() {
-		return lopList;
-	}
-
-	public void setLopList(List<Lop> lopList) {
-		this.lopList = lopList;
-	}
-
-	public List<MonHoc> getMonHocList() {
-		return monHocList;
-	}
-
-	public void setMonHocList(List<MonHoc> monHocList) {
-		this.monHocList = monHocList;
-	}
-	public List<Post> getPosts() {
-		return posts;
-	}
-	public void setPosts(List<Post> posts) {
-		this.posts = posts;
-	}
-	public Integer getIdUser() {
-		return idUser;
-	}
-	public void setIdUser(Integer idUser) {
-		this.idUser = idUser;
-	}
-	public String getMaNhanVien() {
-		return maNhanVien;
-	}
-	public void setMaNhanVien(String maNhanVien) {
-		this.maNhanVien = maNhanVien;
-	}
-	public String getTenNhanVien() {
-		return tenNhanVien;
-	}
-	public void setTenNhanVien(String tenNhanVien) {
-		this.tenNhanVien = tenNhanVien;
-	}
 	public Date getNgaySinh() {
 		return ngaySinh;
 	}
+
 	public void setNgaySinh(Date ngaySinh) {
 		this.ngaySinh = ngaySinh;
 	}
+
+	public Integer getIdUser() {
+		return idUser;
+	}
+
+	public void setIdUser(Integer idUser) {
+		this.idUser = idUser;
+	}
+
+	public String getMaNhanVien() {
+		return maNhanVien;
+	}
+
+	public void setMaNhanVien(String maNhanVien) {
+		this.maNhanVien = maNhanVien;
+	}
+
+	public String getTenNhanVien() {
+		return tenNhanVien;
+	}
+
+	public void setTenNhanVien(String tenNhanVien) {
+		this.tenNhanVien = tenNhanVien;
+	}
+
 	public String getDienThoai() {
 		return dienThoai;
 	}
+
 	public void setDienThoai(String dienThoai) {
 		this.dienThoai = dienThoai;
 	}
+
 	public String getHocVi() {
 		return hocVi;
 	}
+
 	public void setHocVi(String hocVi) {
 		this.hocVi = hocVi;
 	}
+
 	public String getCccd() {
 		return cccd;
 	}
+
 	public void setCccd(String cccd) {
 		this.cccd = cccd;
 	}
+
 	public Date getNgayCapCCCD() {
 		return ngayCapCCCD;
 	}
+
 	public void setNgayCapCCCD(Date ngayCapCCCD) {
 		this.ngayCapCCCD = ngayCapCCCD;
 	}
+
 	public String getNoiCapCCCD() {
 		return noiCapCCCD;
 	}
+
 	public void setNoiCapCCCD(String noiCapCCCD) {
 		this.noiCapCCCD = noiCapCCCD;
 	}
+
 	public String getDiaChiCCCD() {
 		return diaChiCCCD;
 	}
+
 	public void setDiaChiCCCD(String diaChiCCCD) {
 		this.diaChiCCCD = diaChiCCCD;
 	}
+
 	public String getDiaChiHienNay() {
 		return diaChiHienNay;
 	}
+
 	public void setDiaChiHienNay(String diaChiHienNay) {
 		this.diaChiHienNay = diaChiHienNay;
 	}
+
 	public String getChucVu() {
 		return chucVu;
 	}
+
 	public void setChucVu(String chucVu) {
 		this.chucVu = chucVu;
 	}
+
 	public String getNoiCongTac() {
 		return noiCongTac;
 	}
+
 	public void setNoiCongTac(String noiCongTac) {
 		this.noiCongTac = noiCongTac;
 	}
+
 	public String getMaSoThue() {
 		return maSoThue;
 	}
+
 	public void setMaSoThue(String maSoThue) {
 		this.maSoThue = maSoThue;
 	}
+
 	public String getSoTaiKhoan() {
 		return soTaiKhoan;
 	}
+
 	public void setSoTaiKhoan(String soTaiKhoan) {
 		this.soTaiKhoan = soTaiKhoan;
 	}
+
 	public String getNganHang() {
 		return nganHang;
 	}
+
 	public void setNganHang(String nganHang) {
 		this.nganHang = nganHang;
 	}
+
 	public String getChiNhanh() {
 		return chiNhanh;
 	}
+
 	public void setChiNhanh(String chiNhanh) {
 		this.chiNhanh = chiNhanh;
 	}
+
 	public String getFileLyLich() {
 		return fileLyLich;
 	}
+
 	public void setFileLyLich(String fileLyLich) {
 		this.fileLyLich = fileLyLich;
 	}
@@ -248,7 +247,48 @@ public class NhanVien {
 	public String getAvaFileCode() {
 		return avaFileCode;
 	}
-	public void setAvaFileCode(String AvaFileCode) {
+
+	public void setAvaFileCode(String avaFileCode) {
 		this.avaFileCode = avaFileCode;
+	}
+
+	public List<Post> getPosts() {
+		return posts;
+	}
+
+	public void setPosts(List<Post> posts) {
+		this.posts = posts;
+	}
+
+	public List<MonHoc> getMonHocList() {
+		return monHocList;
+	}
+
+	public void setMonHocList(List<MonHoc> monHocList) {
+		this.monHocList = monHocList;
+	}
+
+	public List<Lop> getLopList() {
+		return lopList;
+	}
+
+	public void setLopList(List<Lop> lopList) {
+		this.lopList = lopList;
+	}
+
+	public UserAccount getUserAccount() {
+		return userAccount;
+	}
+
+	public void setUserAccount(UserAccount userAccount) {
+		this.userAccount = userAccount;
+	}
+
+	public PhongBan getPhongBan() {
+		return phongBan;
+	}
+
+	public void setPhongBan(PhongBan phongBan) {
+		this.phongBan = phongBan;
 	}
 }

@@ -2,6 +2,9 @@ package com.kma.repository.entities;
 
 import jakarta.persistence.*;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Entity
 @Table(name="role")
 public class Role {
@@ -10,21 +13,15 @@ public class Role {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer roleId;
 
-    @Column(name="quyen")
-    private String quyen;
+    @Column(name="roleName")
+    private String roleName;
 
-    @Column(name="isLock")
-    private Integer isLock;
+    @Column(name="description")
+    private String description;
 
-    // Config relation to tai_khoan_nguoi_dung
-    @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "tenDangNhap")
-    private TaiKhoanNguoiDung taiKhoanNguoiDung;
-
-    // Config relation to phong_ban
-    @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "maPhongBan")
-    private PhongBan phongBan;
+    // Config relationto user_account
+    @ManyToMany(mappedBy = "roleList")
+    private List<UserAccount> accountList = new ArrayList<>();
 
     public Integer getRoleId() {
         return roleId;
@@ -34,35 +31,27 @@ public class Role {
         this.roleId = roleId;
     }
 
-    public String getQuyen() {
-        return quyen;
+    public String getRoleName() {
+        return roleName;
     }
 
-    public void setQuyen(String quyen) {
-        this.quyen = quyen;
+    public void setRoleName(String roleName) {
+        this.roleName = roleName;
     }
 
-    public Integer getIsLock() {
-        return isLock;
+    public String getDescription() {
+        return description;
     }
 
-    public void setIsLock(Integer isLock) {
-        this.isLock = isLock;
+    public void setDescription(String description) {
+        this.description = description;
     }
 
-    public TaiKhoanNguoiDung getTaiKhoanNguoiDung() {
-        return taiKhoanNguoiDung;
+    public List<UserAccount> getAccountList() {
+        return accountList;
     }
 
-    public void setTaiKhoanNguoiDung(TaiKhoanNguoiDung taiKhoanNguoiDung) {
-        this.taiKhoanNguoiDung = taiKhoanNguoiDung;
-    }
-
-    public PhongBan getPhongBan() {
-        return phongBan;
-    }
-
-    public void setPhongBan(PhongBan phongBan) {
-        this.phongBan = phongBan;
+    public void setAccountList(List<UserAccount> accountList) {
+        this.accountList = accountList;
     }
 }
