@@ -16,5 +16,5 @@ public interface suKienRepo extends JpaRepository<SuKien, Integer> {
             "AND sk.location LIKE %:location% " +
             "AND sk.organizedBy LIKE %:organizedBy% " +
             "ORDER BY sk.eventId DESC")
-    Page<SuKien> findByAllCondition(@Param("eventName") String eventName, @Param("location") String location, @Param("organizedBy") String organizedBy, Pageable pageabl);
+    Page<SuKien> findByAllCondition(@Param("eventName") String eventName, @Param("location") String location, @Param("organizedBy") String organizedBy, Pageable pageable);
 }

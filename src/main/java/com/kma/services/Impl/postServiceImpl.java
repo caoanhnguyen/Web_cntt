@@ -134,7 +134,6 @@ public class postServiceImpl implements postService{
 	public void updatePost(Integer post_id, postRequestDTO postRequestDTO,
 						   List<MultipartFile> files,
 						   List<Integer> deleteFileIds) throws IOException {
-		// TODO Auto-generated method stub
 		Post post = postRepo.findById(post_id).orElse(null);
 		
 		if(post != null) {
@@ -177,7 +176,6 @@ public class postServiceImpl implements postService{
 
 	@Override
 	public void deletePost(Integer post_id) {
-		// TODO Auto-generated method stub
 		Post existedPost = postRepo.findById(post_id).orElse(null);
 		if(existedPost != null) {
 			List<TaiNguyen> tnlist = existedPost.getTaiNguyenList();

@@ -18,7 +18,7 @@ public class PhongBan {
     private String ghiChu;
 
     //Config relation to nhan_vien
-    @OneToMany(mappedBy = "phongBan", cascade = CascadeType.REMOVE)
+    @OneToMany(mappedBy = "phongBan")
     private List<NhanVien> nvList;
 
     public String getMaPhongBan() {

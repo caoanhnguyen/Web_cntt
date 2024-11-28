@@ -12,9 +12,9 @@ import org.springframework.data.repository.query.Param;
 public interface postRepo extends JpaRepository<Post, Integer>, postRepoCustom {
 
     //JPQL
-    @Query("SELECT p FROM Post p JOIN p.nhanVien nv " +
+    @Query("SELECT p FROM Post p LEFT JOIN p.nhanVien nv " +
             "WHERE p.title LIKE %:title% " +
-            "AND nv.tenNhanVien LIKE %:authorName% " +
+            "AND (nv.tenNhanVien LIKE %:authorName% OR nv IS NULL) " +
             "ORDER BY p.postId DESC")
     Page<Post> findByAllCondition(@Param("title") String title,@Param("authorName") String authorName, Pageable pageable);
 

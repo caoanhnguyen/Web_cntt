@@ -13,10 +13,10 @@ public interface sinhVienRepo extends JpaRepository<SinhVien, String> {
     SinhVien findByAvaFileCode(String avaFileCode);
 
     //JPQL
-    @Query("SELECT sv FROM SinhVien sv JOIN sv.lop l " +
+    @Query("SELECT sv FROM SinhVien sv LEFT JOIN sv.lop l " +
             "WHERE sv.maSinhVien LIKE %:maSinhVien% " +
             "AND sv.tenSinhVien LIKE %:tenSinhVien% " +
-            "AND l.tenLop LIKE %:tenLop% " +
+            "AND (l.tenLop LIKE %:tenLop% OR l.idLop IS NULL) " +
             "ORDER BY sv.maSinhVien ASC")
-    Page<SinhVien> findByAllCondition(@Param("tenSinhVien") String tenSinhVien, @Param("maSinhVien") String maSinhVien, @Param("tenLop") String tenLop, Pageable pageabl);
+    Page<SinhVien> findByAllCondition(@Param("tenSinhVien") String tenSinhVien, @Param("maSinhVien") String maSinhVien, @Param("tenLop") String tenLop, Pageable pageable);
 }

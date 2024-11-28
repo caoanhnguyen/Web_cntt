@@ -14,7 +14,12 @@ public interface nhanVienRepo extends JpaRepository<NhanVien, Integer> {
 
 	// Tìm nhân viên theo tên và môn học
 	//JPQL
-	@Query("SELECT nv FROM NhanVien nv JOIN nv.monHocList mh WHERE nv.tenNhanVien LIKE %:name% AND mh.tenMonHoc LIKE %:tenMonHoc%")
-	List<NhanVien> findByNameAndMonHoc(@Param("name") String name, @Param("tenMonHoc") String tenMonHoc);
+	@Query("SELECT nv FROM NhanVien nv " +
+			"JOIN nv.monHocList mh " +
+			"LEFT JOIN nv.phongBan pb " +
+			"WHERE nv.tenNhanVien LIKE %:name% " +
+			"AND mh.tenMonHoc LIKE %:tenMonHoc% " +
+			"AND (pb.tenPhongBan LIKE %:tenPhongBan% OR pb.maPhongBan IS NULL) ")
+	List<NhanVien> findByNameAndMonHoc(@Param("name") String name, @Param("tenMonHoc") String tenMonHoc, @Param("tenPhongBan") String tenPhongBan);
 
 }

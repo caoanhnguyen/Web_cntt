@@ -78,7 +78,7 @@ public class monHocAPI {
                                             @ModelAttribute monHocDTO mhDTO) throws IOException {
         try {
             monHocServ.addMonHoc(files, mhDTO);
-            return ResponseEntity.ok("Add successful!");
+            return ResponseEntity.ok("Add successfully!");
         } catch (Exception e) {
             // TODO: handle exception
             errorResponseDTO errorDTO = new errorResponseDTO();
@@ -99,7 +99,7 @@ public class monHocAPI {
 
         try {
             monHocServ.updateMonHoc(idMonHoc,monHocDTO, files, deleteFileIds);
-            return ResponseEntity.ok("Update successful!");
+            return ResponseEntity.ok("Update successfully!");
         } catch (EntityNotFoundException e) {
             // TODO: handle exception
             errorResponseDTO errorDTO = new errorResponseDTO();
@@ -118,7 +118,7 @@ public class monHocAPI {
     public ResponseEntity<Object> deleteMonHoc(@PathVariable Integer idMonHoc) {
         try {
             monHocServ.deleteMonHoc(idMonHoc);
-            return ResponseEntity.ok("Delete successful!");
+            return ResponseEntity.ok("Delete successfully!");
         } catch (EntityNotFoundException e) {
             // TODO: handle exception
             errorResponseDTO errorDTO = new errorResponseDTO();

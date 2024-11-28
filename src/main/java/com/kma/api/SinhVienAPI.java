@@ -64,12 +64,47 @@ public class SinhVienAPI {
 		}
 	}
 
+	@GetMapping(value = "/api/students/participated_events/{maSinhVien}")
+	public ResponseEntity<Object> getAllParticipatedEvent(@PathVariable String maSinhVien){
+		try {
+			List<suKienResponseDTO> DTO = svServ.getAllParicipatedEvent(maSinhVien.toUpperCase());
+			return new ResponseEntity<>(DTO, HttpStatus.OK);
+		} catch (EntityNotFoundException e) {
+			// TODO: handle exception
+			errorResponseDTO errorDTO = new errorResponseDTO();
+			errorDTO.setError(e.getMessage());
+			List<String> details = new ArrayList<>();
+			details.add("Student not found!");
+			errorDTO.setDetails(details);
+
+			return new ResponseEntity<>(errorDTO, HttpStatus.NOT_FOUND);
+		} catch (Exception e) {
+			// TODO: handle exception
+			errorResponseDTO errorDTO = new errorResponseDTO();
+			errorDTO.setError(e.getMessage());
+			List<String> details = new ArrayList<>();
+			details.add("An error occurred!");
+			errorDTO.setDetails(details);
+
+			return new ResponseEntity<>(errorDTO, HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	}
+
 	@PostMapping(value = "/api/students")
 	public ResponseEntity<Object> addSinhVien(@RequestParam(value = "file", required = false) MultipartFile file,
 											  @ModelAttribute sinhVienDTO svDTO){
 		try {
 			svServ.addSinhVien(file, svDTO);
-			return ResponseEntity.ok("Add successful!");
+			return ResponseEntity.ok("Add successfully!");
+		} catch (EntityNotFoundException e) {
+			// TODO: handle exception
+			errorResponseDTO errorDTO = new errorResponseDTO();
+			errorDTO.setError(e.getMessage());
+			List<String> details = new ArrayList<>();
+			details.add("Student not found!");
+			errorDTO.setDetails(details);
+
+			return new ResponseEntity<>(errorDTO, HttpStatus.NOT_FOUND);
 		} catch (Exception e) {
 			// TODO: handle exception
 			errorResponseDTO errorDTO = new errorResponseDTO();
@@ -88,7 +123,7 @@ public class SinhVienAPI {
 												 @RequestParam(value = "file", required = false) MultipartFile file) {
 		try {
 			svServ.updateSinhVien(maSinhVien.toUpperCase(), svDTO, file);
-			return ResponseEntity.ok("Update successful!");
+			return ResponseEntity.ok("Update successfully!");
 		} catch (EntityNotFoundException e) {
 			// TODO: handle exception
 			errorResponseDTO errorDTO = new errorResponseDTO();
@@ -107,7 +142,7 @@ public class SinhVienAPI {
 	public ResponseEntity<Object> deleteSinhVien(@PathVariable String maSinhVien) {
 		try {
 			svServ.deleteSinhVien(maSinhVien);
-			return ResponseEntity.ok("Delete successful!");
+			return ResponseEntity.ok("Delete successfully!");
 		} catch (EntityNotFoundException e) {
 			// TODO: handle exception
 			errorResponseDTO errorDTO = new errorResponseDTO();

@@ -13,7 +13,6 @@ public class suKienDTO {
     private Date createAt;
     private String organizedBy;
     private List<fileDTO> fileDTOList;
-    private List<sinhVienResponseDTO> sinhVienThamGia;
 
     public Integer getEventId() {
         return eventId;
@@ -87,11 +86,4 @@ public class suKienDTO {
         this.fileDTOList = fileDTOList;
     }
 
-    public List<sinhVienResponseDTO> getSinhVienThamGia() {
-        return sinhVienThamGia;
-    }
-
-    public void setSinhVienThamGia(List<sinhVienResponseDTO> sinhVienThamGia) {
-        this.sinhVienThamGia = sinhVienThamGia;
-    }
 }

@@ -96,7 +96,7 @@ public class PostAPI {
 										  @ModelAttribute postRequestDTO postRequestDTO) throws IOException {		
 		try {
 			postServ.addPost(files, postRequestDTO);
-			return ResponseEntity.ok("Add successful!");
+			return ResponseEntity.ok("Add successfully!");
 		} catch (IllegalArgumentException e) {
 			// TODO: handle exception
 			errorResponseDTO errorDTO = new errorResponseDTO();
@@ -119,7 +119,7 @@ public class PostAPI {
 		
 		try {
 			postServ.updatePost(post_id,postRequestDTO, files, deleteFileIds);
-			return ResponseEntity.ok("Update successful!"); 
+			return ResponseEntity.ok("Update successfully!");
 		} catch (EntityNotFoundException e) {
 			// TODO: handle exception
 			errorResponseDTO errorDTO = new errorResponseDTO();
@@ -138,7 +138,7 @@ public class PostAPI {
 	public ResponseEntity<Object> deletePost(@PathVariable Integer post_id) {
 		try {
 			postServ.deletePost(post_id);
-			return ResponseEntity.ok("Delete successful!"); 
+			return ResponseEntity.ok("Delete successfully!");
 		} catch (EntityNotFoundException e) {
 			// TODO: handle exception
 			errorResponseDTO errorDTO = new errorResponseDTO();

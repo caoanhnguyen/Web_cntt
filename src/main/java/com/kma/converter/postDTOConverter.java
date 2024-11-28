@@ -27,16 +27,21 @@ public class postDTOConverter {
         List<fileDTO> fileDTO = fileServ.getListFileDTO(tnList);
 
         dto.setFile_dto(fileDTO);
-        dto.setAuthor(items.getNhanVien().getTenNhanVien());
-
+        if(items.getNhanVien()!=null){
+            dto.setAuthor(items.getNhanVien().getTenNhanVien());
+        }else{
+            dto.setAuthor(null);
+        }
         return dto;
     }
 
     public postResponseDTO convertToPostResDTO(Post item){
         postResponseDTO postResDTO = modelMapper.map(item, postResponseDTO.class);
-        String authorName = item.getNhanVien().getTenNhanVien();
-
-        postResDTO.setAuthorName(authorName);
+        if(item.getNhanVien()!=null){
+            postResDTO.setAuthorName(item.getNhanVien().getTenNhanVien());
+        }else{
+            postResDTO.setAuthorName(null);
+        }
         return postResDTO;
     }
 }

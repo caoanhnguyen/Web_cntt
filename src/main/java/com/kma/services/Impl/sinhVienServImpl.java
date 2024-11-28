@@ -2,9 +2,12 @@ package com.kma.services.Impl;
 
 import com.kma.constants.fileDirection;
 import com.kma.converter.sinhVienDTOConverter;
+import com.kma.converter.suKienDTOConverter;
 import com.kma.models.paginationResponseDTO;
 import com.kma.models.sinhVienDTO;
 import com.kma.models.sinhVienResponseDTO;
+import com.kma.models.suKienResponseDTO;
+import com.kma.repository.entities.DangKySuKien;
 import com.kma.repository.entities.SinhVien;
 import com.kma.repository.sinhVienRepo;
 import com.kma.services.fileService;
@@ -32,6 +35,8 @@ public class sinhVienServImpl implements sinhVienService {
     sinhVienDTOConverter svDTOConverter;
     @Autowired
     fileService fileServ;
+    @Autowired
+    suKienDTOConverter skDTOConverter;
 
 
     @Override
@@ -59,6 +64,21 @@ public class sinhVienServImpl implements sinhVienService {
         );
     }
 
+    @Override
+    public List<suKienResponseDTO> getAllParicipatedEvent(String maSinhVien) {
+        // Kiểm tra sinh viên có tồn tại không
+        SinhVien sv = svRepo.findById(maSinhVien).orElse(null);
+
+        if(sv!=null){
+            List<DangKySuKien> dkskList = sv.getDkskList();
+            return dkskList.stream()
+                    .map(i->(skDTOConverter.convertToSKResDTO(i.getEvent())))
+                    .toList();
+        }else{
+            throw new EntityNotFoundException("Student not found with id: " + maSinhVien);
+        }
+    }
+
     private Page<SinhVien> fetchSinhViens(@NotNull Map<String, Object> params, Pageable pageable){
         // Lấy giá trị từ params
         String maSinhVien = (params.get("maSinhVien") != null ? (String) params.get("maSinhVien") : "");
@@ -78,17 +98,24 @@ public class sinhVienServImpl implements sinhVienService {
 
     @Override
     public void addSinhVien(MultipartFile file, sinhVienDTO svDTO) throws IOException {
-        // Lưu avaFile, lấy avaFileCode
-        String avaFileCode = "";
-        if(file!=null){
-            String fileDirec = fileDirection.pathForProfile_SV + "/" + svDTO.getMaSinhVien();
-            avaFileCode = fileServ.uploadFile(file, fileDirec);
+        // Kiểm tra mã sinh viên
+        SinhVien svien = svRepo.findById(svDTO.getMaSinhVien()).orElse(null);
+        if(svien==null){
+            // Lưu avaFile, lấy avaFileCode
+            String avaFileCode = "";
+            if(file!=null){
+                String fileDirec = fileDirection.pathForProfile_SV + "/" + svDTO.getMaSinhVien();
+                avaFileCode = fileServ.uploadFile(file, fileDirec);
+            }
+
+            // Tạo sinh viên để lưu
+            SinhVien sv = svDTOConverter.convertToSV(svDTO, avaFileCode);
+            svRepo.save(sv);
+
+        }else{
+            throw new EntityNotFoundException("Mã sinh viên đã tồn tại, vui lòng kiểm tra lại!");
         }
 
-        // Tạo sinh viên để lưu
-        SinhVien sv = svDTOConverter.convertToSV(svDTO, avaFileCode);
-        sv.setMatKhau("1");
-        svRepo.save(sv);
     }
 
     @Override
@@ -104,8 +131,6 @@ public class sinhVienServImpl implements sinhVienService {
 
             // Update dữ liệu
             sv = svDTOConverter.convertToSV(svDTO, avaFileCode);
-//            sv.setTenSinhVien(svDTO.getTenSinhVien());
-//            sv.setAvaFileCode(avaFileCode);
             svRepo.save(sv);
 
         }else{

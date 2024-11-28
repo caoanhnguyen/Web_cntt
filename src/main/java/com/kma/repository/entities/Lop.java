@@ -19,7 +19,7 @@ public class Lop {
     @JoinColumn(name = "idChuNhiem")
     private NhanVien chuNhiem;
 
-    @OneToMany(mappedBy = "lop", cascade = CascadeType.REMOVE)
+    @OneToMany(mappedBy = "lop")
     private List<SinhVien> svList = new ArrayList<>();
 
     public Integer getIdLop() {

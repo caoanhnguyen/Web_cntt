@@ -22,7 +22,7 @@ public class MonHoc {
     private Integer soTinChi;
 
     //Config relation to mon_hoc
-    @OneToMany(mappedBy = "monHoc", cascade = CascadeType.REMOVE)
+    @OneToMany(mappedBy = "monHoc")
     private List<TaiLieuMonHoc> taiLieuMHList = new ArrayList<>();
 
     //Config relation to nhan_vien

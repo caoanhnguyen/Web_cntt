@@ -4,8 +4,10 @@ import com.kma.converter.nhanVienDTOConverter;
 import com.kma.models.nhanVienDTO;
 import com.kma.repository.entities.MonHoc;
 import com.kma.repository.entities.NhanVien;
+import com.kma.repository.entities.UserAccount;
 import com.kma.repository.monHocRepo;
 import com.kma.repository.nhanVienRepo;
+import com.kma.repository.userAccRepo;
 import com.kma.services.nhanVienService;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
@@ -24,6 +26,8 @@ public class nhanVienServImpl implements nhanVienService{
 	monHocRepo mhRepo;
 	@Autowired
 	nhanVienDTOConverter nvDTOConverter;
+	@Autowired
+	userAccRepo accRepo;
 
 	@Override
 	public nhanVienDTO getById(Integer idUser) {
@@ -38,7 +42,8 @@ public class nhanVienServImpl implements nhanVienService{
 		// TODO Auto-generated method stub
 		// Lấy giá trị từ params
 		String tenNhanVien = (String) params.get("name");
-		String tenMonHoc = (String) params.get("ten_mon");
+		String tenMonHoc = (String) params.get("tenMon");
+		String tenPhongBan = (String) params.get("tenPhongBan");
 		// Tìm môn học theo tên môn
 		List<MonHoc> mhList = mhRepo.findByTenMonHocContaining(tenMonHoc);
 		// Tìm kiếm nhân viên theo điều kiện
@@ -56,7 +61,7 @@ public class nhanVienServImpl implements nhanVienService{
 			if(mhList==null){
 				nvList = nvRepo.findByTenNhanVienContaining(tenNhanVien);
 			}else{
-				nvList = nvRepo.findByNameAndMonHoc(tenNhanVien, tenMonHoc);
+				nvList = nvRepo.findByNameAndMonHoc(tenNhanVien, tenMonHoc, tenPhongBan);
 			}
 		}
 		return nvList.stream()

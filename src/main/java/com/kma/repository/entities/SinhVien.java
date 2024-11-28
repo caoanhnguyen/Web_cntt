@@ -40,22 +40,14 @@ public class SinhVien {
     @Column(name = "queQuan")
     private String queQuan;
 
-    @Column(name = "khoa", unique = true)
+    @Column(name = "khoa")
     private String khoa;
 
     @Column(name = "chucVu")
     private String chucVu;
 
-    @Column(name = "matKhau")
-    private String matKhau;
-
     @Column(name = "avaFileCode", unique = true)
     private String avaFileCode;
-
-    // Config relation to user_account
-    @OneToOne
-    @JoinColumn(name = "userAccountId")
-    private UserAccount userAccount;
 
     //Config relation to Lop
     @ManyToOne(fetch = FetchType.EAGER)
@@ -63,7 +55,7 @@ public class SinhVien {
     private Lop lop;
 
     //Config relation to dang_ky_su_kien
-    @OneToMany(mappedBy = "sinhVien", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "sinhVien")
     private List<DangKySuKien> dkskList = new ArrayList<>();
 
     public String getMaSinhVien() {
@@ -154,28 +146,12 @@ public class SinhVien {
         this.chucVu = chucVu;
     }
 
-    public String getMatKhau() {
-        return matKhau;
-    }
-
-    public void setMatKhau(String matKhau) {
-        this.matKhau = matKhau;
-    }
-
     public String getAvaFileCode() {
         return avaFileCode;
     }
 
     public void setAvaFileCode(String avaFileCode) {
         this.avaFileCode = avaFileCode;
-    }
-
-    public UserAccount getUserAccount() {
-        return userAccount;
-    }
-
-    public void setUserAccount(UserAccount userAccount) {
-        this.userAccount = userAccount;
     }
 
     public Lop getLop() {

@@ -37,6 +37,33 @@ public class suKienAPI {
         }
     }
 
+    @GetMapping(value = "/api/sukien/participation_list/{eventId}")
+    public ResponseEntity<Object> getAllSVInEvent(@PathVariable Integer eventId){
+        try {
+            List<sinhVienResponseDTO> DTO = skServ.getAllSVInEvent(eventId);
+            return new ResponseEntity<>(DTO, HttpStatus.OK);
+        } catch (EntityNotFoundException e) {
+            // TODO: handle exception
+            errorResponseDTO errorDTO = new errorResponseDTO();
+            errorDTO.setError(e.getMessage());
+            List<String> details = new ArrayList<>();
+            details.add("Event not found!");
+            errorDTO.setDetails(details);
+
+            return new ResponseEntity<>(errorDTO, HttpStatus.NOT_FOUND);
+        } catch (Exception e) {
+            // TODO: handle exception
+            errorResponseDTO errorDTO = new errorResponseDTO();
+            errorDTO.setError(e.getMessage());
+            List<String> details = new ArrayList<>();
+            details.add("An error occurred!");
+            errorDTO.setDetails(details);
+
+            return new ResponseEntity<>(errorDTO, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+
     @GetMapping(value = "/api/sukien/{eventId}")
     public ResponseEntity<Object> findById(@PathVariable Integer eventId){
         try {
@@ -68,7 +95,7 @@ public class suKienAPI {
                                           @ModelAttribute suKienResponseDTO skResDTO) {
         try {
             skServ.addEvent(files, skResDTO);
-            return ResponseEntity.ok("Add successful!");
+            return ResponseEntity.ok("Add successfully!");
         } catch (IllegalArgumentException e) {
             // TODO: handle exception
             errorResponseDTO errorDTO = new errorResponseDTO();
@@ -91,7 +118,7 @@ public class suKienAPI {
 
         try {
             skServ.updateEvent(eventId, skResDTO, files, deleteFileIds);
-            return ResponseEntity.ok("Update successful!");
+            return ResponseEntity.ok("Update successfully!");
         } catch (EntityNotFoundException e) {
             // TODO: handle exception
             errorResponseDTO errorDTO = new errorResponseDTO();
@@ -110,7 +137,7 @@ public class suKienAPI {
     public ResponseEntity<Object> deletePost(@PathVariable Integer eventId) {
         try {
             skServ.deleteEvent(eventId);
-            return ResponseEntity.ok("Delete successful!");
+            return ResponseEntity.ok("Delete successfully!");
         } catch (EntityNotFoundException e) {
             // TODO: handle exception
             errorResponseDTO errorDTO = new errorResponseDTO();

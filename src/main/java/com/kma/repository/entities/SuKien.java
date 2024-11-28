@@ -34,11 +34,11 @@ public class SuKien {
     private Date createAt;
 
     //Config relation to tai_nguyen
-    @OneToMany(mappedBy = "event", cascade = CascadeType.REMOVE)
+    @OneToMany(mappedBy = "event")
     private List<TaiNguyen> taiNguyenList;
 
     //Config relation to dang_ki_su_kien
-    @OneToMany(mappedBy = "event", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "event")
     private List<DangKySuKien> dkskList;
 
     public List<DangKySuKien> getDkskList() {

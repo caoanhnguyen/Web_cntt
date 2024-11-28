@@ -26,7 +26,7 @@ public class Post {
 	@JoinColumn(name = "authorId")
 	private NhanVien nhanVien;
 	
-	@OneToMany(mappedBy = "post", cascade = CascadeType.REMOVE)
+	@OneToMany(mappedBy = "post")
 	private List<TaiNguyen> taiNguyenList = new ArrayList<>();
 	
 	

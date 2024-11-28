@@ -71,7 +71,7 @@ public class NhanVien {
     private String avaFileCode;
     
     //Config relation to Post
-    @OneToMany(mappedBy = "nhanVien", cascade = CascadeType.REMOVE)
+    @OneToMany(mappedBy = "nhanVien")
 	private List<Post> posts;
 
 	//Config relation to mon_hoc
@@ -79,13 +79,8 @@ public class NhanVien {
 	private List<MonHoc> monHocList;
 
 	//Config relation to lop
-	@OneToMany(mappedBy = "chuNhiem", cascade = CascadeType.REMOVE)
+	@OneToMany(mappedBy = "chuNhiem")
 	private List<Lop> lopList = new ArrayList<>();
-
-	// Config relation to user_account
-	@OneToOne
-	@JoinColumn(name = "userAccountId")
-	private UserAccount userAccount;
 
 	// Config relation to phong_ban
 	@ManyToOne(fetch = FetchType.EAGER)
@@ -274,14 +269,6 @@ public class NhanVien {
 
 	public void setLopList(List<Lop> lopList) {
 		this.lopList = lopList;
-	}
-
-	public UserAccount getUserAccount() {
-		return userAccount;
-	}
-
-	public void setUserAccount(UserAccount userAccount) {
-		this.userAccount = userAccount;
 	}
 
 	public PhongBan getPhongBan() {

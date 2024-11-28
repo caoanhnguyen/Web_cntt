@@ -34,11 +34,6 @@ public class suKienDTOConverter {
         List<fileDTO> fileDTOList = fileServ.getListFileDTO(sk.getTaiNguyenList());
         dto.setFileDTOList(fileDTOList);
 
-        // Lấy danh sách sinh viên tham gia sự kiện này
-        List<DangKySuKien> dkskList = sk.getDkskList();
-        List<sinhVienResponseDTO> svResDTOList = dkskList.stream().map(i->(svDTOConverter.convertToSVResDTO(i.getSinhVien()))).toList();
-        dto.setSinhVienThamGia(svResDTOList);
-
         return dto;
     }
 

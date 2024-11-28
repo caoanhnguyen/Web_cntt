@@ -24,8 +24,13 @@ public class nhanVienDTOConverter {
 		nhanVienDTO dto =  modelMapper.map(nv, nhanVienDTO.class);
 		// Set môn giảng dạy chính
 		MonHoc monGiangDayChinh = mhRepo.findById(nv.getIdMonGiangDayChinh()).orElse(null);
-		monHocResponseDTO monHocResDTO = modelMapper.map(monGiangDayChinh, monHocResponseDTO.class);
-		dto.setMonGiangDayChinh(monHocResDTO);
+		monHocResponseDTO monHocResDTO = new monHocResponseDTO();
+		if(monGiangDayChinh!=null){
+			monHocResDTO = modelMapper.map(monGiangDayChinh, monHocResponseDTO.class);
+			dto.setMonGiangDayChinh(monHocResDTO);
+		}else{
+			dto.setMonGiangDayChinh(null);
+		}
 		// Set các môn liên quan
 		List<monHocResponseDTO> monHocResponseDTOs = nv.getMonHocList().stream()
 				.map(mh -> modelMapper.map(mh, monHocResponseDTO.class))

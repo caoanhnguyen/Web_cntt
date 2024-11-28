@@ -23,8 +23,13 @@ public class sinhVienDTOConverter {
         sinhVienResponseDTO svResDTO = modelMapper.map(sv, sinhVienResponseDTO.class);
         String gioiTinh = sv.getGioiTinh().getDisplayName();
         svResDTO.setGioiTinh(gioiTinh);
-        String tenLop = sv.getLop().getTenLop();
-        svResDTO.setTenLop(tenLop);
+        Lop lop = sv.getLop();
+        if(lop!=null){
+            String tenLop = lop.getTenLop();
+            svResDTO.setTenLop(tenLop);
+        }else{
+            svResDTO.setTenLop(null);
+        }
         return svResDTO;
     }
 
@@ -32,8 +37,13 @@ public class sinhVienDTOConverter {
         sinhVienDTO dto = modelMapper.map(sv, sinhVienDTO.class);
         String gioiTinh = sv.getGioiTinh().getDisplayName();
         dto.setGioiTinh(gioiTinh);
-        String tenLop = sv.getLop().getTenLop();
-        dto.setTenLop(tenLop);
+        Lop lop = sv.getLop();
+        if(lop!=null){
+            String tenLop = lop.getTenLop();
+            dto.setTenLop(tenLop);
+        }else{
+            dto.setTenLop(null);
+        }
         dto.setAvaDownloadUrl("/downloadProfile/"+sv.getAvaFileCode());
         return dto;
     }
@@ -42,10 +52,13 @@ public class sinhVienDTOConverter {
         SinhVien sv = modelMapper.map(svDTO, SinhVien.class);
         sv.setGioiTinh(GioiTinh.fromDisplayName(svDTO.getGioiTinh()));
         Lop lop = lopRepo.findByTenLop(svDTO.getTenLop());
-        sv.setLop(lop);
+        if(lop!=null) {
+            sv.setLop(lop);
+        }else{
+            sv.setLop(null);
+        }
         sv.setAvaFileCode(avaFileCode);
         sv.setDkskList(null);   // tạm thời để null
-
         return sv;
     }
 }

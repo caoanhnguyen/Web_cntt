@@ -1,6 +1,7 @@
 package com.kma.services;
 
 import com.kma.models.paginationResponseDTO;
+import com.kma.models.sinhVienResponseDTO;
 import com.kma.models.suKienDTO;
 import com.kma.models.suKienResponseDTO;
 import org.springframework.web.multipart.MultipartFile;
@@ -19,4 +20,6 @@ public interface suKienService {
     void deleteEvent(Integer eventId);
 
     void updateEvent(Integer eventId, suKienResponseDTO skResDTO, List<MultipartFile> files, List<Integer> deleteFileIds) throws IOException;
+
+    List<sinhVienResponseDTO> getAllSVInEvent(Integer eventId);
 }

@@ -85,7 +85,7 @@ public class NhanVienAPI {
 	public ResponseEntity<Object> deleteNhanVien(@PathVariable Integer idUser) {
 		try {
 			nvServ.deleteNhanVien(idUser);
-			return ResponseEntity.ok("Delete successful!");
+			return ResponseEntity.ok("Delete successfully!");
 		} catch (EntityNotFoundException e) {
 			// TODO: handle exception
 			errorResponseDTO errorDTO = new errorResponseDTO();

@@ -1,8 +1,10 @@
 package com.kma.services.Impl;
 
 import com.kma.constants.fileDirection;
+import com.kma.converter.sinhVienDTOConverter;
 import com.kma.converter.suKienDTOConverter;
 import com.kma.models.paginationResponseDTO;
+import com.kma.models.sinhVienResponseDTO;
 import com.kma.models.suKienDTO;
 import com.kma.models.suKienResponseDTO;
 import com.kma.repository.entities.*;
@@ -38,6 +40,8 @@ public class suKienServImpl implements suKienService {
     fileService fileServ;
     @Autowired
     taiNguyenRepo tnRepo;
+    @Autowired
+    sinhVienDTOConverter svDTOConverter;
 
     @Override
     public paginationResponseDTO<suKienResponseDTO> getAllEvent(Map<String, Object> params, Integer page, Integer size) {
@@ -61,6 +65,22 @@ public class suKienServImpl implements suKienService {
                 suKienPage.getNumber(),
                 suKienPage.getSize()
         );
+    }
+
+    @Override
+    public List<sinhVienResponseDTO> getAllSVInEvent(Integer eventId) {
+        // Kiểm tra sự kiện có tồn tại không
+        SuKien event = skRepo.findById(eventId).orElse(null);
+
+        if(event!=null){
+            List<DangKySuKien> dkskList = event.getDkskList();
+            return dkskList.stream()
+                    .map(i->(svDTOConverter.convertToSVResDTO(i.getSinhVien())))
+                    .toList();
+
+        }else{
+            throw new EntityNotFoundException("Event not found!");
+        }
     }
 
     private Page<SuKien> fetchSuKien(@NotNull Map<String, Object> params, Pageable pageable){
