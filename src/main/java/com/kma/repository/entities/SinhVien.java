@@ -15,7 +15,7 @@ public class SinhVien {
     @Column(name = "maSinhVien", nullable = false)
     private String maSinhVien;
 
-    @Column(name = "tenSinhVien", nullable = false)
+    @Column(name = "tenSinhVien")
     private String tenSinhVien;
 
     @Enumerated(EnumType.STRING)

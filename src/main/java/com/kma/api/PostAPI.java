@@ -1,6 +1,5 @@
 package com.kma.api;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -27,7 +26,7 @@ import jakarta.persistence.EntityNotFoundException;
 public class PostAPI {
 	
 	@Autowired
-	private postService postServ;
+	postService postServ;
 
 	@GetMapping(value = "/api/posts/{post_id}")
 	public ResponseEntity<Object> getById(@PathVariable Integer post_id){
@@ -93,7 +92,7 @@ public class PostAPI {
 	
 	@PostMapping(value = "/api/posts")
 	public ResponseEntity<Object> addPost(@RequestParam(value = "file", required = false) List<MultipartFile> files,
-										  @ModelAttribute postRequestDTO postRequestDTO) throws IOException {		
+										  @ModelAttribute postRequestDTO postRequestDTO) {
 		try {
 			postServ.addPost(files, postRequestDTO);
 			return ResponseEntity.ok("Add successfully!");

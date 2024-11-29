@@ -2,7 +2,6 @@ package com.kma.api;
 
 import com.kma.models.errorResponseDTO;
 import com.kma.models.registrationDTO;
-import com.kma.models.sinhVienResponseDTO;
 import com.kma.services.dangKySKService;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;

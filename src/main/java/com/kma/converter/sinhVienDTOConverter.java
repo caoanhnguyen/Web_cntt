@@ -50,7 +50,9 @@ public class sinhVienDTOConverter {
 
     public SinhVien convertToSV(sinhVienDTO svDTO, String avaFileCode){
         SinhVien sv = modelMapper.map(svDTO, SinhVien.class);
-        sv.setGioiTinh(GioiTinh.fromDisplayName(svDTO.getGioiTinh()));
+        if(svDTO.getGioiTinh()!= null){
+            sv.setGioiTinh(GioiTinh.fromDisplayName(svDTO.getGioiTinh()));
+        }
         Lop lop = lopRepo.findByTenLop(svDTO.getTenLop());
         if(lop!=null) {
             sv.setLop(lop);

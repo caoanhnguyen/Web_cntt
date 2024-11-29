@@ -27,6 +27,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional
@@ -68,16 +69,38 @@ public class suKienServImpl implements suKienService {
     }
 
     @Override
-    public List<sinhVienResponseDTO> getAllSVInEvent(Integer eventId) {
+    public paginationResponseDTO<sinhVienResponseDTO> getAllSVInEvent(Integer eventId, Integer page, Integer size) {
         // Kiểm tra sự kiện có tồn tại không
         SuKien event = skRepo.findById(eventId).orElse(null);
 
         if(event!=null){
+            // Tạo Pageable từ page và size
+            Pageable pageable = PageRequest.of(page, size);
             List<DangKySuKien> dkskList = event.getDkskList();
-            return dkskList.stream()
-                    .map(i->(svDTOConverter.convertToSVResDTO(i.getSinhVien())))
-                    .toList();
 
+            // Tính toán phân trang
+            int start = pageable.getPageNumber() * pageable.getPageSize();
+            int end = Math.min((start + pageable.getPageSize()), dkskList.size());
+
+            List<sinhVienResponseDTO> content = dkskList.subList(start, end).stream()
+                    .map(i -> svDTOConverter.convertToSVResDTO(i.getSinhVien()))
+                    .collect(Collectors.toList());
+
+            // Tính toán các thông tin phân trang
+            int totalElements = dkskList.size();
+            int totalPages = (int) Math.ceil((double) totalElements / pageable.getPageSize());
+            boolean isFirst = pageable.getPageNumber() == 0;
+            boolean isLast = pageable.getPageNumber() + 1 == totalPages;
+
+            return new paginationResponseDTO<>(
+                    content,
+                    totalPages,
+                    totalElements,
+                    isFirst,
+                    isLast,
+                    pageable.getPageNumber(),
+                    pageable.getPageSize()
+            );
         }else{
             throw new EntityNotFoundException("Event not found!");
         }

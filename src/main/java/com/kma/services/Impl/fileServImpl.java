@@ -115,41 +115,64 @@ public class fileServImpl implements fileService{
 
 		// Lấy fileCode từ entity
 		String fileCode;
-		if (entity instanceof TaiNguyen) {
-			fileCode = ((TaiNguyen) entity).getFileCode();
-		} else if (entity instanceof TaiLieuMonHoc) {
-			fileCode = ((TaiLieuMonHoc) entity).getFileCode();
-		} else if (entity instanceof SinhVien) {
-			fileCode = ((SinhVien) entity).getAvaFileCode();
-			directoryPath += "/" + ((SinhVien) entity).getMaSinhVien();
-		} else if (entity instanceof NhanVien) {
-			fileCode = ((NhanVien) entity).getAvaFileCode();
-			directoryPath += "/" + ((NhanVien) entity).getMaNhanVien();
-		} else {
-			throw new IllegalStateException("Unexpected entity type!");
-		}
+        switch (entity) {
+            case TaiNguyen taiNguyen -> fileCode = taiNguyen.getFileCode();
+
+            case TaiLieuMonHoc taiLieuMonHoc -> fileCode = taiLieuMonHoc.getFileCode();
+
+            case SinhVien sinhVien -> {
+                fileCode = sinhVien.getAvaFileCode();
+                String tenLop = sinhVien.getLop().getTenLop();
+                directoryPath += "/" + tenLop + "/" + sinhVien.getMaSinhVien();
+            }
+            case NhanVien nhanVien -> {
+                fileCode = nhanVien.getAvaFileCode();
+				String tenPhongBan = nhanVien.getPhongBan().getTenPhongBan();
+                directoryPath += "/" + tenPhongBan + "/" +nhanVien.getMaNhanVien();
+            }
+            default -> throw new IllegalStateException("Unexpected entity type!");
+        }
 
 		if(fileCode!=null){
 			deleteFromDisk(fileCode, directoryPath);
 		}
 	}
 
-	private void deleteFromDisk(String fileCode, String fileDirec){
+	private void deleteFromDisk(String fileCode, String fileDirec) {
 		// Xóa file
 		try {
 			Path dirPath = Paths.get(fileDirec);
-			Files.list(dirPath).forEach(file -> {
-				if (file.getFileName().toString().startsWith(fileCode)) {
-					try {
-						Files.deleteIfExists(file);
-					} catch (IOException e) {
-						throw new RuntimeException("Failed to delete file: " + file.getFileName(), e);
+
+			// Kiểm tra xem thư mục có tồn tại không
+			if (Files.exists(dirPath) && Files.isDirectory(dirPath)) {
+				// Duyệt qua tất cả các file trong thư mục
+				Files.list(dirPath).forEach(file -> {
+					if (file.getFileName().toString().startsWith(fileCode)) {
+						try {
+							// Xóa tệp nếu tồn tại
+							Files.deleteIfExists(file);
+						} catch (IOException e) {
+							throw new RuntimeException("Failed to delete file: " + file.getFileName(), e);
+						}
 					}
+				});
+
+				// Sau khi đã xóa hết các tệp, thử xóa thư mục (nếu thư mục trống)
+				try {
+					Files.deleteIfExists(dirPath);
+				} catch (IOException e) {
+					throw new RuntimeException("Failed to delete directory: " + dirPath, e);
 				}
-			});
+
+			} else {
+				throw new RuntimeException("Directory does not exist or is not a directory: " + dirPath);
+			}
+
 		} catch (IOException e) {
 			throw new RuntimeException("Error accessing files directory", e);
 		}
 	}
+
+
 
 }

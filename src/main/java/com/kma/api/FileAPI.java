@@ -50,11 +50,11 @@ public class FileAPI {
 		// Tìm kiếm fileCode trong SinhVien và NhanVien
 		SinhVien sinhVien = svRepo.findByAvaFileCode(fileCode);
 		if (sinhVien != null) {
-			directoryPath = fileDirection.pathForProfile_SV + "/" + sinhVien.getMaSinhVien();
+			directoryPath = fileDirection.pathForProfile_SV + "/" + sinhVien.getLop().getTenLop() + "/" + sinhVien.getMaSinhVien();
 		} else {
 			NhanVien nhanVien = nvRepo.findByAvaFileCode(fileCode);
 			if (nhanVien != null) {
-				directoryPath = fileDirection.pathForProfile_NV + "/" + nhanVien.getMaNhanVien();
+				directoryPath = fileDirection.pathForProfile_NV + "/" + nhanVien.getPhongBan().getTenPhongBan() + "/" + nhanVien.getMaNhanVien();
 			} else {
 				return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Không tìm thấy file!");
 			}

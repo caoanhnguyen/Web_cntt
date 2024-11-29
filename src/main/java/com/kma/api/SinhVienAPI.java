@@ -18,7 +18,7 @@ import org.springframework.web.multipart.MultipartFile;
 public class SinhVienAPI {
 	@Autowired
 	sinhVienService svServ;
-	
+
 	@GetMapping(value = "/api/students")
 	public ResponseEntity<Object> getAllStudent(@RequestParam Map<String,Object> params,
 											    @RequestParam(required = false, defaultValue = "0") int page,
@@ -112,7 +112,6 @@ public class SinhVienAPI {
 			List<String> details = new ArrayList<>();
 			details.add("An error occurred!");
 			errorDTO.setDetails(details);
-
 			return new ResponseEntity<>(errorDTO, HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}

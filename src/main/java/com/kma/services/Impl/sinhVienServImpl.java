@@ -101,10 +101,11 @@ public class sinhVienServImpl implements sinhVienService {
         // Kiểm tra mã sinh viên
         SinhVien svien = svRepo.findById(svDTO.getMaSinhVien()).orElse(null);
         if(svien==null){
+
             // Lưu avaFile, lấy avaFileCode
             String avaFileCode = "";
             if(file!=null){
-                String fileDirec = fileDirection.pathForProfile_SV + "/" + svDTO.getMaSinhVien();
+                String fileDirec = fileDirection.pathForProfile_SV + "/" + svDTO.getTenLop() + "/" + svDTO.getMaSinhVien();
                 avaFileCode = fileServ.uploadFile(file, fileDirec);
             }
 
@@ -118,21 +119,23 @@ public class sinhVienServImpl implements sinhVienService {
 
     }
 
+    @Transactional
     @Override
-    public void updateSinhVien(String maSinhVien,sinhVienDTO svDTO, MultipartFile file) throws IOException {
+    public void updateSinhVien(String maSinhVien, sinhVienDTO svDTO, MultipartFile file) throws IOException {
         SinhVien sv = svRepo.findById(maSinhVien).orElse(null);
         if(sv != null){
-            // Xử lí lưu avaFile mới
-            String fileDirec = fileDirection.pathForProfile_SV + "/" + sv.getMaSinhVien();
-            String avaFileCode = fileServ.uploadFile(file, fileDirec);
+            String avaFileCode = sv.getAvaFileCode();
+            if(file!=null){
+                // Xử lí xóa bỏ file cũ
+                fileServ.deleteFile(maSinhVien, 3);
 
-            // Xử lí xóa bỏ file cũ
-            fileServ.deleteFile(maSinhVien, 3);
-
+                // Xử lí lưu avaFile mới
+                String fileDirec = fileDirection.pathForProfile_SV + "/" + svDTO.getTenLop() + "/" + svDTO.getMaSinhVien();
+                avaFileCode = fileServ.uploadFile(file, fileDirec);
+            }
             // Update dữ liệu
             sv = svDTOConverter.convertToSV(svDTO, avaFileCode);
             svRepo.save(sv);
-
         }else{
             throw new EntityNotFoundException("Student not found with id: " + maSinhVien);
         }

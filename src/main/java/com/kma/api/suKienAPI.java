@@ -38,9 +38,11 @@ public class suKienAPI {
     }
 
     @GetMapping(value = "/api/sukien/participation_list/{eventId}")
-    public ResponseEntity<Object> getAllSVInEvent(@PathVariable Integer eventId){
+    public ResponseEntity<Object> getAllSVInEvent(@PathVariable Integer eventId,
+                                                  @RequestParam(required = false, defaultValue = "0") int page,
+                                                  @RequestParam(required = false, defaultValue = "5") int size){
         try {
-            List<sinhVienResponseDTO> DTO = skServ.getAllSVInEvent(eventId);
+            paginationResponseDTO<sinhVienResponseDTO> DTO = skServ.getAllSVInEvent(eventId, page, size);
             return new ResponseEntity<>(DTO, HttpStatus.OK);
         } catch (EntityNotFoundException e) {
             // TODO: handle exception
