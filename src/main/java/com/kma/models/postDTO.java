@@ -1,5 +1,7 @@
 package com.kma.models;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+
 import java.sql.Date;
 import java.util.List;
 
@@ -8,6 +10,7 @@ public class postDTO {
 	private Integer post_id; 
 	private String title;
 	private String content;
+	@JsonFormat(pattern = "yyyy-MM-dd")  // Định dạng ngày tháng năm
 	private Date create_at;
 	private List<fileDTO> file_dto;
 	private String author;

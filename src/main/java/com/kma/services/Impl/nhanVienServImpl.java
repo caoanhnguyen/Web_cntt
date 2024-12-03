@@ -4,10 +4,9 @@ import com.kma.converter.nhanVienDTOConverter;
 import com.kma.models.nhanVienDTO;
 import com.kma.repository.entities.MonHoc;
 import com.kma.repository.entities.NhanVien;
-import com.kma.repository.entities.UserAccount;
 import com.kma.repository.monHocRepo;
 import com.kma.repository.nhanVienRepo;
-import com.kma.repository.userAccRepo;
+import com.kma.repository.userRepo;
 import com.kma.services.nhanVienService;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
@@ -27,7 +26,7 @@ public class nhanVienServImpl implements nhanVienService{
 	@Autowired
 	nhanVienDTOConverter nvDTOConverter;
 	@Autowired
-	userAccRepo accRepo;
+	userRepo accRepo;
 
 	@Override
 	public nhanVienDTO getById(Integer idUser) {

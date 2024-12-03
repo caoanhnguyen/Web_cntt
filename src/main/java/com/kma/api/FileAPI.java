@@ -9,7 +9,7 @@ import com.kma.repository.entities.NhanVien;
 import com.kma.repository.entities.SinhVien;
 import com.kma.repository.nhanVienRepo;
 import com.kma.repository.sinhVienRepo;
-import org.jetbrains.annotations.NotNull;
+import org.antlr.v4.runtime.misc.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;

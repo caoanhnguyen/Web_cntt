@@ -8,21 +8,27 @@ import com.kma.models.sinhVienDTO;
 import com.kma.models.sinhVienResponseDTO;
 import com.kma.models.suKienResponseDTO;
 import com.kma.repository.entities.DangKySuKien;
+import com.kma.repository.entities.Role;
 import com.kma.repository.entities.SinhVien;
+import com.kma.repository.entities.User;
+import com.kma.repository.roleRepo;
 import com.kma.repository.sinhVienRepo;
+import com.kma.repository.userRepo;
 import com.kma.services.fileService;
 import com.kma.services.sinhVienService;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
-import org.jetbrains.annotations.NotNull;
+import org.antlr.v4.runtime.misc.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -37,6 +43,10 @@ public class sinhVienServImpl implements sinhVienService {
     fileService fileServ;
     @Autowired
     suKienDTOConverter skDTOConverter;
+    @Autowired
+    roleRepo rolerepo;
+    @Autowired
+    private userRepo userrepo;
 
 
     @Override
@@ -113,10 +123,31 @@ public class sinhVienServImpl implements sinhVienService {
             SinhVien sv = svDTOConverter.convertToSV(svDTO, avaFileCode);
             svRepo.save(sv);
 
+            createUserForSV(sv.getMaSinhVien());
+
         }else{
             throw new EntityNotFoundException("Mã sinh viên đã tồn tại, vui lòng kiểm tra lại!");
         }
 
+    }
+
+    private void createUserForSV(String maSinhVien){
+        // Mã hóa mật khẩu bằng BCrypt
+        BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+        String encodedPassword = passwordEncoder.encode("admin");  // Mật khẩu sinh viên sẽ là ngày sinh của họ
+
+        // Tạo user mới với username là mã sinh viên và mật khẩu đã mã hóa
+        User user = new User();
+        user.setUserName(maSinhVien);  // Tên đăng nhập là mã sinh viên
+        user.setPassword(encodedPassword);  // Mật khẩu đã mã hóa
+        user.setIsActive(1);  // Set tài khoản ở trạng thái hoạt động (active)
+
+        // Tạo và gán role STUDENT cho user
+        Role studentRole = rolerepo.findByRoleName("STUDENT");
+        user.setRoleList(Collections.singletonList(studentRole));  // Gán role STUDENT cho tài khoản này
+
+        // Lưu tài khoản người dùng vào cơ sở dữ liệu
+        userrepo.save(user);
     }
 
     @Transactional

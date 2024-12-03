@@ -1,5 +1,6 @@
 package com.kma.models;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.kma.repository.entities.PhongBan;
 
 import java.sql.Date;
@@ -8,6 +9,8 @@ import java.util.List;
 public class nhanVienDTO {
 	private Integer idUser;
 	private String tenNhanVien;
+
+	@JsonFormat(pattern = "yyyy-MM-dd")  // Định dạng ngày tháng năm
 	private Date ngaySinh;
 	private String sdt;
 	private String diaChi;

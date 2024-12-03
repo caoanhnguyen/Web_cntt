@@ -1,5 +1,7 @@
 package com.kma.models;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+
 import java.sql.Date;
 
 public class taiNguyenDTO {
@@ -7,6 +9,7 @@ public class taiNguyenDTO {
 	private String title;
 	private String description;
 	private String file_path;
+	@JsonFormat(pattern = "yyyy-MM-dd")  // Định dạng ngày tháng năm
 	private Date create_at;
 	
 	public String getTitle() {

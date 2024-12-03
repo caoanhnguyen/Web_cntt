@@ -1,10 +1,8 @@
 package com.kma.converter;
 
 import com.kma.models.fileDTO;
-import com.kma.models.sinhVienResponseDTO;
 import com.kma.models.suKienDTO;
 import com.kma.models.suKienResponseDTO;
-import com.kma.repository.entities.DangKySuKien;
 import com.kma.repository.entities.SuKien;
 import com.kma.services.fileService;
 import org.modelmapper.ModelMapper;
@@ -20,8 +18,6 @@ public class suKienDTOConverter {
     ModelMapper modelMapper;
     @Autowired
     fileService fileServ;
-    @Autowired
-    sinhVienDTOConverter svDTOConverter;
 
     public suKienResponseDTO convertToSKResDTO(SuKien sk){
         return modelMapper.map(sk, suKienResponseDTO.class);

@@ -1,16 +1,18 @@
 package com.kma.models;
 
-import jakarta.persistence.Column;
+import com.fasterxml.jackson.annotation.JsonFormat;
 
 import java.sql.Date;
 
 public class nhanVienRequestDTO {
 	private String maNhanVien;
 	private String tenNhanVien;
+	@JsonFormat(pattern = "yyyy-MM-dd")  // Định dạng ngày tháng năm
 	private Date ngaySinh;
 	private String dienThoai;
 	private String hocVi;
 	private String cccd;
+	@JsonFormat(pattern = "yyyy-MM-dd")  // Định dạng ngày tháng năm
 	private Date ngayCapCCCD;
 	private String noiCapCCCD;
 	private String diaChiCCCD;

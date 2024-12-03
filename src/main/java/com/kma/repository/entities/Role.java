@@ -21,7 +21,12 @@ public class Role {
 
     // Config relationto user_account
     @ManyToMany(mappedBy = "roleList")
-    private List<UserAccount> accountList = new ArrayList<>();
+    private List<User> userList = new ArrayList<>();
+
+    public static String ADMIN = "ADMIN";
+    public static String EMPLOYEE = "EMPLOYEE";
+    public static String USER = "USER";
+    public static String STUDENT = "STUDENT";
 
     public Integer getRoleId() {
         return roleId;
@@ -47,11 +52,11 @@ public class Role {
         this.description = description;
     }
 
-    public List<UserAccount> getAccountList() {
-        return accountList;
+    public List<User> getAccountList() {
+        return userList;
     }
 
-    public void setAccountList(List<UserAccount> accountList) {
-        this.accountList = accountList;
+    public void setAccountList(List<User> accountList) {
+        this.userList = accountList;
     }
 }

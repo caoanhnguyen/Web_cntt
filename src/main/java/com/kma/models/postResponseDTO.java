@@ -1,11 +1,15 @@
 package com.kma.models;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+
 import java.sql.Date;
 
 public class postResponseDTO {
     private Integer postId;
     private String title;
     private String content;
+
+    @JsonFormat(pattern = "yyyy-MM-dd")  // Định dạng ngày tháng năm
     private Date createAt;
     private String authorName;
 

@@ -60,6 +60,7 @@ public class PostAPI {
 											 @RequestParam(required = false, defaultValue = "10") int size){
 		try {
 			paginationResponseDTO<postResponseDTO> DTO = postServ.getAllPost(params, page, size);
+			// Log kiểm tra dữ liệu trước khi trả về
 			return new ResponseEntity<>(DTO, HttpStatus.OK);
 		} catch (Exception e) {
 			// TODO: handle exception
@@ -77,7 +78,7 @@ public class PostAPI {
 	public ResponseEntity<Object> getLatestPosts() {
 		try {
 			List<postDTO> posts = postServ.getLatestPosts();
-			return ResponseEntity.ok(posts);
+			return new ResponseEntity<>(posts, HttpStatus.OK);
 		} catch (Exception e) {
 			// TODO: handle exception
 			errorResponseDTO errorDTO = new errorResponseDTO();

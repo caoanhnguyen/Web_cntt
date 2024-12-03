@@ -1,14 +1,19 @@
 package com.kma.models;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+
 import java.sql.Date;
 
 public class suKienResponseDTO {
     private Integer eventId;
     private String eventName;
     private String description;
+    @JsonFormat(pattern = "yyyy-MM-dd")  // Định dạng ngày tháng năm
     private Date startAt;
+    @JsonFormat(pattern = "yyyy-MM-dd")  // Định dạng ngày tháng năm
     private Date endAt;
     private String location;
+    @JsonFormat(pattern = "yyyy-MM-dd")  // Định dạng ngày tháng năm
     private Date createAt;
     private String organizedBy;
 
