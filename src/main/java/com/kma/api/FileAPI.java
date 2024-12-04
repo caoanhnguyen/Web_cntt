@@ -54,7 +54,7 @@ public class FileAPI {
 		} else {
 			NhanVien nhanVien = nvRepo.findByAvaFileCode(fileCode);
 			if (nhanVien != null) {
-				directoryPath = fileDirection.pathForProfile_NV + "/" + nhanVien.getPhongBan().getTenPhongBan() + "/" + nhanVien.getMaNhanVien();
+				directoryPath = fileDirection.pathForProfile_NV + "/" + nhanVien.getPhongBan().getMaPhongBan() + "/" + nhanVien.getMaNhanVien();
 			} else {
 				return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Không tìm thấy file!");
 			}

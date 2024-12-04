@@ -12,13 +12,22 @@ public class nhanVienDTO {
 
 	@JsonFormat(pattern = "yyyy-MM-dd")  // Định dạng ngày tháng năm
 	private Date ngaySinh;
-	private String sdt;
+	private String gioiTinh;
+	private String dienThoai;
 	private String diaChi;
 	private phongBanResponseDTO phongBan;
 	private String chucVu;
 	private monHocResponseDTO monGiangDayChinh;
 	private List<monHocResponseDTO> cacMonLienQuan;
 	private String avaFileCode;
+
+	public String getGioiTinh() {
+		return gioiTinh;
+	}
+
+	public void setGioiTinh(String gioiTinh) {
+		this.gioiTinh = gioiTinh;
+	}
 
 	public Integer getIdUser() {
 		return idUser;
@@ -44,12 +53,12 @@ public class nhanVienDTO {
 		this.ngaySinh = ngaySinh;
 	}
 
-	public String getSdt() {
-		return sdt;
+	public String getDienThoai() {
+		return dienThoai;
 	}
 
-	public void setSdt(String sdt) {
-		this.sdt = sdt;
+	public void setDienThoai(String dienThoai) {
+		this.dienThoai = dienThoai;
 	}
 
 	public String getDiaChi() {

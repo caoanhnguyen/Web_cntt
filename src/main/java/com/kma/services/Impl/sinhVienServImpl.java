@@ -18,7 +18,6 @@ import com.kma.services.fileService;
 import com.kma.services.sinhVienService;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
-import org.antlr.v4.runtime.misc.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -46,7 +45,7 @@ public class sinhVienServImpl implements sinhVienService {
     @Autowired
     roleRepo rolerepo;
     @Autowired
-    private userRepo userrepo;
+    userRepo userrepo;
 
 
     @Override
@@ -89,7 +88,7 @@ public class sinhVienServImpl implements sinhVienService {
         }
     }
 
-    private Page<SinhVien> fetchSinhViens(@NotNull Map<String, Object> params, Pageable pageable){
+    private Page<SinhVien> fetchSinhViens(Map<String, Object> params, Pageable pageable){
         // Lấy giá trị từ params
         String maSinhVien = (params.get("maSinhVien") != null ? (String) params.get("maSinhVien") : "");
         String tenSinhVien = (params.get("tenSinhVien") != null ? (String) params.get("tenSinhVien") : "");
@@ -126,7 +125,7 @@ public class sinhVienServImpl implements sinhVienService {
             createUserForSV(sv.getMaSinhVien());
 
         }else{
-            throw new EntityNotFoundException("Mã sinh viên đã tồn tại, vui lòng kiểm tra lại!");
+            throw new EntityNotFoundException("Mã sinh viên: " +svDTO.getMaSinhVien() + " đã tồn tại, vui lòng kiểm tra lại!");
         }
 
     }
@@ -134,7 +133,7 @@ public class sinhVienServImpl implements sinhVienService {
     private void createUserForSV(String maSinhVien){
         // Mã hóa mật khẩu bằng BCrypt
         BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
-        String encodedPassword = passwordEncoder.encode("admin");  // Mật khẩu sinh viên sẽ là ngày sinh của họ
+        String encodedPassword = passwordEncoder.encode(maSinhVien);  // Mật khẩu sinh viên sẽ là ngày sinh của họ
 
         // Tạo user mới với username là mã sinh viên và mật khẩu đã mã hóa
         User user = new User();

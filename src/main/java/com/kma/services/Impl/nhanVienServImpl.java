@@ -1,18 +1,31 @@
 package com.kma.services.Impl;
 
+import com.kma.constants.fileDirection;
 import com.kma.converter.nhanVienDTOConverter;
 import com.kma.models.nhanVienDTO;
+import com.kma.models.nhanVienRequestDTO;
+import com.kma.models.paginationResponseDTO;
 import com.kma.repository.entities.MonHoc;
 import com.kma.repository.entities.NhanVien;
-import com.kma.repository.monHocRepo;
+import com.kma.repository.entities.Role;
+import com.kma.repository.entities.User;
 import com.kma.repository.nhanVienRepo;
+import com.kma.repository.roleRepo;
 import com.kma.repository.userRepo;
+import com.kma.services.fileService;
 import com.kma.services.nhanVienService;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -22,11 +35,13 @@ public class nhanVienServImpl implements nhanVienService{
 	@Autowired
 	nhanVienRepo nvRepo;
 	@Autowired
-	monHocRepo mhRepo;
-	@Autowired
 	nhanVienDTOConverter nvDTOConverter;
 	@Autowired
-	userRepo accRepo;
+	fileService fileServ;
+	@Autowired
+	userRepo userrepo;
+	@Autowired
+	roleRepo rolerepo;
 
 	@Override
 	public nhanVienDTO getById(Integer idUser) {
@@ -37,38 +52,112 @@ public class nhanVienServImpl implements nhanVienService{
 	}
 
 	@Override
-	public List<nhanVienDTO> getAllNhanVien(Map<String, Object> params) {
-		// TODO Auto-generated method stub
-		// Lấy giá trị từ params
-		String tenNhanVien = (String) params.get("name");
-		String tenMonHoc = (String) params.get("tenMon");
-		String tenPhongBan = (String) params.get("tenPhongBan");
-		// Tìm môn học theo tên môn
-		List<MonHoc> mhList = mhRepo.findByTenMonHocContaining(tenMonHoc);
-		// Tìm kiếm nhân viên theo điều kiện
-		List<NhanVien> nvList;
-		if(tenNhanVien==null){
-			if(mhList==null || mhList.isEmpty()){
-				nvList = nvRepo.findAll();
-			}else{
-				nvList = mhList.stream() // Duyệt qua từng môn học trong danh sách
-						.flatMap(mh -> mh.getNvList().stream()) // Lấy danh sách nhân viên liên quan đến từng môn học
-						.distinct() // Loại bỏ trùng lặp nhân viên (nếu có nhân viên dạy nhiều môn)
-						.toList(); // Thu thập thành một danh sách
-			}
-		}else{
-			if(mhList==null){
-				nvList = nvRepo.findByTenNhanVienContaining(tenNhanVien);
-			}else{
-				nvList = nvRepo.findByNameAndMonHoc(tenNhanVien, tenMonHoc, tenPhongBan);
-			}
-		}
-		return nvList.stream()
-					 .map(nvDTOConverter::convertToNhanVienDTO)
-					 .toList();
+	public paginationResponseDTO<nhanVienDTO> getAllNhanVien(Map<String, Object> params, int page, int size) {
+		// Tạo Pageable
+		Pageable pageable = PageRequest.of(page, size);
+
+		// Lấy dữ liệu từ repository
+		Page<NhanVien> nvPage = fetchNhanViens(params, pageable);
+
+		// Chuyển đổi sang DTO
+		List<nhanVienDTO> nvDTOList = nvPage.getContent().stream()
+				.map(nvDTOConverter::convertToNhanVienDTO)
+				.toList();
+
+
+		// Đóng gói dữ liệu và meta vào DTO
+		return new paginationResponseDTO<>(
+				nvDTOList,
+				nvPage.getTotalPages(),
+				(int) nvPage.getTotalElements(),
+				nvPage.isFirst(),
+				nvPage.isLast(),
+				nvPage.getNumber(),
+				nvPage.getSize()
+		);
 	}
 
 
+	private Page<NhanVien> fetchNhanViens(Map<String, Object> params, Pageable pageable){
+		// Lấy giá trị từ params
+		String tenNhanVien = ( params.get("tenNhanVien") != null ? (String) params.get("tenNhanVien") : "");
+		String tenMonHoc = ( params.get("tenMonHoc") != null ? (String) params.get("tenMonHoc") : "");
+		String tenPhongBan = ( params.get("tenPhongBan") != null ? (String) params.get("tenPhongBan") : "");
+
+		// Lấy dữ liệu từ repository
+		return nvRepo.findByAllCondition(tenNhanVien, tenMonHoc, tenPhongBan, pageable);
+	}
+
+	@Override
+	public void addNhanVien(MultipartFile file, nhanVienRequestDTO nvReqDTO) throws IOException {
+		// Kiểm tra mã nhân viên
+		NhanVien nv = nvRepo.findByMaNhanVien(nvReqDTO.getMaNhanVien());
+		if(nv==null){
+
+			// Lưu avaFile, lấy avaFileCode
+			String avaFileCode = "";
+			if(file!=null){
+				String fileDirec = fileDirection.pathForProfile_NV + "/" + nvReqDTO.getMaPhongBan() + "/" + nvReqDTO.getMaNhanVien();
+				avaFileCode = fileServ.uploadFile(file, fileDirec);
+			}
+
+			// Tạo nhân viên để lưu
+			NhanVien nhanVien = nvDTOConverter.convertNVReqToNV(nvReqDTO, avaFileCode);
+			nvRepo.save(nhanVien);
+
+			createUserForNV(nhanVien.getMaNhanVien());
+
+		}else{
+			throw new EntityNotFoundException("Mã nhân viên: " + nvReqDTO.getMaNhanVien() + " đã tồn tại, vui lòng kiểm tra lại!");
+		}
+	}
+
+	private void createUserForNV(String maNhanVien){
+		// Mã hóa mật khẩu bằng BCrypt
+		BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+		String encodedPassword = passwordEncoder.encode(maNhanVien);  // Mật khẩu sinh viên sẽ là mã của họ
+
+		// Tạo user mới với username là mã nhân viên và mật khẩu đã mã hóa
+		User user = new User();
+		user.setUserName(maNhanVien);  // Tên đăng nhập là mã nhân viên
+		user.setPassword(encodedPassword);  // Mật khẩu đã mã hóa
+		user.setIsActive(1);  // Set tài khoản ở trạng thái hoạt động (active)
+
+		// Tạo và gán role EMPLOYEE cho user
+		Role employeeRole = rolerepo.findByRoleName("EMPLOYEE");
+		user.setRoleList(Collections.singletonList(employeeRole));  // Gán role STUDENT cho tài khoản này
+
+		// Lưu tài khoản người dùng vào cơ sở dữ liệu
+		userrepo.save(user);
+	}
+
+	@Transactional
+	@Override
+	public void updateNhanVien(Integer idUser, nhanVienRequestDTO nvReqDTO, MultipartFile file) throws IOException {
+		NhanVien nv = nvRepo.findById(idUser).orElse(null);
+		if(nv != null){
+			String avaFileCode = nv.getAvaFileCode();
+			if(file!=null){
+				// Xử lí xóa bỏ file cũ
+				fileServ.deleteFile(idUser, 4);
+
+				// Xử lí lưu avaFile mới
+				String fileDirec = fileDirection.pathForProfile_NV + "/" + nvReqDTO.getMaPhongBan() + "/" + nvReqDTO.getMaNhanVien();
+				avaFileCode = fileServ.uploadFile(file, fileDirec);
+			}
+			// Update dữ liệu
+			Integer idMonGiangDayChinh = nv.getIdMonGiangDayChinh();
+			List<MonHoc> cacMonLienQuan = nv.getMonHocList();
+
+			nv = nvDTOConverter.convertNVReqToNV(nvReqDTO, avaFileCode);
+			nv.setIdUser(idUser);
+			nv.setIdMonGiangDayChinh(idMonGiangDayChinh);
+			nv.setMonHocList(cacMonLienQuan);
+			nvRepo.save(nv);
+		}else{
+			throw new EntityNotFoundException("Employee not found with id: " + idUser);
+		}
+	}
 
 	@Override
 	public void deleteNhanVien(Integer idUser) {
@@ -77,7 +166,7 @@ public class nhanVienServImpl implements nhanVienService{
 		if(existedNV != null) {
 			nvRepo.delete(existedNV);
 		}else {
-			throw new EntityNotFoundException("User not found with id: " + idUser);
+			throw new EntityNotFoundException("Employee not found with id: " + idUser);
 		}
 	}
 }

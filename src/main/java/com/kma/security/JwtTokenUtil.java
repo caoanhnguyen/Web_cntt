@@ -1,10 +1,13 @@
 package com.kma.security;
 
 import com.kma.repository.entities.User;
+import com.kma.repository.nhanVienRepo;
+import com.kma.repository.sinhVienRepo;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
@@ -14,6 +17,7 @@ import java.security.Key;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -25,11 +29,28 @@ public class JwtTokenUtil {
 
     @Value("${jwt.secretKey}")
     private String secretKey;
+
+    @Autowired
+    sinhVienRepo svRepo;
+
+    @Autowired
+    nhanVienRepo nvRepo;
+
     public String generateToken(User user) throws Exception{
         //properties => claims
         Map<String, Object> claims = new HashMap<>();
-        //this.generateSecretKey();
+
+        // username
         claims.put("userName", user.getUserName());
+        // avatar
+        String avaFileCode = "/downloadProfile/";
+        if(user.getUserName().startsWith("CT")) {
+            avaFileCode += Objects.requireNonNull(svRepo.findById(user.getUserName()).orElse(null)).getAvaFileCode();
+        }else{
+            avaFileCode += Objects.requireNonNull(nvRepo.findByMaNhanVien(user.getUserName())).getAvaFileCode();
+        }
+
+        claims.put("avaFileCode", avaFileCode); // Lưu avatar fileCode trong JWT
         try {
             return Jwts.builder()
                     .setClaims(claims) //how to extract claims from this ?  Payload

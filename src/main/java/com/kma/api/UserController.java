@@ -30,7 +30,7 @@ public class UserController {
     private IUserService userService;
 
     @PostMapping("/login")
-    public ResponseEntity<Object> login(@Valid @RequestBody UserLoginDTO userLoginDTO) {
+    public ResponseEntity<Object> login(@Valid @ModelAttribute UserLoginDTO userLoginDTO) {
         // Kiểm tra thông tin đăng nhập và sinh token
         try {
             String token = userService.login(userLoginDTO.getUserName(), userLoginDTO.getPassword());

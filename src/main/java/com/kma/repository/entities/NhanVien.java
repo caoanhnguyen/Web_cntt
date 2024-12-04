@@ -4,6 +4,7 @@ import java.sql.Date;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.kma.enums.GioiTinh;
 import jakarta.persistence.*;
 
 @Entity
@@ -21,6 +22,10 @@ public class NhanVien {
 
     @Column(name = "ngaySinh")
     private Date ngaySinh;
+
+	@Enumerated(EnumType.STRING)
+	@Column(name = "gioiTinh")
+	private GioiTinh gioiTinh;
 
     @Column(name = "dienThoai")
     private String dienThoai;
@@ -86,6 +91,14 @@ public class NhanVien {
 	@ManyToOne(fetch = FetchType.EAGER)
 	@JoinColumn(name = "maPhongBan")
 	private PhongBan phongBan;
+
+	public GioiTinh getGioiTinh() {
+		return gioiTinh;
+	}
+
+	public void setGioiTinh(GioiTinh gioiTinh) {
+		this.gioiTinh = gioiTinh;
+	}
 
 	public Date getNgaySinh() {
 		return ngaySinh;

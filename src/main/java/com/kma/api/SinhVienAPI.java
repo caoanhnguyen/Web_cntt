@@ -101,10 +101,10 @@ public class SinhVienAPI {
 			errorResponseDTO errorDTO = new errorResponseDTO();
 			errorDTO.setError(e.getMessage());
 			List<String> details = new ArrayList<>();
-			details.add("Student not found!");
+			details.add("Student id already exists!");
 			errorDTO.setDetails(details);
 
-			return new ResponseEntity<>(errorDTO, HttpStatus.NOT_FOUND);
+			return new ResponseEntity<>(errorDTO, HttpStatus.BAD_REQUEST);
 		} catch (Exception e) {
 			// TODO: handle exception
 			errorResponseDTO errorDTO = new errorResponseDTO();

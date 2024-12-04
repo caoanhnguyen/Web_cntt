@@ -127,8 +127,8 @@ public class fileServImpl implements fileService{
             }
             case NhanVien nhanVien -> {
                 fileCode = nhanVien.getAvaFileCode();
-				String tenPhongBan = nhanVien.getPhongBan().getTenPhongBan();
-                directoryPath += "/" + tenPhongBan + "/" +nhanVien.getMaNhanVien();
+				String maPhongBan = nhanVien.getPhongBan().getMaPhongBan();
+                directoryPath += "/" + maPhongBan + "/" +nhanVien.getMaNhanVien();
             }
             default -> throw new IllegalStateException("Unexpected entity type!");
         }
@@ -164,8 +164,6 @@ public class fileServImpl implements fileService{
 					throw new RuntimeException("Failed to delete directory: " + dirPath, e);
 				}
 
-			} else {
-				throw new RuntimeException("Directory does not exist or is not a directory: " + dirPath);
 			}
 
 		} catch (IOException e) {

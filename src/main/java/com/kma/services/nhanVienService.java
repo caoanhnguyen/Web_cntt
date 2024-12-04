@@ -1,16 +1,22 @@
 package com.kma.services;
 
-import java.util.List;
+import java.io.IOException;
 import java.util.Map;
 
 import com.kma.models.nhanVienDTO;
-import com.kma.repository.entities.NhanVien;
+import com.kma.models.nhanVienRequestDTO;
+import com.kma.models.paginationResponseDTO;
+import org.springframework.web.multipart.MultipartFile;
 
 public interface nhanVienService {
 
 	nhanVienDTO getById(Integer idUser);
-	
-	List<nhanVienDTO> getAllNhanVien(Map<String, Object> params);
+
+	paginationResponseDTO<nhanVienDTO> getAllNhanVien(Map<String, Object> params, int page, int size);
+
+	void addNhanVien(MultipartFile file, nhanVienRequestDTO nvReqDTO) throws IOException;
+
+	void updateNhanVien(Integer idUser, nhanVienRequestDTO nvReqDTO, MultipartFile file) throws IOException;
 
 	void deleteNhanVien(Integer idUser);
 }
