@@ -9,6 +9,7 @@ import java.util.List;
 public class nhanVienDTO {
 	private Integer idUser;
 	private String tenNhanVien;
+	private String maNhanVien;
 
 	@JsonFormat(pattern = "yyyy-MM-dd")  // Định dạng ngày tháng năm
 	private Date ngaySinh;
@@ -20,6 +21,14 @@ public class nhanVienDTO {
 	private monHocResponseDTO monGiangDayChinh;
 	private List<monHocResponseDTO> cacMonLienQuan;
 	private String avaFileCode;
+
+	public String getMaNhanVien() {
+		return maNhanVien;
+	}
+
+	public void setMaNhanVien(String maNhanVien) {
+		this.maNhanVien = maNhanVien;
+	}
 
 	public String getGioiTinh() {
 		return gioiTinh;

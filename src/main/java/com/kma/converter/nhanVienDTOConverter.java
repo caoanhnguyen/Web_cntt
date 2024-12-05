@@ -26,7 +26,10 @@ public class nhanVienDTOConverter {
 		String gioiTinh = nv.getGioiTinh().getDisplayName();
 		dto.setGioiTinh(gioiTinh);
 		// Set môn giảng dạy chính
-		MonHoc monGiangDayChinh = mhRepo.findById(nv.getIdMonGiangDayChinh()).orElse(null);
+		MonHoc monGiangDayChinh = null;
+		if(nv.getIdMonGiangDayChinh()!=null){
+			monGiangDayChinh = mhRepo.findById(nv.getIdMonGiangDayChinh()).orElse(null);
+		}
 		monHocResponseDTO monHocResDTO;
 		if(monGiangDayChinh!=null){
 			monHocResDTO = modelMapper.map(monGiangDayChinh, monHocResponseDTO.class);

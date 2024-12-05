@@ -53,8 +53,12 @@ public class sinhVienDTOConverter {
         if(svDTO.getGioiTinh()!= null){
             sv.setGioiTinh(GioiTinh.fromDisplayName(svDTO.getGioiTinh()));
         }
-        Lop lop = lopRepo.findByTenLop(svDTO.getTenLop());
-        sv.setLop(lop);
+        if(svDTO.getTenLop()!=null){
+            Lop lop = lopRepo.findByTenLop(svDTO.getTenLop());
+            sv.setLop(lop);
+        }else{
+            sv.setLop(null);
+        }
         sv.setAvaFileCode(avaFileCode);
         sv.setDkskList(null);   // tạm thời để null
         return sv;

@@ -34,9 +34,7 @@ public class WebSecurityConfig {
                 .addFilterBefore(jwtTokenFilter, UsernamePasswordAuthenticationFilter.class)
                 .authorizeHttpRequests(requests -> requests
                         .requestMatchers(
-                                String.format("%s/login/**", userPrefix),
-                                String.format("%s/class/**", apiPrefix),
-                                String.format("%s/nhanvien/**", apiPrefix)
+                                String.format("%s/login/**", userPrefix)
                         )
                         .permitAll()
 
@@ -92,10 +90,14 @@ public class WebSecurityConfig {
                         // Employee Authorization
                         .requestMatchers(GET,
                                 String.format("%s/nhanvien/**", apiPrefix)).hasAnyRole(Role.ADMIN, Role.STUDENT, Role.EMPLOYEE)
-//                        .requestMatchers(POST,
-//                                String.format("%s/nhanvien/**", apiPrefix)).hasAnyRole(Role.ADMIN)
+                        .requestMatchers(POST,
+                                String.format("%s/nhanvien/**", apiPrefix)).hasAnyRole(Role.ADMIN)
                         .requestMatchers(PUT,
                                 String.format("%s/nhanvien/**", apiPrefix)).hasAnyRole(Role.ADMIN, Role.EMPLOYEE)
+                        .requestMatchers(PATCH,
+                                String.format("%s/nhanvien/main_subject/**", apiPrefix)).hasAnyRole(Role.ADMIN)
+                        .requestMatchers(PATCH,
+                                String.format("%s/nhanvien/related_subject/**", apiPrefix)).hasAnyRole(Role.ADMIN)
                         .requestMatchers(DELETE,
                                 String.format("%s/nhanvien/**", apiPrefix)).hasAnyRole(Role.ADMIN)
 

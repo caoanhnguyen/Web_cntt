@@ -9,6 +9,7 @@ import com.kma.repository.entities.MonHoc;
 import com.kma.repository.entities.NhanVien;
 import com.kma.repository.entities.Role;
 import com.kma.repository.entities.User;
+import com.kma.repository.monHocRepo;
 import com.kma.repository.nhanVienRepo;
 import com.kma.repository.roleRepo;
 import com.kma.repository.userRepo;
@@ -28,6 +29,8 @@ import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional
@@ -42,6 +45,8 @@ public class nhanVienServImpl implements nhanVienService{
 	userRepo userrepo;
 	@Autowired
 	roleRepo rolerepo;
+	@Autowired
+	monHocRepo mhRepo;
 
 	@Override
 	public nhanVienDTO getById(Integer idUser) {
@@ -160,10 +165,59 @@ public class nhanVienServImpl implements nhanVienService{
 	}
 
 	@Override
+	public void updateMGDC(Integer idUser, Integer idMGDC) {
+		NhanVien existedNV = nvRepo.findById(idUser).orElse(null);
+		MonHoc mh = mhRepo.findById(idMGDC).orElse(null);
+		if(existedNV != null) {
+			if(mh!=null){
+				existedNV.setIdMonGiangDayChinh(idMGDC);
+				existedNV.getMonHocList().add(mh);
+				mh.getNvList().add(existedNV);
+
+				nvRepo.save(existedNV);
+				mhRepo.save(mh);
+			}else{
+				throw new EntityNotFoundException("Subject not found with id: " + idUser);
+			}
+
+		}else {
+			throw new EntityNotFoundException("Employee not found with id: " + idUser);
+		}
+	}
+
+	@Override
+	@Transactional
+	public void updateMonHocLienQuan(Integer idUser, List<Integer> idMonHocList) {
+		NhanVien existedNV = nvRepo.findById(idUser).orElse(null);
+		if(existedNV != null) {
+			List<MonHoc> mhList = idMonHocList.stream()
+					.map(i -> mhRepo.findById(i).orElse(null))  // Trả về null nếu không tìm thấy
+					.filter(Objects::nonNull)  // Loại bỏ các giá trị null
+					.collect(Collectors.toList());
+
+			existedNV.setMonHocList(mhList);
+
+			// Cập nhật danh sách nhân viên cho môn học
+			for (MonHoc monHoc : mhList) {
+				// Thêm nhân viên vào danh sách nhân viên của môn học
+				if (!monHoc.getNvList().contains(existedNV)) {
+					monHoc.getNvList().add(existedNV);
+				}
+			}
+			nvRepo.save(existedNV);// Lưu nhân viên
+			mhRepo.saveAll(mhList);  // Lưu các môn học (nếu có thay đổi)
+		}else {
+			throw new EntityNotFoundException("Employee not found with id: " + idUser);
+		}
+	}
+
+	@Override
 	public void deleteNhanVien(Integer idUser) {
 		// TODO Auto-generated method stub
 		NhanVien existedNV = nvRepo.findById(idUser).orElse(null);
 		if(existedNV != null) {
+			// Xử lí xóa bỏ profile
+			fileServ.deleteFile(idUser, 4);
 			nvRepo.delete(existedNV);
 		}else {
 			throw new EntityNotFoundException("Employee not found with id: " + idUser);

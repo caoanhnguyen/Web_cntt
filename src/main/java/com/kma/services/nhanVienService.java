@@ -1,6 +1,7 @@
 package com.kma.services;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.Map;
 
 import com.kma.models.nhanVienDTO;
@@ -17,6 +18,10 @@ public interface nhanVienService {
 	void addNhanVien(MultipartFile file, nhanVienRequestDTO nvReqDTO) throws IOException;
 
 	void updateNhanVien(Integer idUser, nhanVienRequestDTO nvReqDTO, MultipartFile file) throws IOException;
+
+	void updateMGDC(Integer idUser, Integer idMGDC);
+
+	void updateMonHocLienQuan(Integer idUser, List<Integer> idMonHocList);
 
 	void deleteNhanVien(Integer idUser);
 }

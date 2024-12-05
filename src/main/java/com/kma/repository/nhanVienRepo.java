@@ -20,7 +20,7 @@ public interface nhanVienRepo extends JpaRepository<NhanVien, Integer> {
 			"LEFT JOIN nv.phongBan pb " +
 			"WHERE (:tenNhanVien IS NULL OR nv.tenNhanVien LIKE %:tenNhanVien%) " +
 			"AND (:tenMonHoc IS NULL OR mh.tenMonHoc LIKE %:tenMonHoc% OR mh IS NULL) " +
-			"AND (:tenPhongBan IS NULL OR pb.tenPhongBan LIKE %:tenPhongBan% OR pb.maPhongBan IS NULL) " +
+			"AND (:tenPhongBan IS NULL OR pb.tenPhongBan LIKE %:tenPhongBan% OR pb.maPhongBan IS NULL OR pb.maPhongBan LIKE %:tenPhongBan%) " +
 			"ORDER BY nv.tenNhanVien ASC")
 	Page<NhanVien> findByAllCondition(@Param("tenNhanVien") String tenNhanVien,
 									  @Param("tenMonHoc") String tenMonHoc,

@@ -104,6 +104,46 @@ public class NhanVienAPI {
 		}
 	}
 
+	@PatchMapping(value = "/api/nhanvien/main_subject/{idUser}")
+	public ResponseEntity<Object> updateMGDC(@PathVariable Integer idUser,
+											 @RequestParam Integer idMGDC) {
+		try {
+			nvServ.updateMGDC(idUser, idMGDC);
+			return ResponseEntity.ok("Update successfully!");
+		} catch (EntityNotFoundException e) {
+			// TODO: handle exception
+			errorResponseDTO errorDTO = new errorResponseDTO();
+			errorDTO.setError(e.getMessage());
+			List<String> details = new ArrayList<>();
+			details.add("Employee or subject not found!");
+			errorDTO.setDetails(details);
+
+			return new ResponseEntity<>(errorDTO, HttpStatus.NOT_FOUND);
+		} catch (Exception e) {
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An error occurred.");
+		}
+	}
+
+	@PatchMapping(value = "/api/nhanvien/related_subject/{idUser}")
+	public ResponseEntity<Object> updateMonHocLienQuan(@PathVariable Integer idUser,
+											 		   @RequestParam(value = "idMonHoc") List<Integer> idMonHocList) {
+		try {
+			nvServ.updateMonHocLienQuan(idUser, idMonHocList);
+			return ResponseEntity.ok("Update successfully!");
+		} catch (EntityNotFoundException e) {
+			// TODO: handle exception
+			errorResponseDTO errorDTO = new errorResponseDTO();
+			errorDTO.setError(e.getMessage());
+			List<String> details = new ArrayList<>();
+			details.add("Employee not found!");
+			errorDTO.setDetails(details);
+
+			return new ResponseEntity<>(errorDTO, HttpStatus.NOT_FOUND);
+		} catch (Exception e) {
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An error occurred.");
+		}
+	}
+
 	@DeleteMapping(value = "/api/nhanvien/{idUser}")
 	public ResponseEntity<Object> deleteNhanVien(@PathVariable Integer idUser) {
 		try {
