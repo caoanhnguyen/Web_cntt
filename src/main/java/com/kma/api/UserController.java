@@ -27,7 +27,7 @@ public class UserController {
     JwtTokenUtil jwtTokenUtil;
 
     @Autowired
-    private IUserService userService;
+    IUserService userService;
 
     @PostMapping("/login")
     public ResponseEntity<Object> login(@Valid @ModelAttribute UserLoginDTO userLoginDTO) {
@@ -57,7 +57,7 @@ public class UserController {
         }
     }
 
-    @PreAuthorize("hasAnyRole('EMPLOYEE', 'STUDENT') and #username == authentication.name")
+    @PreAuthorize("hasAnyRole('EMPLOYEE', 'STUDENT')")
     @PutMapping("/change_password")
     public ResponseEntity<Object> changePassword(@RequestHeader("Authorization") String token,  // Lấy token từ header Authorization
                                                  @RequestBody changePasswordDTO changePasswordDTO) {
@@ -68,7 +68,48 @@ public class UserController {
 
             userService.changePassword(username, changePasswordDTO);
             return ResponseEntity.ok("Change successfully!");
-        } catch (Exception e) {
+        } catch (IllegalArgumentException e) {
+            // Nếu token hết hạn hoặc không hợp lệ, trả về 401 Unauthorized
+            // TODO: handle exception
+            errorResponseDTO errorDTO = new errorResponseDTO();
+            errorDTO.setError(e.getMessage());
+            List<String> details = new ArrayList<>();
+            details.add("Token expired or Invalid. Please log in again.");
+            errorDTO.setDetails(details);
+
+            return new ResponseEntity<>(errorDTO, HttpStatus.UNAUTHORIZED);
+        }  catch (Exception e) {
+            // TODO: handle exception
+            errorResponseDTO errorDTO = new errorResponseDTO();
+            errorDTO.setError(e.getMessage());
+            List<String> details = new ArrayList<>();
+            details.add("An error occurred!");
+            errorDTO.setDetails(details);
+
+            return new ResponseEntity<>(errorDTO, HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    @PreAuthorize("hasRole('ADMIN')")
+    @PatchMapping("/role/{username}")
+    public ResponseEntity<Object> addRole(@PathVariable String username,
+                                          @RequestParam Integer roleId) {
+        // Kiểm tra thông tin đăng nhập và sinh token
+        try {
+            userService.addRole(username, roleId);
+
+            return ResponseEntity.ok("Add role successfully!");
+        } catch (IllegalArgumentException e) {
+            // Nếu token hết hạn hoặc không hợp lệ, trả về 401 Unauthorized
+            // TODO: handle exception
+            errorResponseDTO errorDTO = new errorResponseDTO();
+            errorDTO.setError(e.getMessage());
+            List<String> details = new ArrayList<>();
+            details.add("Token expired or Invalid. Please log in again.");
+            errorDTO.setDetails(details);
+
+            return new ResponseEntity<>(errorDTO, HttpStatus.UNAUTHORIZED);
+        }  catch (Exception e) {
             // TODO: handle exception
             errorResponseDTO errorDTO = new errorResponseDTO();
             errorDTO.setError(e.getMessage());

@@ -1,7 +1,9 @@
 package com.kma.services.Impl;
 
 import com.kma.models.changePasswordDTO;
+import com.kma.repository.entities.Role;
 import com.kma.repository.entities.User;
+import com.kma.repository.roleRepo;
 import com.kma.repository.userRepo;
 import com.kma.security.JwtTokenUtil;
 import com.kma.services.IUserService;
@@ -19,6 +21,8 @@ import java.util.Optional;
 @Service
 @Transactional
 public class UserService implements IUserService {
+
+    private final roleRepo rolerepo;  // final
     private final userRepo userRepo;  // final
     private final PasswordEncoder passwordEncoder;  // final
     private final JwtTokenUtil jwtTokenUtil;  // final
@@ -71,5 +75,31 @@ public class UserService implements IUserService {
         user.setPassword(encodedNewPassword);
 
         userRepo.save(user);
+    }
+
+    @Override
+    public void addRole(String username, Integer roleId) throws Exception {
+        // Lấy người dùng từ cơ sở dữ liệu
+        User user = userRepo.findByUserName(username)
+                .orElseThrow(() -> new Exception("User not found"));
+
+        // Kiểm tra xem Role có tồn tại không
+        Role newRole = rolerepo.findById(roleId).orElse(null);
+        if (newRole == null) {
+            throw new Exception("Role not found");
+        }
+
+        // Tránh thêm trùng Role cho User
+        if (user.getRoleList().contains(newRole)) {
+            throw new Exception("User already has this role");
+        }
+
+        // Thêm Role cho User và User vào Role
+        user.getRoleList().add(newRole);
+        newRole.getUserList().add(user);
+
+        // Lưu lại thông tin vào cơ sở dữ liệu
+        userRepo.save(user);
+        rolerepo.save(newRole);
     }
 }

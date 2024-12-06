@@ -25,8 +25,15 @@ public class Role {
 
     public static String ADMIN = "ADMIN";
     public static String EMPLOYEE = "EMPLOYEE";
-    public static String USER = "USER";
     public static String STUDENT = "STUDENT";
+
+    public List<User> getUserList() {
+        return userList;
+    }
+
+    public void setUserList(List<User> userList) {
+        this.userList = userList;
+    }
 
     public Integer getRoleId() {
         return roleId;

@@ -109,9 +109,11 @@ public class WebSecurityConfig {
                         .requestMatchers(GET,
                                 ("/downloadFile/**")).hasAnyRole(Role.ADMIN, Role.STUDENT, Role.EMPLOYEE)
 
-                        // Change password Authorization
-                        .requestMatchers(PUT,
-                                ("/change_password/**")).hasAnyRole(Role.STUDENT, Role.EMPLOYEE)
+                        // Special Authorization
+                        .requestMatchers(POST,
+                                String.format("%s/change_password/**", userPrefix)).hasAnyRole(Role.STUDENT, Role.EMPLOYEE)
+                        .requestMatchers(PATCH,
+                                String.format("%s/role/**", userPrefix)).hasRole(Role.ADMIN)
 
                         .anyRequest().authenticated());
         return http.build();
