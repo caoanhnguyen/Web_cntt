@@ -1,5 +1,8 @@
 package com.kma.security;
 
+import com.kma.models.entityInfo;
+import com.kma.repository.entities.NhanVien;
+import com.kma.repository.entities.SinhVien;
 import com.kma.repository.entities.User;
 import com.kma.repository.nhanVienRepo;
 import com.kma.repository.sinhVienRepo;
@@ -42,15 +45,14 @@ public class JwtTokenUtil {
 
         // username
         claims.put("userName", user.getUserName());
-        // avatar
-        String avaFileCode = "/downloadProfile/";
-        if(user.getUserName().startsWith("CT")) {
-            avaFileCode += Objects.requireNonNull(svRepo.findById(user.getUserName()).orElse(null)).getAvaFileCode();
-        }else{
-            avaFileCode += Objects.requireNonNull(nvRepo.findByMaNhanVien(user.getUserName())).getAvaFileCode();
-        }
+
+        // Info
+        entityInfo info = getInfoOfEntity(user);
+        Object entityId = info.getEntityId();
+        String avaFileCode = info.getAvaFileCode();
 
         claims.put("avaFileCode", avaFileCode); // Lưu avatar fileCode trong JWT
+        claims.put("entityId", entityId); // Lưu entityId trong JWT
         try {
             return Jwts.builder()
                     .setClaims(claims) //how to extract claims from this ?  Payload
@@ -66,6 +68,22 @@ public class JwtTokenUtil {
             throw new Exception("Cannot create jwt token, error: "+e.getMessage());
             //return null;
         }
+    }
+
+    private entityInfo getInfoOfEntity(User user){
+        String userName = user.getUserName();
+        String avaFileCode = "/downloadProfile/";
+        Object entityId = null;
+        NhanVien nv = nvRepo.findByMaNhanVien(userName);
+        if(nv!=null){
+            avaFileCode += nv.getAvaFileCode();
+            entityId = nv.getIdUser();
+        }else{
+            SinhVien sv = svRepo.findById(userName).orElse(null);
+            avaFileCode += Objects.requireNonNull(sv).getAvaFileCode();
+            entityId = sv.getMaSinhVien();
+        }
+        return new entityInfo(entityId, avaFileCode);
     }
 
     private Key getSignInKey() {
