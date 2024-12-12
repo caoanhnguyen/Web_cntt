@@ -2,33 +2,56 @@ package com.kma.api;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 import com.kma.constants.fileDirection;
+import com.kma.models.errorResponseDTO;
+import com.kma.models.fileDTO;
 import com.kma.repository.entities.NhanVien;
 import com.kma.repository.entities.SinhVien;
 import com.kma.repository.nhanVienRepo;
 import com.kma.repository.sinhVienRepo;
-import org.antlr.v4.runtime.misc.NotNull;
+import com.kma.services.fileService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import com.kma.utilities.fileDownloadUtil;
+import org.springframework.web.multipart.MultipartFile;
 
 
 @RestController
 public class FileAPI {
+
 	@Autowired
 	sinhVienRepo svRepo;
 	@Autowired
 	nhanVienRepo nvRepo;
+	@Autowired
+	fileService fileServ;
+
+
+	@PostMapping("/uploadImg")
+	public ResponseEntity<?> uploadImg(@RequestParam(value = "file", required = false) MultipartFile multipartFile) {
+		try{
+			fileDTO dto = fileServ.uploadImg(multipartFile);
+			return new ResponseEntity<>(dto, HttpStatus.OK);
+		} catch (Exception e){
+			errorResponseDTO errorDTO = new errorResponseDTO();
+			errorDTO.setError(e.getMessage());
+			List<String> details = new ArrayList<>();
+			details.add("An error occurred!");
+			errorDTO.setDetails(details);
+
+			return new ResponseEntity<>(errorDTO, HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	}
 
 
 	@GetMapping("/downloadFile/{fileCode}")
@@ -65,7 +88,7 @@ public class FileAPI {
 	private ResponseEntity<?> getFileResponse(String fileCode, String path){
 		fileDownloadUtil downloadUtil = new fileDownloadUtil();
 
-		Resource resource = null;
+		Resource resource;
 		try {
 			resource = downloadUtil.getFileAsResource(fileCode, path);
 		} catch (IOException e) {
@@ -88,8 +111,7 @@ public class FileAPI {
 	}
 
 	// Hàm xác định MIME type dựa trên phần mở rộng file
-	@NotNull
-	private String getContentType(@NotNull String filename) {
+	private String getContentType(String filename) {
 		if (filename.endsWith(".jpg") || filename.endsWith(".jpeg")) {
 			return "image/jpeg";
 		} else if (filename.endsWith(".png")) {

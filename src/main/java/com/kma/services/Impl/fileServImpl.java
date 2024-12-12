@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.sql.Date;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -16,6 +17,7 @@ import com.kma.repository.nhanVienRepo;
 import com.kma.repository.sinhVienRepo;
 import com.kma.repository.taiLieuMonHocRepo;
 import com.kma.repository.taiNguyenRepo;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
@@ -29,6 +31,7 @@ import com.kma.utilities.fileUploadUtil;
 import jakarta.persistence.EntityNotFoundException;
 
 @Service
+@Transactional
 public class fileServImpl implements fileService{
 	
 	@Autowired
@@ -46,6 +49,26 @@ public class fileServImpl implements fileService{
 		String fileName = StringUtils.cleanPath(Objects.requireNonNull(multipartFile.getOriginalFilename()));
 
         return fileUploadUtil.saveFile(fileName, multipartFile, fileDirec);
+	}
+
+	@Override
+	public fileDTO uploadImg(MultipartFile file) throws IOException {
+		String fileName = StringUtils.cleanPath(Objects.requireNonNull(file.getOriginalFilename()));
+		String fileCode = fileUploadUtil.saveFile(fileName, file, fileDirection.pathForTaiNguyen);
+		String url = "/downloadFile/" + fileCode;
+
+		// Tạo tài nguyên để lưu
+		TaiNguyen tn = new TaiNguyen();
+		tn.setFileCode(fileCode);
+		tn.setCreateAt(new Date(System.currentTimeMillis()));
+		tnRepo.save(tn);
+
+		// Tạo DTO
+		fileDTO dto = new fileDTO();
+		dto.setId(tn.getResourceId());
+		dto.setDownloadUrl(url);
+
+		return dto;
 	}
 
 	@Override

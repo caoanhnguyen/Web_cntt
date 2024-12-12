@@ -44,7 +44,13 @@ public class WebSecurityConfig {
                                 String.format("%s/login/**", userPrefix)
                         )
                         .permitAll()
-                        .requestMatchers(OPTIONS, "/**").permitAll()
+                        .requestMatchers(POST, "/notifications/**").permitAll()
+                        .requestMatchers(POST, "/api/store-fcm-token").permitAll()
+                        .requestMatchers(POST, "/uploadImg").permitAll()
+                        .requestMatchers(GET,
+                                String.format("%s/posts/**", apiPrefix)).permitAll()
+                        .requestMatchers(GET,
+                                String.format("%s/sukien/**", apiPrefix)).permitAll()
 
                         // PhongBan Authorization
                         .requestMatchers(GET,
@@ -58,8 +64,8 @@ public class WebSecurityConfig {
 
 
                         // POST Authorization
-                        .requestMatchers(GET,
-                                String.format("%s/posts/**", apiPrefix)).hasAnyRole(Role.ADMIN, Role.STUDENT, Role.EMPLOYEE)
+//                        .requestMatchers(GET,
+//                                String.format("%s/posts/**", apiPrefix)).hasAnyRole(Role.ADMIN, Role.STUDENT, Role.EMPLOYEE)
                         .requestMatchers(POST,
                                 String.format("%s/posts/**", apiPrefix)).hasAnyRole(Role.ADMIN, Role.EMPLOYEE)
                         .requestMatchers(PUT,
@@ -72,8 +78,8 @@ public class WebSecurityConfig {
                                 String.format("%s/registration/**", apiPrefix)).hasAnyRole(Role.STUDENT) // Đăng kí sự kiện
 
                         // Event Authorization
-                        .requestMatchers(GET,
-                                String.format("%s/sukien/**", apiPrefix)).hasAnyRole(Role.ADMIN, Role.STUDENT, Role.EMPLOYEE)
+//                        .requestMatchers(GET,
+//                                String.format("%s/sukien/**", apiPrefix)).hasAnyRole(Role.ADMIN, Role.STUDENT, Role.EMPLOYEE)
                         .requestMatchers(GET,
                                 String.format("%s/sukien/participation_list/**", apiPrefix)).hasAnyRole(Role.ADMIN, Role.STUDENT, Role.EMPLOYEE)
                         .requestMatchers(POST,
