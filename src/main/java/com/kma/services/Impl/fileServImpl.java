@@ -162,11 +162,10 @@ public class fileServImpl implements fileService{
 	}
 
 	private void deleteFromDisk(String fileCode, String fileDirec) {
-		// Xóa file
 		try {
 			Path dirPath = Paths.get(fileDirec);
 
-			// Kiểm tra xem thư mục có tồn tại không
+			// Kiểm tra xem thư mục có tồn tại và là thư mục không
 			if (Files.exists(dirPath) && Files.isDirectory(dirPath)) {
 				// Duyệt qua tất cả các file trong thư mục
 				Files.list(dirPath).forEach(file -> {
@@ -180,19 +179,23 @@ public class fileServImpl implements fileService{
 					}
 				});
 
-				// Sau khi đã xóa hết các tệp, thử xóa thư mục (nếu thư mục trống)
+				// Kiểm tra nếu thư mục trống trước khi xóa
 				try {
-					Files.deleteIfExists(dirPath);
+					if (Files.list(dirPath).findAny().isEmpty()) {
+						Files.deleteIfExists(dirPath); // Xóa thư mục nếu trống
+					} else {
+						System.out.println("Directory is not empty, skipping deletion: " + dirPath);
+					}
 				} catch (IOException e) {
-					throw new RuntimeException("Failed to delete directory: " + dirPath, e);
+					throw new RuntimeException("Failed to check or delete directory: " + dirPath, e);
 				}
-
 			}
 
 		} catch (IOException e) {
 			throw new RuntimeException("Error accessing files directory", e);
 		}
 	}
+
 
 
 

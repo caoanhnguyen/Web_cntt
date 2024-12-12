@@ -1,6 +1,6 @@
 package com.kma.services;
 
-import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 public interface FcmService {
@@ -12,5 +12,5 @@ public interface FcmService {
 
     Set<String> getTokenByUserId(String userId); // Lấy tất cả token của user
 
-    List<String> getAllTokens();
+    Map<String, Set<String>> getAllUserTokens();
 }

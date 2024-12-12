@@ -7,7 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 @Service
@@ -72,16 +72,21 @@ public class NotificationService {
     // Gửi thông báo tới tất cả user
     public String sendNotificationToAllUsers(String title, String body) {
         try {
-            // Lấy danh sách tất cả userId từ Redis hoặc database
-            List<String> listFCMToken = fcmServ.getAllTokens(); // Thêm hàm này trong FcmService
+            // Lấy danh sách tất cả userId và token từ Redis
+            Map<String, Set<String>> userTokens = fcmServ.getAllUserTokens();
 
-            if (listFCMToken == null || listFCMToken.isEmpty()) {
+            if (userTokens.isEmpty()) {
                 return "No users found to send notification.";
             }
 
-            // Gửi thông báo tới từng userId
-            for (String token : listFCMToken) {
-                sendNotification(new TokenRequest("", token), title, body);
+            // Gửi thông báo tới từng token
+            for (Map.Entry<String, Set<String>> entry : userTokens.entrySet()) {
+                String userId = entry.getKey();
+                TokenRequest tokenRequest;
+                for (String token : entry.getValue()) {
+                    tokenRequest = new TokenRequest(userId, token);
+                    sendNotification(tokenRequest, title, body);
+                }
             }
 
             return "Notification sent to all users successfully.";
@@ -89,4 +94,5 @@ public class NotificationService {
             throw new RuntimeException("Error while sending notification to all users: " + e.getMessage());
         }
     }
+
 }

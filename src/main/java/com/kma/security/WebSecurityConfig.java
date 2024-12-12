@@ -46,6 +46,7 @@ public class WebSecurityConfig {
                         .permitAll()
                         .requestMatchers(POST, "/notifications/**").permitAll()
                         .requestMatchers(POST, "/api/store-fcm-token").permitAll()
+                        .requestMatchers(GET, "/downloadFile/**").permitAll()
                         .requestMatchers(POST, "/uploadImg").permitAll()
                         .requestMatchers(GET,
                                 String.format("%s/posts/**", apiPrefix)).permitAll()

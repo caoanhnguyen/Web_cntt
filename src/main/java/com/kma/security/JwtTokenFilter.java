@@ -80,6 +80,7 @@ public class JwtTokenFilter extends OncePerRequestFilter {
         } catch (Exception e) {
             // Các lỗi không mong muốn khác, trả về 401 Unauthorized
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            e.printStackTrace();
             response.getWriter().write("{\"message\": \"Unauthorized - Invalid token\"}");
         }
     }
@@ -90,7 +91,8 @@ public class JwtTokenFilter extends OncePerRequestFilter {
                 Pair.of("/notifications", "POST"),
                 Pair.of("/api/store-fcm-token", "POST"),
                 Pair.of(String.format("%s/home", userPrefix), "GET"),
-                Pair.of("/uploadImg", "POST")
+                Pair.of("/uploadImg", "POST"),
+                Pair.of("/downloadFile/**", "GET")
         );
         for(Pair<String, String> bypassToken: bypassTokens) {
             if (request.getServletPath().contains(bypassToken.getFirst()) &&

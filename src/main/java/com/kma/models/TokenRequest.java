@@ -4,9 +4,13 @@ public class TokenRequest {
     private String userId;
     private String fcmToken;
 
-    public TokenRequest(String userId, String token) {
+    public TokenRequest() {
+
+    }
+
+    public TokenRequest(String userId, String fcmToken) {
         this.userId = userId;
-        this.fcmToken = token;
+        this.fcmToken = fcmToken;
     }
 
     // Getters and Setters
