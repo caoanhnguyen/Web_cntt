@@ -13,7 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @RestController
-public class eventRegistrationAPI {
+public class EventRegistrationAPI {
     @Autowired
     dangKySKService dkskServ;
 

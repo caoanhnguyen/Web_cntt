@@ -36,8 +36,7 @@ public class TaiNguyen {
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "eventId")
 	private SuKien event;
-	
-	
+
 	public Post getPost() {
 		return post;
 	}

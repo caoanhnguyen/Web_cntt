@@ -8,4 +8,5 @@ public interface IUserService {
     void changePassword(String username, changePasswordDTO changePasswordDTO) throws Exception;
 
     void addRole(String username, Integer roleId) throws Exception;
+
 }

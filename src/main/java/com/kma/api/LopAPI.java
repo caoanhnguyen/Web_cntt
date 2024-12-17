@@ -1,29 +1,30 @@
 package com.kma.api;
 
 import com.kma.models.*;
-import com.kma.services.suKienService;
+import com.kma.services.lopService;
+import jakarta.persistence.EntityExistsException;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
 @RestController
-public class suKienAPI {
+public class LopAPI {
+
     @Autowired
-    suKienService skServ;
+    lopService lopServ;
 
-    @GetMapping(value = "/api/sukien")
-    public ResponseEntity<Object> getAllSuKien(@RequestParam Map<String,Object> params,
-                                               @RequestParam(required = false, defaultValue = "0") int page,
-                                               @RequestParam(required = false, defaultValue = "10") int size){
+    @GetMapping(value = "/api/class")
+    public ResponseEntity<Object> getAllClass(@RequestParam Map<String,Object> params,
+                                              @RequestParam(required = false, defaultValue = "0") int page,
+                                              @RequestParam(required = false, defaultValue = "10") int size) {
         try {
-            paginationResponseDTO<suKienResponseDTO> DTO =skServ.getAllEvent(params, page, size);
+            paginationResponseDTO<lopDTO> DTO = lopServ.getAllClass(params, page, size);
             return new ResponseEntity<>(DTO, HttpStatus.OK);
         } catch (Exception e) {
             // TODO: handle exception
@@ -37,19 +38,17 @@ public class suKienAPI {
         }
     }
 
-    @GetMapping(value = "/api/sukien/participation_list/{eventId}")
-    public ResponseEntity<Object> getAllSVInEvent(@PathVariable Integer eventId,
-                                                  @RequestParam(required = false, defaultValue = "0") int page,
-                                                  @RequestParam(required = false, defaultValue = "5") int size){
+    @GetMapping(value = "/api/class/{idLop}")
+    public ResponseEntity<Object> getById(@PathVariable Integer idLop){
         try {
-            paginationResponseDTO<sinhVienResponseDTO> DTO = skServ.getAllSVInEvent(eventId, page, size);
+            lopDTO DTO = lopServ.findById(idLop);
             return new ResponseEntity<>(DTO, HttpStatus.OK);
         } catch (EntityNotFoundException e) {
             // TODO: handle exception
             errorResponseDTO errorDTO = new errorResponseDTO();
             errorDTO.setError(e.getMessage());
             List<String> details = new ArrayList<>();
-            details.add("Event not found!");
+            details.add("Class not found!");
             errorDTO.setDetails(details);
 
             return new ResponseEntity<>(errorDTO, HttpStatus.NOT_FOUND);
@@ -65,68 +64,43 @@ public class suKienAPI {
         }
     }
 
-
-    @GetMapping(value = "/api/sukien/{eventId}")
-    public ResponseEntity<Object> findById(@PathVariable Integer eventId){
+    @PostMapping(value = "/api/class")
+    public ResponseEntity<Object> addLop(@ModelAttribute lopDTO DTO){
         try {
-            suKienDTO DTO = skServ.findById(eventId);
-            return new ResponseEntity<>(DTO, HttpStatus.OK);
-        } catch (EntityNotFoundException e) {
-            // TODO: handle exception
-            errorResponseDTO errorDTO = new errorResponseDTO();
-            errorDTO.setError(e.getMessage());
-            List<String> details = new ArrayList<>();
-            details.add("Event not found!");
-            errorDTO.setDetails(details);
-
-            return new ResponseEntity<>(errorDTO, HttpStatus.NOT_FOUND);
-        } catch (Exception e) {
-            // TODO: handle exception
-            errorResponseDTO errorDTO = new errorResponseDTO();
-            errorDTO.setError(e.getMessage());
-            List<String> details = new ArrayList<>();
-            details.add("An error occurred!");
-            errorDTO.setDetails(details);
-
-            return new ResponseEntity<>(errorDTO, HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-    }
-
-    @PostMapping(value = "/api/sukien")
-    public ResponseEntity<Object> addEvent(@RequestParam(value = "file", required = false) List<MultipartFile> files,
-                                          @ModelAttribute suKienResponseDTO skResDTO) {
-        try {
-            skServ.addEvent(files, skResDTO);
+            lopServ.addLop(DTO);
             return ResponseEntity.ok("Add successfully!");
-        } catch (IllegalArgumentException e) {
+        } catch (EntityExistsException e) {
             // TODO: handle exception
             errorResponseDTO errorDTO = new errorResponseDTO();
             errorDTO.setError(e.getMessage());
             List<String> details = new ArrayList<>();
-            details.add("Event not exist!");
+            details.add("Class name already exists!");
             errorDTO.setDetails(details);
 
-            return new ResponseEntity<>(errorDTO, HttpStatus.NOT_FOUND);
+            return new ResponseEntity<>(errorDTO, HttpStatus.BAD_REQUEST);
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An error occurred.");
+            // TODO: handle exception
+            errorResponseDTO errorDTO = new errorResponseDTO();
+            errorDTO.setError(e.getMessage());
+            List<String> details = new ArrayList<>();
+            details.add("An error occurred!");
+            errorDTO.setDetails(details);
+            return new ResponseEntity<>(errorDTO, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
-    @PutMapping(value = "/api/sukien/{eventId}")
-    public ResponseEntity<Object> updatePost(@PathVariable Integer eventId,
-                                             @ModelAttribute suKienResponseDTO skResDTO,
-                                             @RequestParam(value = "file", required = false) List<MultipartFile> files,
-                                             @RequestParam(value = "deleteFileIds", required = false) List<Integer> deleteFileIds) {
-
+    @PutMapping(value = "/api/class/{idLop}")
+    public ResponseEntity<Object> updateSinhVien(@PathVariable Integer idLop,
+                                                 @ModelAttribute lopRequestDTO DTO) {
         try {
-            skServ.updateEvent(eventId, skResDTO, files, deleteFileIds);
+            lopServ.updateLop(idLop, DTO);
             return ResponseEntity.ok("Update successfully!");
         } catch (EntityNotFoundException e) {
             // TODO: handle exception
             errorResponseDTO errorDTO = new errorResponseDTO();
             errorDTO.setError(e.getMessage());
             List<String> details = new ArrayList<>();
-            details.add("Event not found!");
+            details.add("Class not found!");
             errorDTO.setDetails(details);
 
             return new ResponseEntity<>(errorDTO, HttpStatus.NOT_FOUND);
@@ -135,17 +109,19 @@ public class suKienAPI {
         }
     }
 
-    @DeleteMapping(value = "/api/sukien/{eventId}")
-    public ResponseEntity<Object> deletePost(@PathVariable Integer eventId) {
+
+
+    @DeleteMapping(value = "/api/class/{idLop}")
+    public ResponseEntity<Object> deleteClass(@PathVariable Integer idLop) {
         try {
-            skServ.deleteEvent(eventId);
+            lopServ.deleteLop(idLop);
             return ResponseEntity.ok("Delete successfully!");
         } catch (EntityNotFoundException e) {
             // TODO: handle exception
             errorResponseDTO errorDTO = new errorResponseDTO();
             errorDTO.setError(e.getMessage());
             List<String> details = new ArrayList<>();
-            details.add("Event not found!");
+            details.add("Class not found!");
             errorDTO.setDetails(details);
 
             return new ResponseEntity<>(errorDTO, HttpStatus.NOT_FOUND);

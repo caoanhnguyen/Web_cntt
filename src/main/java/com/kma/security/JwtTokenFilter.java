@@ -56,6 +56,11 @@ public class JwtTokenFilter extends OncePerRequestFilter {
                 response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Token expired. Please log in again.");
                 return;
             }
+            // Kiểm tra JWT trong Blacklist
+            if (jwtTokenUtil.isTokenBlacklisted(token)) {
+                response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Unauthorized");
+                return;
+            }
             final String userName = jwtTokenUtil.extractUserName(token);
             if (userName != null && SecurityContextHolder.getContext().getAuthentication() == null) {
 
@@ -80,7 +85,6 @@ public class JwtTokenFilter extends OncePerRequestFilter {
         } catch (Exception e) {
             // Các lỗi không mong muốn khác, trả về 401 Unauthorized
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-            e.printStackTrace();
             response.getWriter().write("{\"message\": \"Unauthorized - Invalid token\"}");
         }
     }
@@ -92,7 +96,13 @@ public class JwtTokenFilter extends OncePerRequestFilter {
                 Pair.of("/api/store-fcm-token", "POST"),
                 Pair.of(String.format("%s/home", userPrefix), "GET"),
                 Pair.of("/uploadImg", "POST"),
-                Pair.of("/downloadFile/**", "GET")
+                Pair.of("/downloadFile", "GET"),
+                Pair.of("/downloadProfile", "GET"),
+                Pair.of("/api/discussion", "GET"),
+//                Pair.of("/api/discussion", "POST"),
+                Pair.of(String.format("%s/posts/**", userPrefix), "GET"),
+                Pair.of(String.format("%s/sukien/**", userPrefix), "GET")
+
         );
         for(Pair<String, String> bypassToken: bypassTokens) {
             if (request.getServletPath().contains(bypassToken.getFirst()) &&

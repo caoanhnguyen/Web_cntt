@@ -10,9 +10,7 @@ import java.util.List;
 import java.util.Objects;
 
 import com.kma.constants.fileDirection;
-import com.kma.repository.entities.NhanVien;
-import com.kma.repository.entities.SinhVien;
-import com.kma.repository.entities.TaiLieuMonHoc;
+import com.kma.repository.entities.*;
 import com.kma.repository.nhanVienRepo;
 import com.kma.repository.sinhVienRepo;
 import com.kma.repository.taiLieuMonHocRepo;
@@ -24,7 +22,6 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.kma.models.fileDTO;
-import com.kma.repository.entities.TaiNguyen;
 import com.kma.services.fileService;
 import com.kma.utilities.fileUploadUtil;
 
@@ -52,7 +49,7 @@ public class fileServImpl implements fileService{
 	}
 
 	@Override
-	public fileDTO uploadImg(MultipartFile file) throws IOException {
+	public fileDTO uploadImg(MultipartFile file) throws IOException {	// Dùng để lưu và trả ra downloadUrl của ảnh cho bài viết, sự kiện và discussion trong content
 		String fileName = StringUtils.cleanPath(Objects.requireNonNull(file.getOriginalFilename()));
 		String fileCode = fileUploadUtil.saveFile(fileName, file, fileDirection.pathForTaiNguyen);
 		String url = "/downloadFile/" + fileCode;

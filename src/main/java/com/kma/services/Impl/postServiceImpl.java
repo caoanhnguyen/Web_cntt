@@ -1,6 +1,7 @@
 package com.kma.services.Impl;
 
 import java.io.IOException;
+import java.security.Principal;
 import java.sql.Date;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -9,12 +10,14 @@ import com.kma.constants.fileDirection;
 import com.kma.converter.postDTOConverter;
 import com.kma.models.paginationResponseDTO;
 import com.kma.models.postResponseDTO;
+import com.kma.repository.entities.User;
 import com.kma.repository.taiNguyenRepo;
 import com.kma.utilities.taiNguyenUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -44,6 +47,8 @@ public class postServiceImpl implements postService{
 	taiNguyenRepo taiNguyenRepo;
 	@Autowired
 	postDTOConverter dtoConverter;
+	@Autowired
+	NotificationService notiServ;
 
 	@Override
 	public postDTO getById(Integer post_id) {
@@ -93,14 +98,10 @@ public class postServiceImpl implements postService{
 
 	@Override
 	public void addPost(List<MultipartFile> files,
-						postRequestDTO postRequestDTO) throws IOException {
-		
-		// Kiểm tra tính hợp lệ của author_id
-		if(postRequestDTO.getAuthor_id() == null) {
-			throw new IllegalArgumentException("Invalid Author ID");
-		}
-		// Kiểm tra xem nhân viên có tồn tại không
-		NhanVien nhanVien = nvRepo.findById(postRequestDTO.getAuthor_id()).orElse(null);
+						postRequestDTO postRequestDTO, Principal principal) throws IOException {
+		User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+
+		NhanVien nhanVien = nvRepo.findByMaNhanVien(user.getUserName());
 		if(nhanVien == null) {
 			throw new IllegalArgumentException("Invalid Author ID");
 		}
@@ -127,6 +128,11 @@ public class postServiceImpl implements postService{
 		}
 		post.setTaiNguyenList(tnList);
 		postRepo.save(post);
+
+		// Gửi thông báo bài viết mới
+		String title = "Có bài viết mới. Xem ngay!";
+		String content = nhanVien.getTenNhanVien() + " vừa tạo 1 bài viết mới!\n" + post.getTitle();
+		notiServ.sendNotificationToAllUsers(title, content);
 	}
 	
 
@@ -169,6 +175,7 @@ public class postServiceImpl implements postService{
 		    }
 		    post.setTaiNguyenList(tnList);
 			postRepo.save(post);
+
 		}else {
 			throw new EntityNotFoundException("Post not found with id: " + post_id);
 		}

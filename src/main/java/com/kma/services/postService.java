@@ -1,6 +1,7 @@
 package com.kma.services;
 
 import java.io.IOException;
+import java.security.Principal;
 import java.util.List;
 import java.util.Map;
 
@@ -19,7 +20,7 @@ public interface postService {
 	List<postDTO> getLatestPosts();
 	
 	void addPost(List<MultipartFile> files,
-				 postRequestDTO postRequestDTO) throws IOException;
+				 postRequestDTO postRequestDTO, Principal principal) throws IOException;
 	
 	void updatePost(Integer post_id,
 					postRequestDTO postRequestDTO,

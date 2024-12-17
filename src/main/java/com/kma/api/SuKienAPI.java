@@ -1,34 +1,29 @@
 package com.kma.api;
 
 import com.kma.models.*;
-import com.kma.services.phongBanService;
+import com.kma.services.suKienService;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
 @RestController
-public class phongBanAPI {
-
-    @Value("${api.prefix}")
-    private String apiPrefix;
-
+public class SuKienAPI {
     @Autowired
-    phongBanService pbServ;
+    suKienService skServ;
 
-    @GetMapping(value = "/api/phong_ban")
-    public ResponseEntity<Object> getAllPhongBan(@RequestParam Map<Object,Object> params,
-                                                 @RequestParam(required = false, defaultValue = "0") int page,
-                                                 @RequestParam(required = false, defaultValue = "5") int size){
+    @GetMapping(value = "/api/sukien")
+    public ResponseEntity<Object> getAllSuKien(@RequestParam Map<String,Object> params,
+                                               @RequestParam(required = false, defaultValue = "0") int page,
+                                               @RequestParam(required = false, defaultValue = "10") int size){
         try {
-            paginationResponseDTO<phongBanResponseDTO> DTO = pbServ.getAllPhongBan(params, page, size);
+            paginationResponseDTO<suKienResponseDTO> DTO =skServ.getAllEvent(params, page, size);
             return new ResponseEntity<>(DTO, HttpStatus.OK);
         } catch (Exception e) {
             // TODO: handle exception
@@ -42,17 +37,19 @@ public class phongBanAPI {
         }
     }
 
-    @GetMapping(value = "/api/phong_ban/{maPhongBan}")
-    public ResponseEntity<Object> getById(@PathVariable String maPhongBan){
+    @GetMapping(value = "/api/sukien/participation_list/{eventId}")
+    public ResponseEntity<Object> getAllSVInEvent(@PathVariable Integer eventId,
+                                                  @RequestParam(required = false, defaultValue = "0") int page,
+                                                  @RequestParam(required = false, defaultValue = "5") int size){
         try {
-            phongBanResponseDTO DTO = pbServ.getById(maPhongBan);
+            paginationResponseDTO<sinhVienResponseDTO> DTO = skServ.getAllSVInEvent(eventId, page, size);
             return new ResponseEntity<>(DTO, HttpStatus.OK);
         } catch (EntityNotFoundException e) {
             // TODO: handle exception
             errorResponseDTO errorDTO = new errorResponseDTO();
             errorDTO.setError(e.getMessage());
             List<String> details = new ArrayList<>();
-            details.add("Department not found!");
+            details.add("Event not found!");
             errorDTO.setDetails(details);
 
             return new ResponseEntity<>(errorDTO, HttpStatus.NOT_FOUND);
@@ -68,20 +65,21 @@ public class phongBanAPI {
         }
     }
 
-    @PostMapping(value = "/api/phong_ban")
-    public ResponseEntity<Object> addPhongBan(@ModelAttribute phongBanResponseDTO pbResDTO){
+
+    @GetMapping(value = "/api/sukien/{eventId}")
+    public ResponseEntity<Object> findById(@PathVariable Integer eventId){
         try {
-            pbServ.addPhongBan(pbResDTO);
-            return ResponseEntity.ok("Add successfully!");
+            suKienDTO DTO = skServ.findById(eventId);
+            return new ResponseEntity<>(DTO, HttpStatus.OK);
         } catch (EntityNotFoundException e) {
             // TODO: handle exception
             errorResponseDTO errorDTO = new errorResponseDTO();
             errorDTO.setError(e.getMessage());
             List<String> details = new ArrayList<>();
-            details.add("Department id already exists!");
+            details.add("Event not found!");
             errorDTO.setDetails(details);
 
-            return new ResponseEntity<>(errorDTO, HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(errorDTO, HttpStatus.NOT_FOUND);
         } catch (Exception e) {
             // TODO: handle exception
             errorResponseDTO errorDTO = new errorResponseDTO();
@@ -89,22 +87,23 @@ public class phongBanAPI {
             List<String> details = new ArrayList<>();
             details.add("An error occurred!");
             errorDTO.setDetails(details);
+
             return new ResponseEntity<>(errorDTO, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
-    @PutMapping(value = "/api/phong_ban/{maPhongBan}")
-    public ResponseEntity<Object> updatePhongBan(@PathVariable String maPhongBan,
-                                                 @ModelAttribute phongBanResponseDTO pbResDTO) {
+    @PostMapping(value = "/api/sukien")
+    public ResponseEntity<Object> addEvent(@RequestParam(value = "file", required = false) List<MultipartFile> files,
+                                          @ModelAttribute suKienResponseDTO skResDTO) {
         try {
-            pbServ.updatePhongBan(maPhongBan, pbResDTO);
-            return ResponseEntity.ok("Update successfully!");
-        } catch (EntityNotFoundException e) {
+            skServ.addEvent(files, skResDTO);
+            return ResponseEntity.ok("Add successfully!");
+        } catch (IllegalArgumentException e) {
             // TODO: handle exception
             errorResponseDTO errorDTO = new errorResponseDTO();
             errorDTO.setError(e.getMessage());
             List<String> details = new ArrayList<>();
-            details.add("Department not found!");
+            details.add("Event not exist!");
             errorDTO.setDetails(details);
 
             return new ResponseEntity<>(errorDTO, HttpStatus.NOT_FOUND);
@@ -113,17 +112,40 @@ public class phongBanAPI {
         }
     }
 
-    @DeleteMapping(value = "/api/phong_ban/{maPhongBan}")
-    public ResponseEntity<Object> deletePhongBan(@PathVariable String maPhongBan) {
+    @PutMapping(value = "/api/sukien/{eventId}")
+    public ResponseEntity<Object> updatePost(@PathVariable Integer eventId,
+                                             @ModelAttribute suKienResponseDTO skResDTO,
+                                             @RequestParam(value = "file", required = false) List<MultipartFile> files,
+                                             @RequestParam(value = "deleteFileIds", required = false) List<Integer> deleteFileIds) {
+
         try {
-            pbServ.deletePhongBan(maPhongBan);
+            skServ.updateEvent(eventId, skResDTO, files, deleteFileIds);
+            return ResponseEntity.ok("Update successfully!");
+        } catch (EntityNotFoundException e) {
+            // TODO: handle exception
+            errorResponseDTO errorDTO = new errorResponseDTO();
+            errorDTO.setError(e.getMessage());
+            List<String> details = new ArrayList<>();
+            details.add("Event not found!");
+            errorDTO.setDetails(details);
+
+            return new ResponseEntity<>(errorDTO, HttpStatus.NOT_FOUND);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An error occurred.");
+        }
+    }
+
+    @DeleteMapping(value = "/api/sukien/{eventId}")
+    public ResponseEntity<Object> deletePost(@PathVariable Integer eventId) {
+        try {
+            skServ.deleteEvent(eventId);
             return ResponseEntity.ok("Delete successfully!");
         } catch (EntityNotFoundException e) {
             // TODO: handle exception
             errorResponseDTO errorDTO = new errorResponseDTO();
             errorDTO.setError(e.getMessage());
             List<String> details = new ArrayList<>();
-            details.add("Department not found!");
+            details.add("Event not found!");
             errorDTO.setDetails(details);
 
             return new ResponseEntity<>(errorDTO, HttpStatus.NOT_FOUND);

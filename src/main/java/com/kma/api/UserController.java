@@ -7,6 +7,7 @@ import com.kma.models.errorResponseDTO;
 import com.kma.security.JwtTokenUtil;
 import com.kma.services.IUserService;
 import io.jsonwebtoken.ExpiredJwtException;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -110,6 +111,29 @@ public class UserController {
 
             return new ResponseEntity<>(errorDTO, HttpStatus.UNAUTHORIZED);
         }  catch (Exception e) {
+            // TODO: handle exception
+            errorResponseDTO errorDTO = new errorResponseDTO();
+            errorDTO.setError(e.getMessage());
+            List<String> details = new ArrayList<>();
+            details.add("An error occurred!");
+            errorDTO.setDetails(details);
+
+            return new ResponseEntity<>(errorDTO, HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    @PostMapping("/logout")
+    public ResponseEntity<?> logout(HttpServletRequest request) {
+        try{
+            String authorizationHeader = request.getHeader("Authorization");
+            if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
+                String jwt = authorizationHeader.substring(7);
+                long expirationTime = jwtTokenUtil.getExpirationTime(jwt); // Tính thời gian hết hạn
+                jwtTokenUtil.addTokenToBlacklist(jwt, expirationTime);
+                return ResponseEntity.ok("Logout successful. Token blacklisted.");
+            }
+            return ResponseEntity.badRequest().body("Invalid Authorization header");
+        } catch (Exception e) {
             // TODO: handle exception
             errorResponseDTO errorDTO = new errorResponseDTO();
             errorDTO.setError(e.getMessage());

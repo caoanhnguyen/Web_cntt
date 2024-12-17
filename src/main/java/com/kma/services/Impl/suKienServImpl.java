@@ -43,6 +43,8 @@ public class suKienServImpl implements suKienService {
     taiNguyenRepo tnRepo;
     @Autowired
     sinhVienDTOConverter svDTOConverter;
+    @Autowired
+    NotificationService notiServ;
 
     @Override
     public paginationResponseDTO<suKienResponseDTO> getAllEvent(Map<String, Object> params, Integer page, Integer size) {
@@ -136,6 +138,11 @@ public class suKienServImpl implements suKienService {
 
         event.setTaiNguyenList(tnList);
         skRepo.save(event);
+
+        // Gửi thông báo bài viết mới
+        String title = "Có sự kiện mới. Xem ngay!";
+        String content = event.getEventName();
+        notiServ.sendNotificationToAllUsers(title, content);
     }
 
     @Override

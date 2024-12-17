@@ -1,5 +1,6 @@
 package com.kma.api;
 
+import java.security.Principal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -93,9 +94,9 @@ public class PostAPI {
 	
 	@PostMapping(value = "/api/posts")
 	public ResponseEntity<Object> addPost(@RequestParam(value = "file", required = false) List<MultipartFile> files,
-										  @ModelAttribute postRequestDTO postRequestDTO) {
+										  @ModelAttribute postRequestDTO postRequestDTO, Principal principal) {
 		try {
-			postServ.addPost(files, postRequestDTO);
+			postServ.addPost(files, postRequestDTO, principal);
 			return ResponseEntity.ok("Add successfully!");
 		} catch (IllegalArgumentException e) {
 			// TODO: handle exception

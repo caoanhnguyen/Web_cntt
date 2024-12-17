@@ -1,26 +1,24 @@
 package com.kma.security;
 
 import com.kma.models.entityInfo;
-import com.kma.repository.entities.NhanVien;
-import com.kma.repository.entities.SinhVien;
 import com.kma.repository.entities.User;
-import com.kma.repository.nhanVienRepo;
-import com.kma.repository.sinhVienRepo;
+import com.kma.utilities.userInfoUtil;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 import org.springframework.security.core.GrantedAuthority;
 
 import java.security.Key;
+import java.time.Duration;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Objects;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -34,10 +32,9 @@ public class JwtTokenUtil {
     private String secretKey;
 
     @Autowired
-    sinhVienRepo svRepo;
-
+    RedisTemplate<String, String> redisTemplate;
     @Autowired
-    nhanVienRepo nvRepo;
+    userInfoUtil userUtil;
 
     public String generateToken(User user) throws Exception{
         //properties => claims
@@ -46,8 +43,11 @@ public class JwtTokenUtil {
         // username
         claims.put("userName", user.getUserName());
 
+        // accountId
+        claims.put("accountId", user.getUserId());
+
         // Info
-        entityInfo info = getInfoOfEntity(user);
+        entityInfo info = userUtil.getInfoOfEntity(user);
         Object entityId = info.getEntityId();
         String avaFileCode = info.getAvaFileCode();
 
@@ -68,22 +68,6 @@ public class JwtTokenUtil {
             throw new Exception("Cannot create jwt token, error: "+e.getMessage());
             //return null;
         }
-    }
-
-    private entityInfo getInfoOfEntity(User user){
-        String userName = user.getUserName();
-        String avaFileCode = "/downloadProfile/";
-        Object entityId = null;
-        NhanVien nv = nvRepo.findByMaNhanVien(userName);
-        if(nv!=null){
-            avaFileCode += nv.getAvaFileCode();
-            entityId = nv.getIdUser();
-        }else{
-            SinhVien sv = svRepo.findById(userName).orElse(null);
-            avaFileCode += Objects.requireNonNull(sv).getAvaFileCode();
-            entityId = sv.getMaSinhVien();
-        }
-        return new entityInfo(entityId, avaFileCode);
     }
 
     private Key getSignInKey() {
@@ -163,5 +147,37 @@ public class JwtTokenUtil {
         String userName = extractUserName(token);
         return (userName.equals(userDetails.getUsername()))
                 && !isTokenExpired(token); //check hạn của token
+    }
+
+    // Lấy thời gian hết hạn của JWT
+    public long getExpirationTime(String token) {
+        Claims claims = Jwts.parser()
+                .setSigningKey(secretKey)
+                .parseClaimsJws(token)
+                .getBody();
+
+        Date expiration = claims.getExpiration();
+        return expiration.getTime() - System.currentTimeMillis(); // TTL = thời gian hết hạn - thời gian hiện tại
+    }
+
+    // Kiểm tra xem JWT có nằm trong Blacklist không
+    public boolean isTokenBlacklisted(String jwt) {
+        if (jwt == null || jwt.isEmpty()) {
+            return false; // Token null hoặc rỗng không thể bị blacklist
+        }
+        String redisKey = "blacklist:jwt";
+        // Kiểm tra xem JWT có tồn tại trong Set không
+        Boolean isMember = redisTemplate.opsForSet().isMember(redisKey, jwt);
+        return Boolean.TRUE.equals(isMember); // Trả về true nếu token tồn tại
+    }
+
+    public void addTokenToBlacklist(String jwt, long expirationTimeInMillis) {
+        String redisKey = "blacklist:jwt";
+        // Thêm JWT vào Redis Set
+        redisTemplate.opsForSet().add(redisKey, jwt);
+
+        // Đặt TTL cho Set, tương ứng với thời gian hết hạn lâu nhất của token
+        redisTemplate.expire(redisKey, Duration.ofMillis(expirationTimeInMillis));
+        System.out.println("JWT token added to blacklist: " + jwt);
     }
 }

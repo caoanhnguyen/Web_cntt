@@ -7,6 +7,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Entity
@@ -35,6 +36,38 @@ public class User implements UserDetails {
     )
     private Collection<Role> roleList = new ArrayList<>();
 
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    private Set<Discussion> discussions;
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    private Set<Answer> answers;
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    private Set<Vote> votes;
+
+    public Set<Discussion> getDiscussions() {
+        return discussions;
+    }
+
+    public void setDiscussions(Set<Discussion> discussions) {
+        this.discussions = discussions;
+    }
+
+    public Set<Answer> getAnswers() {
+        return answers;
+    }
+
+    public void setAnswers(Set<Answer> answers) {
+        this.answers = answers;
+    }
+
+    public Set<Vote> getVotes() {
+        return votes;
+    }
+
+    public void setVotes(Set<Vote> votes) {
+        this.votes = votes;
+    }
 
     public String getUserName() {
         return userName;

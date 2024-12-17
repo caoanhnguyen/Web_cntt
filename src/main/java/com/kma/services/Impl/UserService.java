@@ -9,12 +9,14 @@ import com.kma.security.JwtTokenUtil;
 import com.kma.services.IUserService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.time.Duration;
 import java.util.Optional;
 
 @RequiredArgsConstructor
@@ -27,6 +29,7 @@ public class UserService implements IUserService {
     private final PasswordEncoder passwordEncoder;  // final
     private final JwtTokenUtil jwtTokenUtil;  // final
     private final AuthenticationManager authenticationManager;  // final
+    private final RedisTemplate<String, String> redisTemplate;
 
     @Override
     public String login(String userName, String password) throws Exception {
@@ -102,4 +105,15 @@ public class UserService implements IUserService {
         userRepo.save(user);
         rolerepo.save(newRole);
     }
+
+//    @Override
+//    public void addTokenToBlacklist(String jwt, long expirationTimeInMillis) {
+//        String redisKey = "blacklist:jwt";
+//        // Thêm JWT vào Redis Set
+//        redisTemplate.opsForSet().add(redisKey, jwt);
+//
+//        // Đặt TTL cho Set, tương ứng với thời gian hết hạn lâu nhất của token
+//        redisTemplate.expire(redisKey, Duration.ofMillis(expirationTimeInMillis));
+//        System.out.println("JWT token added to blacklist: " + jwt);
+//    }
 }

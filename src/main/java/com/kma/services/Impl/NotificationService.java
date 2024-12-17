@@ -15,7 +15,8 @@ public class NotificationService {
 
     @Autowired
     FcmService fcmServ;
-    RedisTemplate<String, String> redisTemplate;
+//    @Autowired
+//    RedisTemplate<String, String> redisTemplate;
 
     // Gửi thông báo trực tiếp bằng FCM token
     public void sendNotification(TokenRequest tokenRequest, String title, String body) {

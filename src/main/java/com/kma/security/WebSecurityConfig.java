@@ -47,11 +47,24 @@ public class WebSecurityConfig {
                         .requestMatchers(POST, "/notifications/**").permitAll()
                         .requestMatchers(POST, "/api/store-fcm-token").permitAll()
                         .requestMatchers(GET, "/downloadFile/**").permitAll()
+                        .requestMatchers(GET, "/downloadProfile/**").permitAll()
                         .requestMatchers(POST, "/uploadImg").permitAll()
                         .requestMatchers(GET,
                                 String.format("%s/posts/**", apiPrefix)).permitAll()
                         .requestMatchers(GET,
                                 String.format("%s/sukien/**", apiPrefix)).permitAll()
+                        .requestMatchers(
+                                String.format("%s/discussion/**", apiPrefix)).permitAll()
+
+                        // Discussion Authorization
+                        .requestMatchers(GET,
+                                String.format("%s/discussion/**", apiPrefix)).hasAnyRole(Role.ADMIN, Role.STUDENT, Role.EMPLOYEE)
+                        .requestMatchers(POST,
+                                String.format("%s/discussion/**", apiPrefix)).hasAnyRole(Role.ADMIN, Role.STUDENT, Role.EMPLOYEE)
+                        .requestMatchers(PUT,
+                                String.format("%s/discussion/**", apiPrefix)).hasAnyRole(Role.ADMIN, Role.STUDENT, Role.EMPLOYEE)
+                        .requestMatchers(DELETE,
+                                String.format("%s/discussion/**", apiPrefix)).hasAnyRole(Role.ADMIN, Role.STUDENT, Role.EMPLOYEE)
 
                         // PhongBan Authorization
                         .requestMatchers(GET,
@@ -90,17 +103,37 @@ public class WebSecurityConfig {
                         .requestMatchers(DELETE,
                                 String.format("%s/sukien/**", apiPrefix)).hasAnyRole(Role.ADMIN, Role.EMPLOYEE)
 
+                        // Subject Authorization
+                        .requestMatchers(GET,
+                                String.format("%s/sukien/**", apiPrefix)).hasAnyRole(Role.ADMIN, Role.STUDENT, Role.EMPLOYEE)
+                        .requestMatchers(GET,
+                                String.format("%s/sukien/participation_list/**", apiPrefix)).hasAnyRole(Role.ADMIN, Role.STUDENT, Role.EMPLOYEE)
+                        .requestMatchers(POST,
+                                String.format("%s/sukien/**", apiPrefix)).hasAnyRole(Role.ADMIN, Role.EMPLOYEE)
+                        .requestMatchers(PUT,
+                                String.format("%s/sukien/**", apiPrefix)).hasAnyRole(Role.ADMIN, Role.EMPLOYEE)
+                        .requestMatchers(DELETE,
+                                String.format("%s/sukien/**", apiPrefix)).hasAnyRole(Role.ADMIN, Role.EMPLOYEE)
+
                         // Student Authorization
                         .requestMatchers(GET,
-                                String.format("%s/students/**", apiPrefix)).hasAnyRole(Role.ADMIN, Role.STUDENT, Role.EMPLOYEE)
-                        .requestMatchers(GET,
-                                String.format("%s/students/participated_events/**", apiPrefix)).hasAnyRole(Role.ADMIN, Role.STUDENT, Role.EMPLOYEE)
+                                String.format("%s/monhoc/**", apiPrefix)).hasAnyRole(Role.ADMIN, Role.STUDENT, Role.EMPLOYEE)
                         .requestMatchers(POST,
-                                String.format("%s/students/**", apiPrefix)).hasAnyRole(Role.ADMIN)
+                                String.format("%s/monhoc/**", apiPrefix)).hasAnyRole(Role.ADMIN)
                         .requestMatchers(PUT,
-                                String.format("%s/students/**", apiPrefix)).hasAnyRole(Role.ADMIN, Role.STUDENT)
+                                String.format("%s/monhoc/**", apiPrefix)).hasAnyRole(Role.ADMIN, Role.EMPLOYEE)
                         .requestMatchers(DELETE,
-                                String.format("%s/students/**", apiPrefix)).hasAnyRole(Role.ADMIN)
+                                String.format("%s/monhoc/**", apiPrefix)).hasAnyRole(Role.ADMIN)
+
+                        // Class Authorization
+                        .requestMatchers(GET,
+                                String.format("%s/class/**", apiPrefix)).hasAnyRole(Role.ADMIN, Role.STUDENT, Role.EMPLOYEE)
+                        .requestMatchers(POST,
+                                String.format("%s/class/**", apiPrefix)).hasAnyRole(Role.ADMIN)
+                        .requestMatchers(PUT,
+                                String.format("%s/class/**", apiPrefix)).hasAnyRole(Role.ADMIN, Role.EMPLOYEE)
+                        .requestMatchers(DELETE,
+                                String.format("%s/class/**", apiPrefix)).hasAnyRole(Role.ADMIN)
 
                         // Employee Authorization
                         .requestMatchers(GET,
