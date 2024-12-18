@@ -2,6 +2,7 @@ package com.kma.security;
 
 import com.kma.repository.entities.User;
 
+import io.lettuce.core.RedisConnectionException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -25,10 +26,10 @@ import java.util.List;
 @RequiredArgsConstructor
 public class JwtTokenFilter extends OncePerRequestFilter {
     @Value("${api.prefix}")
-    private String apiPrefix;
+    String apiPrefix;
 
     @Value("${user.prefix}")
-    private String userPrefix;
+    String userPrefix;
 
 
     private final UserDetailsService userDetailsService;
@@ -82,6 +83,10 @@ public class JwtTokenFilter extends OncePerRequestFilter {
             // Nếu token hết hạn hoặc không hợp lệ, trả về 401 Unauthorized
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             response.getWriter().write("{\"message\": \"Token expired or Invalid. Please log in again.\"}");
+        } catch (RedisConnectionException e) {
+            // Nếu lỗi kết nối redis
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            response.getWriter().write("{\"message\": \"Failed to connect to Redis.\"}");
         } catch (Exception e) {
             // Các lỗi không mong muốn khác, trả về 401 Unauthorized
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
@@ -98,10 +103,9 @@ public class JwtTokenFilter extends OncePerRequestFilter {
                 Pair.of("/uploadImg", "POST"),
                 Pair.of("/downloadFile", "GET"),
                 Pair.of("/downloadProfile", "GET"),
-                Pair.of("/api/discussion", "GET"),
-//                Pair.of("/api/discussion", "POST"),
-                Pair.of(String.format("%s/posts/**", userPrefix), "GET"),
-                Pair.of(String.format("%s/sukien/**", userPrefix), "GET")
+                Pair.of("/downloadDocs", "GET"),
+                Pair.of(String.format("%s/posts", apiPrefix), "GET"),
+                Pair.of(String.format("%s/sukien", apiPrefix), "GET")
 
         );
         for(Pair<String, String> bypassToken: bypassTokens) {

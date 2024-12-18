@@ -1,5 +1,6 @@
 package com.kma.repository.entities;
 
+import com.kma.enums.DiscussionStatus;
 import jakarta.persistence.*;
 
 import java.sql.Date;
@@ -21,6 +22,10 @@ public class Discussion {
     @Column(name="createAt")
     private Date createAt = new Date(System.currentTimeMillis());
 
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private DiscussionStatus status; // UP or DOWN
+
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "userId")    // Chứa mã SV hoặc mã NV
     private User user;
@@ -38,6 +43,14 @@ public class Discussion {
             inverseJoinColumns = @JoinColumn(name = "tagId")
     )
     private Set<Tag> tags;
+
+    public DiscussionStatus getStatus() {
+        return status;
+    }
+
+    public void setStatus(DiscussionStatus status) {
+        this.status = status;
+    }
 
     public Set<Vote> getVotes() {
         return votes;

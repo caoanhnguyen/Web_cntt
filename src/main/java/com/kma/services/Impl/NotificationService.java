@@ -4,7 +4,7 @@ import com.google.firebase.messaging.*;
 import com.kma.models.TokenRequest;
 import com.kma.services.FcmService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import java.util.Map;
@@ -15,10 +15,9 @@ public class NotificationService {
 
     @Autowired
     FcmService fcmServ;
-//    @Autowired
-//    RedisTemplate<String, String> redisTemplate;
 
     // Gửi thông báo trực tiếp bằng FCM token
+    @Async("notificationExecutor")
     public void sendNotification(TokenRequest tokenRequest, String title, String body) {
         try {
             // Tạo thông báo

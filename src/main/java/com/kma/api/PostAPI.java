@@ -112,7 +112,7 @@ public class PostAPI {
 		}
 	}
 	
-	@PutMapping(value = "/api/posts/{post_id}")
+	@PutMapping("/api/posts/{post_id}")
 	public ResponseEntity<Object> updatePost(@PathVariable Integer post_id, 
 											 @ModelAttribute postRequestDTO postRequestDTO,
 											 @RequestParam(value = "file", required = false) List<MultipartFile> files,

@@ -1,0 +1,26 @@
+package com.kma.config;
+
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.scheduling.annotation.EnableAsync;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
+
+import java.util.concurrent.Executor;
+
+@Configuration
+@EnableAsync
+public class AsyncConfig {
+
+    @Bean(name = "notificationExecutor")
+    public Executor notificationExecutor() {
+        ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
+        executor.setCorePoolSize(5);  // Số luồng cơ bản
+        executor.setMaxPoolSize(10);  // Số luồng tối đa
+        executor.setQueueCapacity(50); // Độ dài hàng đợi
+        executor.setThreadNamePrefix("Notification-");
+        executor.initialize();
+        return executor;
+    }
+}
+
+

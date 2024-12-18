@@ -1,6 +1,7 @@
 package com.kma.services.Impl;
 
 import com.kma.converter.discussionDTOConverter;
+import com.kma.enums.DiscussionStatus;
 import com.kma.models.discussionDTO;
 import com.kma.models.discussionRequestDTO;
 import com.kma.models.discussionResponseDTO;
@@ -84,9 +85,34 @@ public class discussionServImpl implements discussionService {
     }
 
     @Override
+    public paginationResponseDTO<discussionResponseDTO> getAllPendingDiscuss(Integer page, Integer size) {
+        // Tạo Pageable
+        Pageable pageable = PageRequest.of(page, size);
+
+        // Lấy dữ liệu từ repository
+        Page<Discussion> discussPage = discussRepo.findByStatus(DiscussionStatus.PENDING, pageable);
+
+        // Chuyển đổi Post sang postResponseDTO
+        List<discussionResponseDTO> discussResDTOList = discussPage.getContent().stream()
+                .map(discussDTOConverter::convertToDiscussResDTO)
+                .toList();
+
+        // Đóng gói dữ liệu và meta vào DTO
+        return new paginationResponseDTO<>(
+                discussResDTOList,
+                discussPage.getTotalPages(),
+                (int) discussPage.getTotalElements(),
+                discussPage.isFirst(),
+                discussPage.isLast(),
+                discussPage.getNumber(),
+                discussPage.getSize()
+        );
+    }
+
+    @Override
     public List<discussionResponseDTO> getLatestDiscussions() {
         // Tìm kiếm bài viết mới nhất
-        List<Discussion> posts = discussRepo.findTop6ByOrderByDiscussionIdDesc();
+        List<Discussion> posts = discussRepo.findTop6ByStatusOrderByDiscussionIdDesc(DiscussionStatus.APPROVED);
         return posts.stream()
                 .map(discussDTOConverter::convertToDiscussResDTO)
                 .collect(Collectors.toList());
@@ -99,6 +125,8 @@ public class discussionServImpl implements discussionService {
 
         Discussion discussion = discussDTOConverter.convertToDiscussion(discussReqDTO, tagIdList);
         discussion.setUser(user);
+
+        discussion.setStatus(DiscussionStatus.PENDING);
 
         discussRepo.save(discussion);
 
@@ -133,6 +161,39 @@ public class discussionServImpl implements discussionService {
             throw new EntityNotFoundException("Discussion not found!");
         }
 
+    }
+
+    @Override
+    public void updateDiscussionStatus(Integer discussionId, String discussionStatus) {
+        // Kiểm tra xem discussion có tồn tại không
+        Discussion discussion = discussRepo.findById(discussionId).orElse(null);
+        if(discussion!=null){
+            // Chuyển đổi discussionStatus từ String sang Enum
+            DiscussionStatus status;
+            try {
+                status = DiscussionStatus.valueOf(discussionStatus.toUpperCase());
+            } catch (IllegalArgumentException e) {
+                throw new IllegalArgumentException("Invalid discussion status: " + discussionStatus);
+            }
+
+            if(status.equals(DiscussionStatus.REJECTED)){
+                // Xóa bài thảo luận khỏi DB
+                discussRepo.delete(discussion);
+
+                // Thông báo đến user đó là discussion bị reject
+                User user = discussion.getUser();
+                String userId = user.getUserName();
+                String title = "Bài thảo luận bị từ chối!";
+                String content = "Bài thảo luận với tiêu đề: " + discussion.getTitle() + " của bạn đã bị từ chối!";
+                notiServ.sendNotificationByUserId(userId, title, content);
+            }else if(status.equals(DiscussionStatus.APPROVED)){
+                // Duyệt bài thảo luận
+                discussion.setStatus(DiscussionStatus.APPROVED);
+            }
+
+        }else{
+            throw new EntityNotFoundException("Discussion not found!");
+        }
     }
 
     @Override

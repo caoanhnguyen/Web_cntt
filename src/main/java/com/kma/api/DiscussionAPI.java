@@ -22,7 +22,7 @@ public class DiscussionAPI {
     discussionService discussionServ;
 
 
-    @GetMapping(value = "/discussion/{discussionId}")
+    @GetMapping(value = "/discussions/{discussionId}")
     public ResponseEntity<Object> getById(@PathVariable Integer discussionId){
         try {
             discussionDTO DTO = discussionServ.getById(discussionId);
@@ -48,7 +48,7 @@ public class DiscussionAPI {
         }
     }
 
-    @GetMapping(value="/discussion")
+    @GetMapping(value="/discussions")
     public ResponseEntity<Object> getAllDiscussion(@RequestParam Map<String,Object> params,
                                                    @RequestParam(required = false, defaultValue = "0") int page,
                                                    @RequestParam(required = false, defaultValue = "10") int size){
@@ -67,7 +67,26 @@ public class DiscussionAPI {
         }
     }
 
-    @GetMapping(value = "/discussion/latest")
+    @GetMapping(value="/discussions/pending")
+    public ResponseEntity<Object> getAllPendingDiscuss(@RequestParam Map<String,Object> params,
+                                                       @RequestParam(required = false, defaultValue = "0") int page,
+                                                       @RequestParam(required = false, defaultValue = "10") int size){
+        try {
+            paginationResponseDTO<discussionResponseDTO> DTO = discussionServ.getAllPendingDiscuss(page, size);
+            return new ResponseEntity<>(DTO, HttpStatus.OK);
+        } catch (Exception e) {
+            // TODO: handle exception
+            errorResponseDTO errorDTO = new errorResponseDTO();
+            errorDTO.setError(e.getMessage());
+            List<String> details = new ArrayList<>();
+            details.add("An error occurred!");
+            errorDTO.setDetails(details);
+
+            return new ResponseEntity<>(errorDTO, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @GetMapping(value = "/discussions/latest")
     public ResponseEntity<Object> getLatestDiscussions() {
         try {
             List<discussionResponseDTO> DTO = discussionServ.getLatestDiscussions();
@@ -84,10 +103,10 @@ public class DiscussionAPI {
         }
     }
 
-    @PostMapping(value = "/discussion")
-    public ResponseEntity<Object> addPost(@ModelAttribute discussionRequestDTO discussReqDTO,
-                                          @RequestParam(value = "tags", required = false) List<Integer> tagIdList,
-                                          Principal principal) {
+    @PostMapping(value = "/discussions")
+    public ResponseEntity<Object> addDiscussion(@ModelAttribute discussionRequestDTO discussReqDTO,
+                                                @RequestParam(value = "tags", required = false) List<Integer> tagIdList,
+                                                Principal principal) {
         try {
             discussionServ.addDiscussion(discussReqDTO, tagIdList, principal);
             return ResponseEntity.ok("Add successfully!");
@@ -105,10 +124,10 @@ public class DiscussionAPI {
         }
     }
 
-    @PutMapping(value = "/discussion/{discussionId}")
-    public ResponseEntity<Object> updatePost(@PathVariable Integer discussionId,
-                                             @ModelAttribute discussionRequestDTO discussReqDTO,
-                                             @RequestParam(value = "tags", required = false) List<Integer> tagIdList) {
+    @PutMapping(value = "/discussions/{discussionId}")
+    public ResponseEntity<Object> updateDiscussion(@PathVariable Integer discussionId,
+                                                   @ModelAttribute discussionRequestDTO discussReqDTO,
+                                                   @RequestParam(value = "tags", required = false) List<Integer> tagIdList) {
 
         try {
             discussionServ.updateDiscussion(discussionId, discussReqDTO, tagIdList);
@@ -127,8 +146,29 @@ public class DiscussionAPI {
         }
     }
 
-    @DeleteMapping(value = "/discussion/{discussionId}")
-    public ResponseEntity<Object> deletePost(@PathVariable Integer discussionId) {
+    @PatchMapping(value = "/discussions/{discussionId}/status")
+    public ResponseEntity<Object> updateDiscussionStatus(@PathVariable Integer discussionId,
+                                                         @RequestParam(value = "discussionStatus") String discussionStatus) {
+
+        try {
+            discussionServ.updateDiscussionStatus(discussionId, discussionStatus);
+            return ResponseEntity.ok("Update successfully!");
+        } catch (EntityNotFoundException | IllegalArgumentException e) {
+            // TODO: handle exception
+            errorResponseDTO errorDTO = new errorResponseDTO();
+            errorDTO.setError(e.getMessage());
+            List<String> details = new ArrayList<>();
+            details.add("Discussion not found!");
+            errorDTO.setDetails(details);
+
+            return new ResponseEntity<>(errorDTO, HttpStatus.NOT_FOUND);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An error occurred.");
+        }
+    }
+
+    @DeleteMapping(value = "/discussions/{discussionId}")
+    public ResponseEntity<Object> deleteDiscussion(@PathVariable Integer discussionId) {
         try {
             discussionServ.deleteDiscussion(discussionId);
             return ResponseEntity.ok("Delete successfully!");

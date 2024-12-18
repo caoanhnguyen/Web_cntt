@@ -27,10 +27,10 @@ public class WebSecurityConfig {
     private final JwtTokenFilter jwtTokenFilter;
 
     @Value("${api.prefix}")
-    private String apiPrefix;
+    String apiPrefix;
 
     @Value("${user.prefix}")
-    private String userPrefix;
+    String userPrefix;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http)  throws Exception{
@@ -48,23 +48,33 @@ public class WebSecurityConfig {
                         .requestMatchers(POST, "/api/store-fcm-token").permitAll()
                         .requestMatchers(GET, "/downloadFile/**").permitAll()
                         .requestMatchers(GET, "/downloadProfile/**").permitAll()
+                        .requestMatchers(GET, "/downloadDocs/**").permitAll()
                         .requestMatchers(POST, "/uploadImg").permitAll()
                         .requestMatchers(GET,
                                 String.format("%s/posts/**", apiPrefix)).permitAll()
                         .requestMatchers(GET,
                                 String.format("%s/sukien/**", apiPrefix)).permitAll()
-                        .requestMatchers(
-                                String.format("%s/discussion/**", apiPrefix)).permitAll()
+
+                        // Vote Authorization
+                        .requestMatchers(POST,
+                                String.format("%s/discussions/*/votes", apiPrefix)).hasAnyRole(Role.ADMIN, Role.STUDENT, Role.EMPLOYEE)
+                        .requestMatchers(POST,
+                                String.format("%s/answers/*/votes", apiPrefix)).hasAnyRole(Role.ADMIN, Role.STUDENT, Role.EMPLOYEE)
+                        .requestMatchers(GET,
+                                String.format("%s/votes/check/**", apiPrefix)).hasAnyRole(Role.ADMIN, Role.STUDENT, Role.EMPLOYEE)
+
 
                         // Discussion Authorization
                         .requestMatchers(GET,
-                                String.format("%s/discussion/**", apiPrefix)).hasAnyRole(Role.ADMIN, Role.STUDENT, Role.EMPLOYEE)
+                                String.format("%s/discussions/**", apiPrefix)).hasAnyRole(Role.ADMIN, Role.STUDENT, Role.EMPLOYEE)
                         .requestMatchers(POST,
-                                String.format("%s/discussion/**", apiPrefix)).hasAnyRole(Role.ADMIN, Role.STUDENT, Role.EMPLOYEE)
+                                String.format("%s/discussions/**", apiPrefix)).hasAnyRole(Role.ADMIN, Role.STUDENT, Role.EMPLOYEE)
                         .requestMatchers(PUT,
-                                String.format("%s/discussion/**", apiPrefix)).hasAnyRole(Role.ADMIN, Role.STUDENT, Role.EMPLOYEE)
+                                String.format("%s/discussions/**", apiPrefix)).hasAnyRole(Role.ADMIN, Role.STUDENT, Role.EMPLOYEE)
+                        .requestMatchers(PATCH,
+                                String.format("%s/discussions/**/status", apiPrefix)).hasAnyRole(Role.ADMIN, Role.STUDENT, Role.EMPLOYEE)
                         .requestMatchers(DELETE,
-                                String.format("%s/discussion/**", apiPrefix)).hasAnyRole(Role.ADMIN, Role.STUDENT, Role.EMPLOYEE)
+                                String.format("%s/discussions/**", apiPrefix)).hasAnyRole(Role.ADMIN, Role.STUDENT, Role.EMPLOYEE)
 
                         // PhongBan Authorization
                         .requestMatchers(GET,
@@ -172,7 +182,7 @@ public class WebSecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(List.of("http://172.20.10.18:8083", "http://localhost:8083"));
+        configuration.setAllowedOrigins(List.of("http://localhost:8083", "https://fond-frank-goose.ngrok-free.app"));
         configuration.setAllowedMethods(List.of("*"));
         configuration.setAllowedHeaders(List.of("*"));
         configuration.setAllowCredentials(true);

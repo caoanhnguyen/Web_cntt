@@ -1,14 +1,12 @@
 package com.kma.api;
 
-import com.kma.models.discussionDTO;
 import com.kma.models.errorResponseDTO;
+import com.kma.services.voteService;
 import jakarta.persistence.EntityNotFoundException;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -16,18 +14,21 @@ import java.util.List;
 @RestController
 @RequestMapping("/api")
 public class VoteAPI {
+    @Autowired
+    voteService voteServ;
 
-    @GetMapping(value = "/votes/{discussionId}")
-    public ResponseEntity<Object> getVotesOfDiscussion(@RequestParam Integer discussionId){
+    @GetMapping("/votes/check")
+    public ResponseEntity<Object> checkVote(@RequestParam(required = false) Integer discussionId,
+                                            @RequestParam(required = false) Integer answerId){
         try {
-
-            return new ResponseEntity<>(null, HttpStatus.OK);
+            boolean isVoted = voteServ.isVoted(discussionId, answerId);
+            return new ResponseEntity<>(isVoted, HttpStatus.OK);
         } catch (EntityNotFoundException e) {
             // TODO: handle exception
             errorResponseDTO errorDTO = new errorResponseDTO();
             errorDTO.setError(e.getMessage());
             List<String> details = new ArrayList<>();
-            details.add("Discussion not found!");
+            details.add("Discussion or answer not found!");
             errorDTO.setDetails(details);
 
             return new ResponseEntity<>(errorDTO, HttpStatus.NOT_FOUND);
@@ -39,6 +40,56 @@ public class VoteAPI {
             details.add("An error occurred!");
             errorDTO.setDetails(details);
 
+            return new ResponseEntity<>(errorDTO, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @PostMapping("/discussions/{discussionId}/votes")
+    public ResponseEntity<Object> voteDiscussion(@PathVariable Integer discussionId,
+                                                 @RequestParam(value = "voteType") String voteType) {
+        try {
+            voteServ.voteDiscussion(discussionId, voteType);
+            return ResponseEntity.ok("Vote successfully recorded!");
+        } catch (EntityNotFoundException e) {
+            // TODO: handle exception
+            errorResponseDTO errorDTO = new errorResponseDTO();
+            errorDTO.setError(e.getMessage());
+            List<String> details = new ArrayList<>();
+            details.add("Discussion not exist!");
+            errorDTO.setDetails(details);
+
+            return new ResponseEntity<>(errorDTO, HttpStatus.NOT_FOUND);
+        } catch (Exception e) {
+            errorResponseDTO errorDTO = new errorResponseDTO();
+            errorDTO.setError(e.getMessage());
+            List<String> details = new ArrayList<>();
+            details.add("An error occurred!");
+            errorDTO.setDetails(details);
+            return new ResponseEntity<>(errorDTO, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @PostMapping(value = "/answers/{answerId}/votes")
+    public ResponseEntity<Object> voteAnswer(@PathVariable Integer answerId,
+                                             @RequestParam(value = "voteType") String voteType) {
+        try {
+            voteServ.voteAnswer(answerId, voteType);
+            return ResponseEntity.ok("Vote successfully recorded!");
+        } catch (EntityNotFoundException e) {
+            // TODO: handle exception
+            errorResponseDTO errorDTO = new errorResponseDTO();
+            errorDTO.setError(e.getMessage());
+            List<String> details = new ArrayList<>();
+            details.add("Answer not exist!");
+            errorDTO.setDetails(details);
+
+            return new ResponseEntity<>(errorDTO, HttpStatus.NOT_FOUND);
+        } catch (Exception e) {
+            errorResponseDTO errorDTO = new errorResponseDTO();
+            errorDTO.setError(e.getMessage());
+            List<String> details = new ArrayList<>();
+            details.add("An error occurred!");
+            errorDTO.setDetails(details);
             return new ResponseEntity<>(errorDTO, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }

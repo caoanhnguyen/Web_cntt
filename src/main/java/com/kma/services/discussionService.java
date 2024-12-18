@@ -14,11 +14,15 @@ public interface discussionService {
 
     paginationResponseDTO<discussionResponseDTO> getAllDiscussion(Map<String,Object> params, Integer page, Integer size);
 
+    paginationResponseDTO<discussionResponseDTO> getAllPendingDiscuss(Integer page, Integer size);
+
     List<discussionResponseDTO> getLatestDiscussions();
 
     void addDiscussion(discussionRequestDTO discussReqDTO, List<Integer> tagIdList, Principal principal);
 
     void updateDiscussion(Integer discussionId, discussionRequestDTO discussReqDTO, List<Integer> tagIdList);
+
+    void updateDiscussionStatus(Integer discussionId, String discussionStatus);
 
     void deleteDiscussion(Integer discussionId);
 
