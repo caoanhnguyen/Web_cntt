@@ -2,7 +2,6 @@ package com.kma.security;
 
 import com.kma.repository.entities.User;
 
-import io.lettuce.core.RedisConnectionException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -10,6 +9,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.redis.RedisConnectionFailureException;
 import org.springframework.data.util.Pair;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -83,7 +83,7 @@ public class JwtTokenFilter extends OncePerRequestFilter {
             // Nếu token hết hạn hoặc không hợp lệ, trả về 401 Unauthorized
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             response.getWriter().write("{\"message\": \"Token expired or Invalid. Please log in again.\"}");
-        } catch (RedisConnectionException e) {
+        } catch (RedisConnectionFailureException e) {
             // Nếu lỗi kết nối redis
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             response.getWriter().write("{\"message\": \"Failed to connect to Redis.\"}");
