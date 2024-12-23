@@ -2,8 +2,6 @@ package com.kma.api;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Objects;
 
 import com.kma.constants.fileDirection;
@@ -14,6 +12,7 @@ import com.kma.repository.entities.SinhVien;
 import com.kma.repository.nhanVienRepo;
 import com.kma.repository.sinhVienRepo;
 import com.kma.services.fileService;
+import com.kma.utilities.buildErrorResUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
@@ -35,6 +34,8 @@ public class FileAPI {
 	nhanVienRepo nvRepo;
 	@Autowired
 	fileService fileServ;
+	@Autowired
+	buildErrorResUtil buildErrorResUtil;
 
 
 	@PostMapping("/uploadImg")
@@ -43,12 +44,7 @@ public class FileAPI {
 			fileDTO dto = fileServ.uploadImg(multipartFile);
 			return new ResponseEntity<>(dto, HttpStatus.OK);
 		} catch (Exception e){
-			errorResponseDTO errorDTO = new errorResponseDTO();
-			errorDTO.setError(e.getMessage());
-			List<String> details = new ArrayList<>();
-			details.add("An error occurred!");
-			errorDTO.setDetails(details);
-
+			errorResponseDTO errorDTO = buildErrorResUtil.buildErrorRes(e, "An error occurred!");
 			return new ResponseEntity<>(errorDTO, HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}

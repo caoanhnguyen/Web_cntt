@@ -2,6 +2,7 @@ package com.kma.api;
 
 import com.kma.models.errorResponseDTO;
 import com.kma.services.Impl.NotificationService;
+import com.kma.utilities.buildErrorResUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -15,7 +16,9 @@ import java.util.List;
 public class NotificationController {
 
     @Autowired
-    private NotificationService notificationService;
+    NotificationService notificationService;
+    @Autowired
+    com.kma.utilities.buildErrorResUtil buildErrorResUtil;
 
     // API gửi thông báo tới một userId cụ thể
     @PostMapping("/send")

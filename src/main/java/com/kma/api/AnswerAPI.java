@@ -2,6 +2,7 @@ package com.kma.api;
 
 import com.kma.models.*;
 import com.kma.services.answerService;
+import com.kma.utilities.buildErrorResUtil;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -9,14 +10,14 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
-import java.util.List;
-
 @RestController
 @RequestMapping("/api/discussions")
 public class AnswerAPI {
+
     @Autowired
     answerService answerServ;
+    @Autowired
+    buildErrorResUtil buildErrorResUtil;
 
     @GetMapping(value="/{discussionId}/answers")
     @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_EMPLOYEE') or hasRole('ROLE_STUDENT')")
@@ -27,13 +28,7 @@ public class AnswerAPI {
             paginationResponseDTO<answerDTO> DTO =  answerServ.getAllAnswerOfDiscussion(discussionId, page, size);
             return new ResponseEntity<>(DTO, HttpStatus.OK);
         } catch (Exception e) {
-            // TODO: handle exception
-            errorResponseDTO errorDTO = new errorResponseDTO();
-            errorDTO.setError(e.getMessage());
-            List<String> details = new ArrayList<>();
-            details.add("An error occurred!");
-            errorDTO.setDetails(details);
-
+            errorResponseDTO errorDTO = buildErrorResUtil.buildErrorRes(e, "An error occurred!");
             return new ResponseEntity<>(errorDTO, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
@@ -46,13 +41,7 @@ public class AnswerAPI {
             answerServ.addAnswer(discussionId, answerReqDTO);
             return ResponseEntity.ok("Add successfully!");
         } catch (EntityNotFoundException e) {
-            // TODO: handle exception
-            errorResponseDTO errorDTO = new errorResponseDTO();
-            errorDTO.setError(e.getMessage());
-            List<String> details = new ArrayList<>();
-            details.add("Author not exist!");
-            errorDTO.setDetails(details);
-
+            errorResponseDTO errorDTO = buildErrorResUtil.buildErrorRes(e, "Author not exist!");
             return new ResponseEntity<>(errorDTO, HttpStatus.NOT_FOUND);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An error occurred.");
@@ -70,12 +59,7 @@ public class AnswerAPI {
             return ResponseEntity.ok("Update successfully!");
         } catch (EntityNotFoundException e) {
             // TODO: handle exception
-            errorResponseDTO errorDTO = new errorResponseDTO();
-            errorDTO.setError(e.getMessage());
-            List<String> details = new ArrayList<>();
-            details.add("Discussion or answer not found!");
-            errorDTO.setDetails(details);
-
+            errorResponseDTO errorDTO = buildErrorResUtil.buildErrorRes(e, "Discussion or answer not found!");
             return new ResponseEntity<>(errorDTO, HttpStatus.NOT_FOUND);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An error occurred.");
@@ -92,12 +76,7 @@ public class AnswerAPI {
             return ResponseEntity.ok("Delete successfully!");
         } catch (EntityNotFoundException e) {
             // TODO: handle exception
-            errorResponseDTO errorDTO = new errorResponseDTO();
-            errorDTO.setError(e.getMessage());
-            List<String> details = new ArrayList<>();
-            details.add("Discussion or answer not found!");
-            errorDTO.setDetails(details);
-
+            errorResponseDTO errorDTO = buildErrorResUtil.buildErrorRes(e, "Discussion or answer not found!");
             return new ResponseEntity<>(errorDTO, HttpStatus.NOT_FOUND);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An error occurred.");

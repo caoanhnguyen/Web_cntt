@@ -1,6 +1,5 @@
 package com.kma.api;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -9,14 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.kma.services.postService;
@@ -24,10 +16,13 @@ import com.kma.services.postService;
 import jakarta.persistence.EntityNotFoundException;
 
 @RestController
+@RequestMapping("/api")
 public class PostAPI {
 	
 	@Autowired
 	postService postServ;
+	@Autowired
+	com.kma.utilities.buildErrorResUtil buildErrorResUtil;
 
 	@GetMapping(value="/user/my_posts")
 	@PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_EMPLOYEE') or hasRole('ROLE_STUDENT')")
@@ -37,44 +32,26 @@ public class PostAPI {
 			paginationResponseDTO<postResponseDTO> DTO = postServ.getAllPostOfUser(page, size);
 			return new ResponseEntity<>(DTO, HttpStatus.OK);
 		} catch (Exception e) {
-			// TODO: handle exception
-			errorResponseDTO errorDTO = new errorResponseDTO();
-			errorDTO.setError(e.getMessage());
-			List<String> details = new ArrayList<>();
-			details.add("An error occurred!");
-			errorDTO.setDetails(details);
-
+			errorResponseDTO errorDTO = buildErrorResUtil.buildErrorRes(e, "An error occurred!");
 			return new ResponseEntity<>(errorDTO, HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
 
-	@GetMapping(value = "/api/public/posts/{post_id}")
+	@GetMapping(value = "/public/posts/{post_id}")
 	public ResponseEntity<Object> getById(@PathVariable Integer post_id){
 		try {
 			postDTO DTO = postServ.getById(post_id);
 			return new ResponseEntity<>(DTO, HttpStatus.OK);
 		} catch (EntityNotFoundException e) {
-			// TODO: handle exception
-			errorResponseDTO errorDTO = new errorResponseDTO();
-			errorDTO.setError(e.getMessage());
-			List<String> details = new ArrayList<>();
-			details.add("Post not found!");
-			errorDTO.setDetails(details);
-
+			errorResponseDTO errorDTO = buildErrorResUtil.buildErrorRes(e, "Post not found!");
 			return new ResponseEntity<>(errorDTO, HttpStatus.NOT_FOUND);
 		} catch (Exception e) {
-			// TODO: handle exception
-			errorResponseDTO errorDTO = new errorResponseDTO();
-			errorDTO.setError(e.getMessage());
-			List<String> details = new ArrayList<>();
-			details.add("An error occurred!");
-			errorDTO.setDetails(details);
-
+			errorResponseDTO errorDTO = buildErrorResUtil.buildErrorRes(e, "An error occurred!");
 			return new ResponseEntity<>(errorDTO, HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
 	
-	@GetMapping(value="/api/public/posts")
+	@GetMapping(value="/public/posts")
 	public ResponseEntity<Object> getAllPost(@RequestParam Map<String,Object> params,
 											 @RequestParam(required = false, defaultValue = "0") int page,
 											 @RequestParam(required = false, defaultValue = "10") int size){
@@ -83,35 +60,23 @@ public class PostAPI {
 			// Log kiểm tra dữ liệu trước khi trả về
 			return new ResponseEntity<>(DTO, HttpStatus.OK);
 		} catch (Exception e) {
-			// TODO: handle exception
-			errorResponseDTO errorDTO = new errorResponseDTO();
-			errorDTO.setError(e.getMessage());
-			List<String> details = new ArrayList<>();
-			details.add("An error occurred!");
-			errorDTO.setDetails(details);
-			
+			errorResponseDTO errorDTO = buildErrorResUtil.buildErrorRes(e, "An error occurred!");
 			return new ResponseEntity<>(errorDTO, HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
 
-	@GetMapping(value = "/api/public/posts/latest")
+	@GetMapping(value = "/public/posts/latest")
 	public ResponseEntity<Object> getLatestPosts() {
 		try {
 			List<postDTO> posts = postServ.getLatestPosts();
 			return new ResponseEntity<>(posts, HttpStatus.OK);
 		} catch (Exception e) {
-			// TODO: handle exception
-			errorResponseDTO errorDTO = new errorResponseDTO();
-			errorDTO.setError(e.getMessage());
-			List<String> details = new ArrayList<>();
-			details.add("An error occurred!");
-			errorDTO.setDetails(details);
-
+			errorResponseDTO errorDTO = buildErrorResUtil.buildErrorRes(e, "An error occurred!");
 			return new ResponseEntity<>(errorDTO, HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
 	
-	@PostMapping(value = "/api/posts")
+	@PostMapping(value = "/posts")
 	@PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_EMPLOYEE')")
 	public ResponseEntity<Object> addPost(@RequestParam(value = "file", required = false) List<MultipartFile> files,
 										  @ModelAttribute postRequestDTO postRequestDTO) {
@@ -119,20 +84,15 @@ public class PostAPI {
 			postServ.addPost(files, postRequestDTO);
 			return ResponseEntity.ok("Add successfully!");
 		} catch (IllegalArgumentException e) {
-			// TODO: handle exception
-			errorResponseDTO errorDTO = new errorResponseDTO();
-			errorDTO.setError(e.getMessage());
-			List<String> details = new ArrayList<>();
-			details.add("Author not exist!");
-			errorDTO.setDetails(details);
-			
+			errorResponseDTO errorDTO = buildErrorResUtil.buildErrorRes(e, "Post not found!");
 			return new ResponseEntity<>(errorDTO, HttpStatus.NOT_FOUND);
 		} catch (Exception e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An error occurred.");
+			errorResponseDTO errorDTO = buildErrorResUtil.buildErrorRes(e, "An error occurred!");
+			return new ResponseEntity<>(errorDTO, HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
 	
-	@PutMapping("/api/posts/{post_id}")
+	@PutMapping("/posts/{post_id}")
 	@PreAuthorize("@postServ.isOwner(#post_id, principal.nhanVien.idUser) or hasRole('ADMIN')")
 	public ResponseEntity<Object> updatePost(@PathVariable Integer post_id, 
 											 @ModelAttribute postRequestDTO postRequestDTO,
@@ -143,36 +103,26 @@ public class PostAPI {
 			postServ.updatePost(post_id,postRequestDTO, files, deleteFileIds);
 			return ResponseEntity.ok("Update successfully!");
 		} catch (EntityNotFoundException e) {
-			// TODO: handle exception
-			errorResponseDTO errorDTO = new errorResponseDTO();
-			errorDTO.setError(e.getMessage());
-			List<String> details = new ArrayList<>();
-			details.add("Post not found!");
-			errorDTO.setDetails(details);
-			
+			errorResponseDTO errorDTO = buildErrorResUtil.buildErrorRes(e, "Post not found!");
 			return new ResponseEntity<>(errorDTO, HttpStatus.NOT_FOUND);
 		} catch (Exception e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An error occurred.");
+			errorResponseDTO errorDTO = buildErrorResUtil.buildErrorRes(e, "An error occurred!");
+			return new ResponseEntity<>(errorDTO, HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
 	
-	@DeleteMapping(value = "/api/posts/{post_id}")
+	@DeleteMapping(value = "/posts/{post_id}")
 	@PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_EMPLOYEE') or hasRole('ROLE_STUDENT')")
 	public ResponseEntity<Object> deletePost(@PathVariable Integer post_id) {
 		try {
 			postServ.deletePost(post_id);
 			return ResponseEntity.ok("Delete successfully!");
 		} catch (EntityNotFoundException e) {
-			// TODO: handle exception
-			errorResponseDTO errorDTO = new errorResponseDTO();
-			errorDTO.setError(e.getMessage());
-			List<String> details = new ArrayList<>();
-			details.add("Post not found!");
-			errorDTO.setDetails(details);
-			
+			errorResponseDTO errorDTO = buildErrorResUtil.buildErrorRes(e, "Post not found!");
 			return new ResponseEntity<>(errorDTO, HttpStatus.NOT_FOUND);
 		} catch (Exception e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An error occurred.");
+			errorResponseDTO errorDTO = buildErrorResUtil.buildErrorRes(e, "An error occurred!");
+			return new ResponseEntity<>(errorDTO, HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
 }

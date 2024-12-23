@@ -1,52 +1,46 @@
 package com.kma.api;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
 import com.kma.models.*;
+import com.kma.utilities.buildErrorResUtil;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import com.kma.services.nhanVienService;
 import org.springframework.web.multipart.MultipartFile;
 
 @RestController
+@RequestMapping("/api/nhanvien")
 public class NhanVienAPI {
 	
 	@Autowired
 	nhanVienService nvServ;
+	@Autowired
+	buildErrorResUtil buildErrorResUtil;
 
-	@GetMapping(value = "/api/nhanvien/{idUser}")
+	@GetMapping(value = "/{idUser}")
+	@PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_EMPLOYEE') or hasRole('ROLE_STUDENT')")
 	public ResponseEntity<Object> getById(@PathVariable Integer idUser){
 		try {
 			nhanVienDTO DTO = nvServ.getById(idUser);
 			return new ResponseEntity<>(DTO, HttpStatus.OK);
 		} catch (EntityNotFoundException e) {
-			// TODO: handle exception
-			errorResponseDTO errorDTO = new errorResponseDTO();
-			errorDTO.setError(e.getMessage());
-			List<String> details = new ArrayList<>();
-			details.add("Employee not found!");
-			errorDTO.setDetails(details);
-
+			errorResponseDTO errorDTO = buildErrorResUtil.buildErrorRes(e, "Employee not found!");
 			return new ResponseEntity<>(errorDTO, HttpStatus.NOT_FOUND);
 		} catch (Exception e) {
-			// TODO: handle exception
-			errorResponseDTO errorDTO = new errorResponseDTO();
-			errorDTO.setError(e.getMessage());
-			List<String> details = new ArrayList<>();
-			details.add("An error occurred!");
-			errorDTO.setDetails(details);
-
+			errorResponseDTO errorDTO = buildErrorResUtil.buildErrorRes(e, "An error occurred!");
 			return new ResponseEntity<>(errorDTO, HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
 	
-	@GetMapping(value="/api/nhanvien")
+	@GetMapping(value="")
+	@PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_EMPLOYEE')")
 	public ResponseEntity<Object> getAllNhanVien(@RequestParam Map<String, Object> params,
 												 @RequestParam(required = false, defaultValue = "0") int page,
 												 @RequestParam(required = false, defaultValue = "10") int size){
@@ -54,36 +48,26 @@ public class NhanVienAPI {
 			paginationResponseDTO<nhanVienDTO> DTO = nvServ.getAllNhanVien(params, page, size);
 			return new ResponseEntity<>(DTO, HttpStatus.OK);
 		} catch (Exception e) {
-			// TODO: handle exception
-			errorResponseDTO errorDTO = new errorResponseDTO();
-			errorDTO.setError(e.getMessage());
-			List<String> details = new ArrayList<>();
-			details.add("An error occurred!");
-			errorDTO.setDetails(details);
-			
+			errorResponseDTO errorDTO = buildErrorResUtil.buildErrorRes(e, "An error occurred!");
 			return new ResponseEntity<>(errorDTO, HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
 
-	@PostMapping(value = "/api/nhanvien")
+	@PostMapping(value = "")
+	@PreAuthorize("hasRole('ROLE_ADMIN')")
 	public 	ResponseEntity<Object> addNhanVien(@RequestParam(value = "file", required = false) MultipartFile file,
 											   @ModelAttribute nhanVienRequestDTO nvReqDTO){
 		try {
 			nvServ.addNhanVien(file, nvReqDTO);
 			return ResponseEntity.ok("Add successful!");
 		} catch (Exception e) {
-			// TODO: handle exception
-			errorResponseDTO errorDTO = new errorResponseDTO();
-			errorDTO.setError(e.getMessage());
-			List<String> details = new ArrayList<>();
-			details.add("An error occurred!");
-			errorDTO.setDetails(details);
-
+			errorResponseDTO errorDTO = buildErrorResUtil.buildErrorRes(e, "Employee not found!");
 			return new ResponseEntity<>(errorDTO, HttpStatus.NOT_FOUND);
 		}
 	}
 
-	@PutMapping(value = "/api/nhanvien/{idUser}")
+	@PutMapping(value = "/{idUser}")
+	@PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_EMPLOYEE')")
 	public ResponseEntity<Object> updateNhanVien(@PathVariable Integer idUser,
 												 @ModelAttribute nhanVienRequestDTO nvReqDTO,
 												 @RequestParam(value = "file", required = false) MultipartFile file) {
@@ -91,75 +75,58 @@ public class NhanVienAPI {
 			nvServ.updateNhanVien(idUser, nvReqDTO, file);
 			return ResponseEntity.ok("Update successfully!");
 		} catch (EntityNotFoundException e) {
-			// TODO: handle exception
-			errorResponseDTO errorDTO = new errorResponseDTO();
-			errorDTO.setError(e.getMessage());
-			List<String> details = new ArrayList<>();
-			details.add("Employee not found!");
-			errorDTO.setDetails(details);
-
+			errorResponseDTO errorDTO = buildErrorResUtil.buildErrorRes(e, "Employee not found!");
 			return new ResponseEntity<>(errorDTO, HttpStatus.NOT_FOUND);
 		} catch (Exception e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An error occurred.");
+			errorResponseDTO errorDTO = buildErrorResUtil.buildErrorRes(e, "An error occurred!");
+			return new ResponseEntity<>(errorDTO, HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
 
-	@PatchMapping(value = "/api/nhanvien/main_subject/{idUser}")
+	@PatchMapping(value = "/main_subject/{idUser}")
+	@PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_EMPLOYEE')")
 	public ResponseEntity<Object> updateMGDC(@PathVariable Integer idUser,
 											 @RequestParam Integer idMGDC) {
 		try {
 			nvServ.updateMGDC(idUser, idMGDC);
 			return ResponseEntity.ok("Update successfully!");
 		} catch (EntityNotFoundException e) {
-			// TODO: handle exception
-			errorResponseDTO errorDTO = new errorResponseDTO();
-			errorDTO.setError(e.getMessage());
-			List<String> details = new ArrayList<>();
-			details.add("Employee or subject not found!");
-			errorDTO.setDetails(details);
-
+			errorResponseDTO errorDTO = buildErrorResUtil.buildErrorRes(e, "Employee not found!");
 			return new ResponseEntity<>(errorDTO, HttpStatus.NOT_FOUND);
 		} catch (Exception e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An error occurred.");
+			errorResponseDTO errorDTO = buildErrorResUtil.buildErrorRes(e, "An error occurred!");
+			return new ResponseEntity<>(errorDTO, HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
 
-	@PatchMapping(value = "/api/nhanvien/related_subject/{idUser}")
+	@PatchMapping(value = "/related_subject/{idUser}")
+	@PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_EMPLOYEE')")
 	public ResponseEntity<Object> updateMonHocLienQuan(@PathVariable Integer idUser,
 											 		   @RequestParam(value = "idMonHoc") List<Integer> idMonHocList) {
 		try {
 			nvServ.updateMonHocLienQuan(idUser, idMonHocList);
 			return ResponseEntity.ok("Update successfully!");
 		} catch (EntityNotFoundException e) {
-			// TODO: handle exception
-			errorResponseDTO errorDTO = new errorResponseDTO();
-			errorDTO.setError(e.getMessage());
-			List<String> details = new ArrayList<>();
-			details.add("Employee not found!");
-			errorDTO.setDetails(details);
-
+			errorResponseDTO errorDTO = buildErrorResUtil.buildErrorRes(e, "Employee not found!");
 			return new ResponseEntity<>(errorDTO, HttpStatus.NOT_FOUND);
 		} catch (Exception e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An error occurred.");
+			errorResponseDTO errorDTO = buildErrorResUtil.buildErrorRes(e, "An error occurred!");
+			return new ResponseEntity<>(errorDTO, HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
 
-	@DeleteMapping(value = "/api/nhanvien/{idUser}")
+	@DeleteMapping(value = "/{idUser}")
+	@PreAuthorize("hasRole('ROLE_ADMIN')")
 	public ResponseEntity<Object> deleteNhanVien(@PathVariable Integer idUser) {
 		try {
 			nvServ.deleteNhanVien(idUser);
 			return ResponseEntity.ok("Delete successfully!");
 		} catch (EntityNotFoundException e) {
-			// TODO: handle exception
-			errorResponseDTO errorDTO = new errorResponseDTO();
-			errorDTO.setError(e.getMessage());
-			List<String> details = new ArrayList<>();
-			details.add("User not found!");
-			errorDTO.setDetails(details);
-
+			errorResponseDTO errorDTO = buildErrorResUtil.buildErrorRes(e, "Employee not found!");
 			return new ResponseEntity<>(errorDTO, HttpStatus.NOT_FOUND);
 		} catch (Exception e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An error occurred.");
+			errorResponseDTO errorDTO = buildErrorResUtil.buildErrorRes(e, "An error occurred!");
+			return new ResponseEntity<>(errorDTO, HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
 }

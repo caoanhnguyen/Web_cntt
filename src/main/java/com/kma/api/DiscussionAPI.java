@@ -9,7 +9,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -19,6 +18,8 @@ public class DiscussionAPI {
 
     @Autowired
     discussionService discussionServ;
+    @Autowired
+    com.kma.utilities.buildErrorResUtil buildErrorResUtil;
 
     @GetMapping(value="/discussions/tags/{tagId}")
     @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_EMPLOYEE') or hasRole('ROLE_STUDENT')")
@@ -31,13 +32,7 @@ public class DiscussionAPI {
             paginationResponseDTO<discussionResponseDTO> DTO = discussionServ.getAllDiscussionByTag(tagId, page, size, sort, order);
             return new ResponseEntity<>(DTO, HttpStatus.OK);
         } catch (Exception e) {
-            // TODO: handle exception
-            errorResponseDTO errorDTO = new errorResponseDTO();
-            errorDTO.setError(e.getMessage());
-            List<String> details = new ArrayList<>();
-            details.add("An error occurred!");
-            errorDTO.setDetails(details);
-
+            errorResponseDTO errorDTO = buildErrorResUtil.buildErrorRes(e, "An error occurred!");
             return new ResponseEntity<>(errorDTO, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
@@ -49,22 +44,10 @@ public class DiscussionAPI {
             discussionDTO DTO = discussionServ.getById(discussionId);
             return new ResponseEntity<>(DTO, HttpStatus.OK);
         } catch (EntityNotFoundException e) {
-            // TODO: handle exception
-            errorResponseDTO errorDTO = new errorResponseDTO();
-            errorDTO.setError(e.getMessage());
-            List<String> details = new ArrayList<>();
-            details.add("Discussion not found!");
-            errorDTO.setDetails(details);
-
+            errorResponseDTO errorDTO = buildErrorResUtil.buildErrorRes(e, "Discussion not found!");
             return new ResponseEntity<>(errorDTO, HttpStatus.NOT_FOUND);
         } catch (Exception e) {
-            // TODO: handle exception
-            errorResponseDTO errorDTO = new errorResponseDTO();
-            errorDTO.setError(e.getMessage());
-            List<String> details = new ArrayList<>();
-            details.add("An error occurred!");
-            errorDTO.setDetails(details);
-
+            errorResponseDTO errorDTO = buildErrorResUtil.buildErrorRes(e, "An error occurred!");
             return new ResponseEntity<>(errorDTO, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
@@ -80,13 +63,7 @@ public class DiscussionAPI {
             paginationResponseDTO<discussionResponseDTO> DTO =  discussionServ.getAllDiscussion(params, page, size, sort, order);
             return new ResponseEntity<>(DTO, HttpStatus.OK);
         } catch (Exception e) {
-            // TODO: handle exception
-            errorResponseDTO errorDTO = new errorResponseDTO();
-            errorDTO.setError(e.getMessage());
-            List<String> details = new ArrayList<>();
-            details.add("An error occurred!");
-            errorDTO.setDetails(details);
-
+            errorResponseDTO errorDTO = buildErrorResUtil.buildErrorRes(e, "An error occurred!");
             return new ResponseEntity<>(errorDTO, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
@@ -102,13 +79,7 @@ public class DiscussionAPI {
             paginationResponseDTO<discussionResponseDTO> DTO =  discussionServ.getAllDiscussionOfUser(params, page, size, sort, order);
             return new ResponseEntity<>(DTO, HttpStatus.OK);
         } catch (Exception e) {
-            // TODO: handle exception
-            errorResponseDTO errorDTO = new errorResponseDTO();
-            errorDTO.setError(e.getMessage());
-            List<String> details = new ArrayList<>();
-            details.add("An error occurred!");
-            errorDTO.setDetails(details);
-
+            errorResponseDTO errorDTO = buildErrorResUtil.buildErrorRes(e, "An error occurred!");
             return new ResponseEntity<>(errorDTO, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
@@ -122,13 +93,7 @@ public class DiscussionAPI {
             paginationResponseDTO<discussionResponseDTO> DTO = discussionServ.getAllPendingDiscuss(page, size);
             return new ResponseEntity<>(DTO, HttpStatus.OK);
         } catch (Exception e) {
-            // TODO: handle exception
-            errorResponseDTO errorDTO = new errorResponseDTO();
-            errorDTO.setError(e.getMessage());
-            List<String> details = new ArrayList<>();
-            details.add("An error occurred!");
-            errorDTO.setDetails(details);
-
+            errorResponseDTO errorDTO = buildErrorResUtil.buildErrorRes(e, "An error occurred!");
             return new ResponseEntity<>(errorDTO, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
@@ -141,16 +106,11 @@ public class DiscussionAPI {
             discussionServ.addDiscussion(discussReqDTO, tagIdList);
             return ResponseEntity.ok("Add successfully!");
         } catch (EntityNotFoundException e) {
-            // TODO: handle exception
-            errorResponseDTO errorDTO = new errorResponseDTO();
-            errorDTO.setError(e.getMessage());
-            List<String> details = new ArrayList<>();
-            details.add("Author not exist!");
-            errorDTO.setDetails(details);
-
+            errorResponseDTO errorDTO = buildErrorResUtil.buildErrorRes(e, "Author not exist!");
             return new ResponseEntity<>(errorDTO, HttpStatus.NOT_FOUND);
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An error occurred.");
+            errorResponseDTO errorDTO = buildErrorResUtil.buildErrorRes(e, "An error occurred!");
+            return new ResponseEntity<>(errorDTO, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -164,16 +124,11 @@ public class DiscussionAPI {
             discussionServ.updateDiscussion(discussionId, discussReqDTO, tagIdList);
             return ResponseEntity.ok("Update successfully!");
         } catch (EntityNotFoundException e) {
-            // TODO: handle exception
-            errorResponseDTO errorDTO = new errorResponseDTO();
-            errorDTO.setError(e.getMessage());
-            List<String> details = new ArrayList<>();
-            details.add("Discussion not found!");
-            errorDTO.setDetails(details);
-
+            errorResponseDTO errorDTO = buildErrorResUtil.buildErrorRes(e, "Discussion not found!");
             return new ResponseEntity<>(errorDTO, HttpStatus.NOT_FOUND);
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An error occurred.");
+            errorResponseDTO errorDTO = buildErrorResUtil.buildErrorRes(e, "An error occurred!");
+            return new ResponseEntity<>(errorDTO, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -186,16 +141,11 @@ public class DiscussionAPI {
             discussionServ.updateDiscussionStatus(discussionId, discussionStatus);
             return ResponseEntity.ok("Update successfully!");
         } catch (EntityNotFoundException | IllegalArgumentException e) {
-            // TODO: handle exception
-            errorResponseDTO errorDTO = new errorResponseDTO();
-            errorDTO.setError(e.getMessage());
-            List<String> details = new ArrayList<>();
-            details.add("Discussion not found!");
-            errorDTO.setDetails(details);
-
+            errorResponseDTO errorDTO = buildErrorResUtil.buildErrorRes(e, "Discussion not found!");
             return new ResponseEntity<>(errorDTO, HttpStatus.NOT_FOUND);
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An error occurred.");
+            errorResponseDTO errorDTO = buildErrorResUtil.buildErrorRes(e, "An error occurred!");
+            return new ResponseEntity<>(errorDTO, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -206,16 +156,11 @@ public class DiscussionAPI {
             discussionServ.deleteDiscussion(discussionId);
             return ResponseEntity.ok("Delete successfully!");
         } catch (EntityNotFoundException e) {
-            // TODO: handle exception
-            errorResponseDTO errorDTO = new errorResponseDTO();
-            errorDTO.setError(e.getMessage());
-            List<String> details = new ArrayList<>();
-            details.add("Discussion not found!");
-            errorDTO.setDetails(details);
-
+            errorResponseDTO errorDTO = buildErrorResUtil.buildErrorRes(e, "Discussion not found!");
             return new ResponseEntity<>(errorDTO, HttpStatus.NOT_FOUND);
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An error occurred.");
+            errorResponseDTO errorDTO = buildErrorResUtil.buildErrorRes(e, "An error occurred!");
+            return new ResponseEntity<>(errorDTO, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 

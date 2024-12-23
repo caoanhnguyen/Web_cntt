@@ -12,6 +12,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -51,11 +52,9 @@ public class UserService implements IUserService {
     }
 
     @Override
-    public void changePassword(String username, changePasswordDTO changePasswordDTO) throws Exception {
-        // Lấy người dùng từ cơ sở dữ liệu
-        Optional<User> optionalUser = userRepo.findByUserName(username);
-        // Kiểm tra xem người dùng có tồn tại không
-        User user = optionalUser.orElseThrow(() -> new Exception("User not found"));
+    public void changePassword(changePasswordDTO changePasswordDTO) throws Exception {
+        // Lấy người dùng
+        User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
         // Kiểm tra mật khẩu cũ có khớp không
         if (!passwordEncoder.matches(changePasswordDTO.getOldPassword(), user.getPassword())) {
@@ -77,9 +76,24 @@ public class UserService implements IUserService {
     }
 
     @Override
-    public void addRole(String username, Integer roleId) throws Exception {
+    public void resetPasswordForUser(Integer userId) throws Exception {
         // Lấy người dùng từ cơ sở dữ liệu
-        User user = userRepo.findByUserName(username)
+        User user = userRepo.findById(userId)
+                .orElseThrow(() -> new Exception("User not found"));
+
+        // Mã hóa mật khẩu mới
+        String encodedNewPassword = passwordEncoder.encode("12345");
+
+        // Cập nhật mật khẩu mới vào cơ sở dữ liệu
+        user.setPassword(encodedNewPassword);
+
+        userRepo.save(user);
+    }
+
+    @Override
+    public void addRole(Integer accountId, Integer roleId) throws Exception {
+        // Lấy người dùng từ cơ sở dữ liệu
+        User user = userRepo.findById(accountId)
                 .orElseThrow(() -> new Exception("User not found"));
 
         // Kiểm tra xem Role có tồn tại không

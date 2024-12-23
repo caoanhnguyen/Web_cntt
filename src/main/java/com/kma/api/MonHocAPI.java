@@ -5,110 +5,88 @@ import com.kma.models.errorResponseDTO;
 import com.kma.models.monHocDTO;
 import com.kma.models.monHocResponseDTO;
 import com.kma.services.monHocService;
+import com.kma.utilities.buildErrorResUtil;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
 @RestController
+@RequestMapping("/api/monhoc")
 public class MonHocAPI {
 
     @Autowired
     monHocService monHocServ;
+    @Autowired
+    buildErrorResUtil buildErrorResUtil ;
 
-    @GetMapping(value = "/api/monhoc/grouped")
+    @GetMapping(value = "/grouped")
+    @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_EMPLOYEE') or hasRole('ROLE_STUDENT')")
     public ResponseEntity<?> getSubjectsOrderByCategory() {
         try {
             Map<SubjectCategory, List<monHocResponseDTO>> DTO = monHocServ.getGroupedSubjects();
-
             // Trả về danh sách môn học
             return new ResponseEntity<>(DTO, HttpStatus.OK);
-
         } catch (IllegalArgumentException e) {
-            return ResponseEntity.badRequest().body("Invalid category name. Valid values: GENERAL, FOUNDATION, SPECIALIZED.");
+            errorResponseDTO errorDTO = buildErrorResUtil.buildErrorRes(e, "Invalid category name. Valid values: GENERAL, FOUNDATION, SPECIALIZED.");
+            return new ResponseEntity<>(errorDTO, HttpStatus.BAD_REQUEST);
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An error occurred.");
+            errorResponseDTO errorDTO = buildErrorResUtil.buildErrorRes(e, "An error occurred!");
+            return new ResponseEntity<>(errorDTO, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
-    @GetMapping(value = "/api/monhoc/{idUser}")
+    @GetMapping(value = "/{idUser}")
+    @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_EMPLOYEE') or hasRole('ROLE_STUDENT')")
     public ResponseEntity<Object> getById(@PathVariable Integer idUser){
         try {
             monHocDTO DTO = monHocServ.getById(idUser);
             return new ResponseEntity<>(DTO, HttpStatus.OK);
         } catch (EntityNotFoundException e) {
-            // TODO: handle exception
-            errorResponseDTO errorDTO = new errorResponseDTO();
-            errorDTO.setError(e.getMessage());
-            List<String> details = new ArrayList<>();
-            details.add("Subject not found!");
-            errorDTO.setDetails(details);
-
+            errorResponseDTO errorDTO = buildErrorResUtil.buildErrorRes(e, "Subject not found!");
             return new ResponseEntity<>(errorDTO, HttpStatus.NOT_FOUND);
         } catch (Exception e) {
-            // TODO: handle exception
-            errorResponseDTO errorDTO = new errorResponseDTO();
-            errorDTO.setError(e.getMessage());
-            List<String> details = new ArrayList<>();
-            details.add("An error occurred!");
-            errorDTO.setDetails(details);
-
+            errorResponseDTO errorDTO = buildErrorResUtil.buildErrorRes(e, "An error occurred!");
             return new ResponseEntity<>(errorDTO, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
-    @GetMapping(value = "/api/monhoc")
+    @GetMapping(value = "")
+    @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_EMPLOYEE') or hasRole('ROLE_STUDENT')")
     public ResponseEntity<Object> getAllMonHoc(@RequestParam Map<Object,Object> params){
         try {
             List<monHocDTO> DTO = monHocServ.getAllMonHoc(params);
             return new ResponseEntity<>(DTO, HttpStatus.OK);
         } catch (NumberFormatException e) {
-            // TODO: handle exception
-            errorResponseDTO errorDTO = new errorResponseDTO();
-            errorDTO.setError(e.getMessage());
-            List<String> details = new ArrayList<>();
-            details.add("Điền sai số tín chỉ!");
-            errorDTO.setDetails(details);
-
+            errorResponseDTO errorDTO = buildErrorResUtil.buildErrorRes(e, "Điền sai số tín chỉ!");
             return new ResponseEntity<>(errorDTO, HttpStatus.BAD_REQUEST);
         } catch (Exception e) {
-            // TODO: handle exception
-            errorResponseDTO errorDTO = new errorResponseDTO();
-            errorDTO.setError(e.getMessage());
-            List<String> details = new ArrayList<>();
-            details.add("An error occurred!");
-            errorDTO.setDetails(details);
-
+            errorResponseDTO errorDTO = buildErrorResUtil.buildErrorRes(e, "An error occurred!");
             return new ResponseEntity<>(errorDTO, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
-    @PostMapping(value = "/api/monhoc")
+    @PostMapping(value = "")
+    @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_EMPLOYEE')")
     public ResponseEntity<Object> addMonHoc(@RequestParam(value = "file", required = false) List<MultipartFile> files,
-                                            @ModelAttribute monHocDTO mhDTO) throws IOException {
+                                            @ModelAttribute monHocDTO mhDTO) {
         try {
             monHocServ.addMonHoc(files, mhDTO);
             return ResponseEntity.ok("Add successfully!");
         } catch (Exception e) {
-            // TODO: handle exception
-            errorResponseDTO errorDTO = new errorResponseDTO();
-            errorDTO.setError(e.getMessage());
-            List<String> details = new ArrayList<>();
-            details.add("An error occurred!");
-            errorDTO.setDetails(details);
-
+            errorResponseDTO errorDTO = buildErrorResUtil.buildErrorRes(e, "An error occurred!");
             return new ResponseEntity<>(errorDTO, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
-    @PutMapping(value = "/api/monhoc/{idMonHoc}")
+    @PutMapping(value = "/{idMonHoc}")
+    @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_EMPLOYEE')")
     public ResponseEntity<Object> updatePost(@PathVariable Integer idMonHoc,
                                              @ModelAttribute monHocDTO monHocDTO,
                                              @RequestParam(value = "file", required = false) List<MultipartFile> files,
@@ -118,48 +96,25 @@ public class MonHocAPI {
             monHocServ.updateMonHoc(idMonHoc,monHocDTO, files, deleteFileIds);
             return ResponseEntity.ok("Update successfully!");
         } catch (EntityNotFoundException e) {
-            // TODO: handle exception
-            errorResponseDTO errorDTO = new errorResponseDTO();
-            errorDTO.setError(e.getMessage());
-            List<String> details = new ArrayList<>();
-            details.add("Subject not found!");
-            errorDTO.setDetails(details);
-
+            errorResponseDTO errorDTO = buildErrorResUtil.buildErrorRes(e, "Subject not found!");
             return new ResponseEntity<>(errorDTO, HttpStatus.NOT_FOUND);
         } catch (Exception e) {
-            // TODO: handle exception
-            errorResponseDTO errorDTO = new errorResponseDTO();
-            errorDTO.setError(e.getMessage());
-            List<String> details = new ArrayList<>();
-            details.add("An error occurred!");
-            errorDTO.setDetails(details);
-
+            errorResponseDTO errorDTO = buildErrorResUtil.buildErrorRes(e, "An error occurred!");
             return new ResponseEntity<>(errorDTO, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
-    @DeleteMapping(value = "api/monhoc/{idMonHoc}")
+    @DeleteMapping(value = "/{idMonHoc}")
+    @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_EMPLOYEE')")
     public ResponseEntity<Object> deleteMonHoc(@PathVariable Integer idMonHoc) {
         try {
             monHocServ.deleteMonHoc(idMonHoc);
             return ResponseEntity.ok("Delete successfully!");
         } catch (EntityNotFoundException e) {
-            // TODO: handle exception
-            errorResponseDTO errorDTO = new errorResponseDTO();
-            errorDTO.setError(e.getMessage());
-            List<String> details = new ArrayList<>();
-            details.add("Subject not found!");
-            errorDTO.setDetails(details);
-
+            errorResponseDTO errorDTO = buildErrorResUtil.buildErrorRes(e, "Subject not found!");
             return new ResponseEntity<>(errorDTO, HttpStatus.NOT_FOUND);
         } catch (Exception e) {
-            // TODO: handle exception
-            errorResponseDTO errorDTO = new errorResponseDTO();
-            errorDTO.setError(e.getMessage());
-            List<String> details = new ArrayList<>();
-            details.add("An error occurred!");
-            errorDTO.setDetails(details);
-
+            errorResponseDTO errorDTO = buildErrorResUtil.buildErrorRes(e, "An error occurred!");
             return new ResponseEntity<>(errorDTO, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }

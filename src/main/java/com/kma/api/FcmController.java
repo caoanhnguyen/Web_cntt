@@ -14,7 +14,7 @@ import java.util.Set;
 public class FcmController {
 
     @Autowired
-    private FcmService fcmService;
+    FcmService fcmService;
 
     // API lưu token
     @PostMapping("/store-fcm-token")

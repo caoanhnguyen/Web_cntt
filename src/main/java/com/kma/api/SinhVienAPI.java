@@ -1,25 +1,30 @@
 package com.kma.api;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
 import com.kma.models.*;
 import com.kma.services.sinhVienService;
+import com.kma.utilities.buildErrorResUtil;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 
 @RestController
+@RequestMapping("/api/students")
 public class SinhVienAPI {
 	@Autowired
 	sinhVienService svServ;
+	@Autowired
+	buildErrorResUtil buildErrorResUtil;
 
-	@GetMapping(value = "/api/students")
+	@GetMapping(value = "")
+	@PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_EMPLOYEE') or hasRole('ROLE_STUDENT')")
 	public ResponseEntity<Object> getAllStudent(@RequestParam Map<String,Object> params,
 											    @RequestParam(required = false, defaultValue = "0") int page,
 											    @RequestParam(required = false, defaultValue = "10") int size) {
@@ -27,96 +32,59 @@ public class SinhVienAPI {
 			paginationResponseDTO<sinhVienResponseDTO> DTO = svServ.getAllSinhVien(params, page, size);
 			return new ResponseEntity<>(DTO, HttpStatus.OK);
 		} catch (Exception e) {
-			// TODO: handle exception
-			errorResponseDTO errorDTO = new errorResponseDTO();
-			errorDTO.setError(e.getMessage());
-			List<String> details = new ArrayList<>();
-			details.add("An error occurred!");
-			errorDTO.setDetails(details);
-
+			errorResponseDTO errorDTO = buildErrorResUtil.buildErrorRes(e, "An error occurred!");
 			return new ResponseEntity<>(errorDTO, HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
 
-	@GetMapping(value = "/api/students/{maSinhVien}")
+	@GetMapping(value = "/{maSinhVien}")
+	@PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_EMPLOYEE') or hasRole('ROLE_STUDENT')")
 	public ResponseEntity<Object> getById(@PathVariable String maSinhVien){
 		try {
 			sinhVienDTO DTO = svServ.findById(maSinhVien.toUpperCase());
 			return new ResponseEntity<>(DTO, HttpStatus.OK);
 		} catch (EntityNotFoundException e) {
-			// TODO: handle exception
-			errorResponseDTO errorDTO = new errorResponseDTO();
-			errorDTO.setError(e.getMessage());
-			List<String> details = new ArrayList<>();
-			details.add("Student not found!");
-			errorDTO.setDetails(details);
-
+			errorResponseDTO errorDTO = buildErrorResUtil.buildErrorRes(e, "Student not found!");
 			return new ResponseEntity<>(errorDTO, HttpStatus.NOT_FOUND);
 		} catch (Exception e) {
-			// TODO: handle exception
-			errorResponseDTO errorDTO = new errorResponseDTO();
-			errorDTO.setError(e.getMessage());
-			List<String> details = new ArrayList<>();
-			details.add("An error occurred!");
-			errorDTO.setDetails(details);
-
+			errorResponseDTO errorDTO = buildErrorResUtil.buildErrorRes(e, "An error occurred!");
 			return new ResponseEntity<>(errorDTO, HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
 
-	@GetMapping(value = "/api/students/participated_events/{maSinhVien}")
+	@GetMapping(value = "/participated_events/{maSinhVien}")
+	@PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_EMPLOYEE') or hasRole('ROLE_STUDENT')")
 	public ResponseEntity<Object> getAllParticipatedEvent(@PathVariable String maSinhVien){
 		try {
 			List<suKienResponseDTO> DTO = svServ.getAllParicipatedEvent(maSinhVien.toUpperCase());
 			return new ResponseEntity<>(DTO, HttpStatus.OK);
 		} catch (EntityNotFoundException e) {
-			// TODO: handle exception
-			errorResponseDTO errorDTO = new errorResponseDTO();
-			errorDTO.setError(e.getMessage());
-			List<String> details = new ArrayList<>();
-			details.add("Student not found!");
-			errorDTO.setDetails(details);
-
+			errorResponseDTO errorDTO = buildErrorResUtil.buildErrorRes(e, "Student not found!");
 			return new ResponseEntity<>(errorDTO, HttpStatus.NOT_FOUND);
 		} catch (Exception e) {
-			// TODO: handle exception
-			errorResponseDTO errorDTO = new errorResponseDTO();
-			errorDTO.setError(e.getMessage());
-			List<String> details = new ArrayList<>();
-			details.add("An error occurred!");
-			errorDTO.setDetails(details);
-
+			errorResponseDTO errorDTO = buildErrorResUtil.buildErrorRes(e, "An error occurred!");
 			return new ResponseEntity<>(errorDTO, HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
 
-	@PostMapping(value = "/api/students")
+	@PostMapping(value = "")
+	@PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_EMPLOYEE')")
 	public ResponseEntity<Object> addSinhVien(@RequestParam(value = "file", required = false) MultipartFile file,
 											  @ModelAttribute sinhVienDTO svDTO){
 		try {
 			svServ.addSinhVien(file, svDTO);
 			return ResponseEntity.ok("Add successfully!");
 		} catch (EntityNotFoundException e) {
-			// TODO: handle exception
-			errorResponseDTO errorDTO = new errorResponseDTO();
-			errorDTO.setError(e.getMessage());
-			List<String> details = new ArrayList<>();
-			details.add("Student id already exists!");
-			errorDTO.setDetails(details);
-
+			errorResponseDTO errorDTO = buildErrorResUtil.buildErrorRes(e, "Student id already exists!");
 			return new ResponseEntity<>(errorDTO, HttpStatus.BAD_REQUEST);
 		} catch (Exception e) {
-			// TODO: handle exception
-			errorResponseDTO errorDTO = new errorResponseDTO();
-			errorDTO.setError(e.getMessage());
-			List<String> details = new ArrayList<>();
-			details.add("An error occurred!");
-			errorDTO.setDetails(details);
+			errorResponseDTO errorDTO = buildErrorResUtil.buildErrorRes(e, "An error occurred!");
 			return new ResponseEntity<>(errorDTO, HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
 
-	@PutMapping(value = "/api/students/{maSinhVien}")
+	@PutMapping(value = "/{maSinhVien}")
+	@PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_EMPLOYEE') or hasRole('ROLE_STUDENT')")
 	public ResponseEntity<Object> updateSinhVien(@PathVariable String maSinhVien,
 												 @ModelAttribute sinhVienDTO svDTO,
 												 @RequestParam(value = "file", required = false) MultipartFile file) {
@@ -124,35 +92,26 @@ public class SinhVienAPI {
 			svServ.updateSinhVien(maSinhVien.toUpperCase(), svDTO, file);
 			return ResponseEntity.ok("Update successfully!");
 		} catch (EntityNotFoundException e) {
-			// TODO: handle exception
-			errorResponseDTO errorDTO = new errorResponseDTO();
-			errorDTO.setError(e.getMessage());
-			List<String> details = new ArrayList<>();
-			details.add("Student not found!");
-			errorDTO.setDetails(details);
-
+			errorResponseDTO errorDTO = buildErrorResUtil.buildErrorRes(e, "Student not found!");
 			return new ResponseEntity<>(errorDTO, HttpStatus.NOT_FOUND);
 		} catch (Exception e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An error occurred.");
+			errorResponseDTO errorDTO = buildErrorResUtil.buildErrorRes(e, "An error occurred!");
+			return new ResponseEntity<>(errorDTO, HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
 
-	@DeleteMapping(value = "/api/students/{maSinhVien}")
+	@DeleteMapping(value = "/{maSinhVien}")
+	@PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_EMPLOYEE')")
 	public ResponseEntity<Object> deleteSinhVien(@PathVariable String maSinhVien) {
 		try {
 			svServ.deleteSinhVien(maSinhVien);
 			return ResponseEntity.ok("Delete successfully!");
 		} catch (EntityNotFoundException e) {
-			// TODO: handle exception
-			errorResponseDTO errorDTO = new errorResponseDTO();
-			errorDTO.setError(e.getMessage());
-			List<String> details = new ArrayList<>();
-			details.add("Student not found!");
-			errorDTO.setDetails(details);
-
+			errorResponseDTO errorDTO = buildErrorResUtil.buildErrorRes(e, "Student not found!");
 			return new ResponseEntity<>(errorDTO, HttpStatus.NOT_FOUND);
 		} catch (Exception e) {
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An error occurred.");
+			errorResponseDTO errorDTO = buildErrorResUtil.buildErrorRes(e, "An error occurred!");
+			return new ResponseEntity<>(errorDTO, HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
 }

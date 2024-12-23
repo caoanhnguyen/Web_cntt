@@ -55,8 +55,6 @@ public class WebSecurityConfig {
                         .requestMatchers(POST, "/uploadImg").permitAll()
                         .requestMatchers(GET,
                                 String.format("%s/public/**", apiPrefix)).permitAll()
-                        .requestMatchers(GET,
-                                String.format("%s/sukien/**", apiPrefix)).permitAll()
 
                         // Tag Authorization
                         .requestMatchers(GET,
@@ -168,17 +166,19 @@ public class WebSecurityConfig {
                         .requestMatchers(DELETE,
                                 String.format("%s/nhanvien/**", apiPrefix)).hasAnyRole(Role.ADMIN)
 
-                        // FILE Authorization
-                        .requestMatchers(GET,
-                               ("/downloadProfile/**")).hasAnyRole(Role.ADMIN, Role.STUDENT, Role.EMPLOYEE)
-                        .requestMatchers(GET,
-                                ("/downloadDocs/**")).hasAnyRole(Role.ADMIN, Role.STUDENT, Role.EMPLOYEE)
-                        .requestMatchers(GET,
-                                ("/downloadFile/**")).hasAnyRole(Role.ADMIN, Role.STUDENT, Role.EMPLOYEE)
+//                        // FILE Authorization
+//                        .requestMatchers(GET,
+//                               ("/downloadProfile/**")).hasAnyRole(Role.ADMIN, Role.STUDENT, Role.EMPLOYEE)
+//                        .requestMatchers(GET,
+//                                ("/downloadDocs/**")).hasAnyRole(Role.ADMIN, Role.STUDENT, Role.EMPLOYEE)
+//                        .requestMatchers(GET,
+//                                ("/downloadFile/**")).hasAnyRole(Role.ADMIN, Role.STUDENT, Role.EMPLOYEE)
 
-                        // Special Authorization
-                        .requestMatchers(POST,
-                                String.format("%s/change_password/**", userPrefix)).hasAnyRole(Role.STUDENT, Role.EMPLOYEE)
+                        // Special Authorization for ADMIN
+                        .requestMatchers(PUT,
+                                String.format("%s/change_password/**", userPrefix)).hasAnyRole(Role.ADMIN, Role.STUDENT, Role.EMPLOYEE)
+                        .requestMatchers(PUT,
+                                String.format("%s/admin/reset_password/**", userPrefix)).hasAnyRole(Role.ADMIN)
                         .requestMatchers(PATCH,
                                 String.format("%s/role/**", userPrefix)).hasRole(Role.ADMIN)
 
