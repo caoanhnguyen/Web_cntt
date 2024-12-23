@@ -1,5 +1,6 @@
 package com.kma.repository.entities;
 
+import com.kma.enums.TagCategory;
 import jakarta.persistence.*;
 
 import java.util.Set;
@@ -14,8 +15,31 @@ public class Tag {
     @Column(nullable = false, unique = true)
     private String name;
 
+    @Column(name="description")
+    private String description;
+
+    @Enumerated(EnumType.STRING) // Sử dụng Enum để định nghĩa loại môn học
+    @Column(name="category", nullable = false)
+    private TagCategory category;
+
     @ManyToMany(mappedBy = "tags")
     private Set<Discussion> discussions;
+
+    public TagCategory getCategory() {
+        return category;
+    }
+
+    public void setCategory(TagCategory category) {
+        this.category = category;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
 
     public Long getTagId() {
         return tagId;

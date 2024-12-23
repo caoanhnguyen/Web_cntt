@@ -1,7 +1,9 @@
 package com.kma.api;
 
+import com.kma.enums.SubjectCategory;
 import com.kma.models.errorResponseDTO;
 import com.kma.models.monHocDTO;
+import com.kma.models.monHocResponseDTO;
 import com.kma.services.monHocService;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,6 +22,21 @@ public class MonHocAPI {
 
     @Autowired
     monHocService monHocServ;
+
+    @GetMapping(value = "/api/monhoc/grouped")
+    public ResponseEntity<?> getSubjectsOrderByCategory() {
+        try {
+            Map<SubjectCategory, List<monHocResponseDTO>> DTO = monHocServ.getGroupedSubjects();
+
+            // Trả về danh sách môn học
+            return new ResponseEntity<>(DTO, HttpStatus.OK);
+
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body("Invalid category name. Valid values: GENERAL, FOUNDATION, SPECIALIZED.");
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An error occurred.");
+        }
+    }
 
     @GetMapping(value = "/api/monhoc/{idUser}")
     public ResponseEntity<Object> getById(@PathVariable Integer idUser){
@@ -60,7 +77,7 @@ public class MonHocAPI {
             details.add("Điền sai số tín chỉ!");
             errorDTO.setDetails(details);
 
-            return new ResponseEntity<>(errorDTO, HttpStatus.NOT_FOUND);
+            return new ResponseEntity<>(errorDTO, HttpStatus.BAD_REQUEST);
         } catch (Exception e) {
             // TODO: handle exception
             errorResponseDTO errorDTO = new errorResponseDTO();
@@ -110,7 +127,14 @@ public class MonHocAPI {
 
             return new ResponseEntity<>(errorDTO, HttpStatus.NOT_FOUND);
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An error occurred.");
+            // TODO: handle exception
+            errorResponseDTO errorDTO = new errorResponseDTO();
+            errorDTO.setError(e.getMessage());
+            List<String> details = new ArrayList<>();
+            details.add("An error occurred!");
+            errorDTO.setDetails(details);
+
+            return new ResponseEntity<>(errorDTO, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -129,7 +153,14 @@ public class MonHocAPI {
 
             return new ResponseEntity<>(errorDTO, HttpStatus.NOT_FOUND);
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An error occurred.");
+            // TODO: handle exception
+            errorResponseDTO errorDTO = new errorResponseDTO();
+            errorDTO.setError(e.getMessage());
+            List<String> details = new ArrayList<>();
+            details.add("An error occurred!");
+            errorDTO.setDetails(details);
+
+            return new ResponseEntity<>(errorDTO, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 

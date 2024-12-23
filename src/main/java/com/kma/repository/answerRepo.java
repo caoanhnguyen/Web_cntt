@@ -15,6 +15,8 @@ public interface answerRepo extends JpaRepository<Answer, Integer> {
 
     Optional<Answer> findByAnswerIdAndDiscussion_DiscussionId(Integer answerId, Integer discussionId);
 
+    boolean existsByAnswerIdAndUser_UserId(Integer answerId, Integer userId);
+
     @Query("SELECT COUNT(a) " +
             "FROM Answer a " +
             "WHERE a.discussion.discussionId = :discussionId ")

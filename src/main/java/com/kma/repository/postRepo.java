@@ -19,4 +19,8 @@ public interface postRepo extends JpaRepository<Post, Integer>, postRepoCustom {
     Page<Post> findByAllCondition(@Param("title") String title,@Param("authorName") String authorName, Pageable pageable);
 
     List<Post> findTop6ByOrderByPostIdDesc();
+
+    Page<Post> findByNhanVien_IdUser(Integer authorId, Pageable pageable);
+
+    boolean existsByPostIdAndNhanVien_IdUser(Integer postId, Integer authorId);
 }

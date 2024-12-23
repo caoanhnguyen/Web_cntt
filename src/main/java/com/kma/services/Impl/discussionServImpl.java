@@ -2,6 +2,7 @@ package com.kma.services.Impl;
 
 import com.kma.converter.discussionDTOConverter;
 import com.kma.enums.DiscussionStatus;
+import com.kma.enums.TagCategory;
 import com.kma.models.discussionDTO;
 import com.kma.models.discussionRequestDTO;
 import com.kma.models.discussionResponseDTO;
@@ -18,10 +19,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
-import java.security.Principal;
 import java.sql.Date;
 import java.util.HashSet;
 import java.util.List;
@@ -29,7 +31,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-@Service
+@Service("discussionServ")
 @Transactional
 public class discussionServImpl implements discussionService {
 
@@ -44,19 +46,74 @@ public class discussionServImpl implements discussionService {
 
     @Override
     public discussionDTO getById(Integer discussionId) {
+
         Discussion discussion = discussRepo.findById(discussionId).orElse(null);
-        if(discussion!=null)
-            return discussDTOConverter.convertToDiscussDTO(discussion);
-        throw new EntityNotFoundException("Discussion not found!");
+        if(discussion!=null) {
+            User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+            return discussDTOConverter.convertToDiscussDTO(discussion, user.getUserName());
+        }else {
+            throw new EntityNotFoundException("Discussion not found!");
+        }
     }
 
     @Override
-    public paginationResponseDTO<discussionResponseDTO> getAllDiscussion(Map<String, Object> params, Integer page, Integer size) {
+    public paginationResponseDTO<discussionResponseDTO> getAllDiscussionOfUser(Map<String,Object> params, Integer page, Integer size, String sort, String order) {
+        User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+
+        // Lấy sortCriterial
+        Sort sortCriteria = handleSort(sort,order);
+
         // Tạo Pageable
-        Pageable pageable = PageRequest.of(page, size);
+        Pageable pageable = PageRequest.of(page, size, sortCriteria);
 
         // Lấy dữ liệu từ repository
-        Page<Discussion> discussPage = fetchDiscussion(params, pageable);
+        Page<Object[]> discussPage = fetchDiscussionOfUser(params, user.getUserId(), pageable);
+
+        // Chuyển đổi Post sang postResponseDTO
+        List<discussionResponseDTO> discussResDTOList = discussPage.getContent().stream()
+                .map(discussDTOConverter::convertToDiscussResDTO)
+                .toList();
+        // Đóng gói dữ liệu và meta vào DTO
+        return new paginationResponseDTO<>(
+                discussResDTOList,
+                discussPage.getTotalPages(),
+                (int) discussPage.getTotalElements(),
+                discussPage.isFirst(),
+                discussPage.isLast(),
+                discussPage.getNumber(),
+                discussPage.getSize()
+        );
+    }
+
+    private Page<Object[]> fetchDiscussionOfUser(Map<String, Object> params, Integer userId, Pageable pageable){
+        // Lấy giá trị từ params
+        String title = ( params.get("title") != null ? (String) params.get("title") : "");
+        String tagName = ( params.get("tagName") != null ? (String) params.get("tagName") : "");
+        String category = ( params.get("tag_category") != null ? (String) params.get("tag_category") : "");
+
+        if(!category.isEmpty()){
+            try {
+                category = TagCategory.valueOf(category).toString();
+            } catch (IllegalArgumentException e) {
+                throw new IllegalArgumentException("Invalid tag category value: " + category);
+            }
+        }
+
+        // Lấy dữ liệu từ repository
+        return discussRepo.findByUser_UserId(userId, title, tagName, category, pageable);
+    }
+
+    @Override
+    public paginationResponseDTO<discussionResponseDTO> getAllDiscussion(Map<String, Object> params, Integer page, Integer size, String sort, String order) {
+
+        // Lấy sortCriterial
+        Sort sortCriteria = handleSort(sort,order);
+
+        // Tạo Pageable
+        Pageable pageable = PageRequest.of(page, size, sortCriteria);
+
+        // Lấy dữ liệu từ repository
+        Page<Object[]> discussPage = fetchDiscussion(params, pageable);
 
         // Chuyển đổi Post sang postResponseDTO
         List<discussionResponseDTO> discussResDTOList = discussPage.getContent().stream()
@@ -75,13 +132,36 @@ public class discussionServImpl implements discussionService {
         );
     }
 
-    private Page<Discussion> fetchDiscussion(Map<String, Object> params, Pageable pageable){
+    private Sort handleSort(String sort, String order){
+        // Xử lý Sort theo tiêu chí và thứ tự
+        Sort.Direction direction = "desc".equalsIgnoreCase(order) ? Sort.Direction.DESC : Sort.Direction.ASC;
+
+        // Xác định trường sắp xếp dựa trên sort
+        return switch (sort) {
+            case "score" ->  // Sắp xếp theo điểm
+                    Sort.by(direction, "score");
+            case "answers" ->  // Sắp xếp theo số câu trả lời
+                    Sort.by(direction, "answer_count");  // Sắp xếp theo ngày tạo
+            default -> Sort.by(direction, "createAt");
+        };
+    }
+
+    private Page<Object[]> fetchDiscussion(Map<String, Object> params, Pageable pageable){
         // Lấy giá trị từ params
         String title = ( params.get("title") != null ? (String) params.get("title") : "");
         String tagName = ( params.get("tagName") != null ? (String) params.get("tagName") : "");
+        String category = ( params.get("tag_category") != null ? (String) params.get("tag_category") : "");
+
+        if(!category.isEmpty()){
+            try {
+                category = TagCategory.valueOf(category).toString();
+            } catch (IllegalArgumentException e) {
+                throw new IllegalArgumentException("Invalid tag category value: " + category);
+            }
+        }
 
         // Lấy dữ liệu từ repository
-        return discussRepo.findByAllCondition(title, tagName, pageable);
+        return discussRepo.findByAllCondition(title, tagName, category, pageable);
     }
 
     @Override
@@ -90,7 +170,7 @@ public class discussionServImpl implements discussionService {
         Pageable pageable = PageRequest.of(page, size);
 
         // Lấy dữ liệu từ repository
-        Page<Discussion> discussPage = discussRepo.findByStatus(DiscussionStatus.PENDING, pageable);
+        Page<Object[]> discussPage = discussRepo.findByStatus(pageable);
 
         // Chuyển đổi Post sang postResponseDTO
         List<discussionResponseDTO> discussResDTOList = discussPage.getContent().stream()
@@ -110,16 +190,7 @@ public class discussionServImpl implements discussionService {
     }
 
     @Override
-    public List<discussionResponseDTO> getLatestDiscussions() {
-        // Tìm kiếm bài viết mới nhất
-        List<Discussion> posts = discussRepo.findTop6ByStatusOrderByDiscussionIdDesc(DiscussionStatus.APPROVED);
-        return posts.stream()
-                .map(discussDTOConverter::convertToDiscussResDTO)
-                .collect(Collectors.toList());
-    }
-
-    @Override
-    public void addDiscussion(discussionRequestDTO discussReqDTO, List<Integer> tagIdList, Principal principal) {
+    public void addDiscussion(discussionRequestDTO discussReqDTO, List<Integer> tagIdList) {
         // Lấy thông tin người đăng
         User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
@@ -206,4 +277,14 @@ public class discussionServImpl implements discussionService {
             throw new EntityNotFoundException("Discussion not found!");
         }
     }
+
+    @Override
+    public boolean isOwner(Integer discussionId, Integer userId) {
+        boolean isOwner = discussRepo.existsByDiscussionIdAndUser_UserId(discussionId, userId);
+        if (!isOwner) {
+            throw new AccessDeniedException("You do not have permission to modify this discussion.");
+        }
+        return true;
+    }
+
 }

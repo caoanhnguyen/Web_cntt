@@ -1,5 +1,7 @@
 package com.kma.models;
 
+import com.kma.enums.SubjectCategory;
+
 import java.util.List;
 
 public class monHocDTO {
@@ -7,8 +9,17 @@ public class monHocDTO {
     private String tenMonHoc;
     private String moTa;
     private Integer soTinChi;
+    private SubjectCategory category;
     private List<fileDTO> taiLieuMHList;
     private List<nhanVienResponseDTO> nvList;
+
+    public SubjectCategory getCategory() {
+        return category;
+    }
+
+    public void setCategory(SubjectCategory category) {
+        this.category = category;
+    }
 
     public Integer getIdMonHoc() {
         return idMonHoc;

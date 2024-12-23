@@ -92,6 +92,19 @@ public class NhanVien {
 	@JoinColumn(name = "maPhongBan")
 	private PhongBan phongBan;
 
+	// Quan hệ 1-1 với User
+	@OneToOne
+	@JoinColumn(name = "userId", referencedColumnName = "userId")
+	private User user;
+
+	public User getUser() {
+		return user;
+	}
+
+	public void setUser(User user) {
+		this.user = user;
+	}
+
 	public GioiTinh getGioiTinh() {
 		return gioiTinh;
 	}

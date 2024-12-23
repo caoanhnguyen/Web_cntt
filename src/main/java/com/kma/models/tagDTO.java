@@ -3,6 +3,15 @@ package com.kma.models;
 public class tagDTO {
     private Integer tagId;
     private String tagName;
+    private String description;
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
 
     public Integer getTagId() {
         return tagId;

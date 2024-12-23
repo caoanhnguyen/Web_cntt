@@ -2,7 +2,9 @@ package com.kma.services.Impl;
 
 import com.kma.constants.fileDirection;
 import com.kma.converter.monHocDTOConverter;
+import com.kma.enums.SubjectCategory;
 import com.kma.models.monHocDTO;
+import com.kma.models.monHocResponseDTO;
 import com.kma.repository.entities.MonHoc;
 import com.kma.repository.entities.TaiLieuMonHoc;
 import com.kma.repository.monHocRepo;
@@ -20,6 +22,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -37,6 +40,23 @@ public class monHocServImpl implements monHocService {
     fileService fileServ;
     @Autowired
     taiLieuMonHocRepo tlmhRepo;
+
+    @Override
+    public Map<SubjectCategory, List<monHocResponseDTO>> getGroupedSubjects() {
+        // Lấy tất cả môn học
+        List<MonHoc> subjects = mhRepo.findAllByOrderByCategory();
+
+        // Nhóm các môn học theo danh mục
+        Map<SubjectCategory, List<monHocResponseDTO>> groupedSubjects = new LinkedHashMap<>();
+        for (SubjectCategory category : SubjectCategory.values()) {
+            List<monHocResponseDTO> subjectDTOs = subjects.stream()
+                    .filter(subject -> subject.getCategory() == category)
+                    .map(mhDTOConverter::convertToMonHocResDTO)
+                    .toList();
+            groupedSubjects.put(category, subjectDTOs);
+        }
+        return groupedSubjects;
+    }
 
     @Override
     public monHocDTO getById(Integer idMonHoc) {
@@ -105,6 +125,7 @@ public class monHocServImpl implements monHocService {
             monHoc.setTenMonHoc(monHocDTO.getTenMonHoc());
             monHoc.setMoTa(monHocDTO.getMoTa());
             monHoc.setSoTinChi(monHocDTO.getSoTinChi());
+            monHoc.setCategory(monHocDTO.getCategory());
             List<TaiLieuMonHoc> tnList = monHoc.getTaiLieuMHList();
 
             //Xử lí file thêm mới

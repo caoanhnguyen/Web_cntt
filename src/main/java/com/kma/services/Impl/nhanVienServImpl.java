@@ -2,6 +2,7 @@ package com.kma.services.Impl;
 
 import com.kma.constants.fileDirection;
 import com.kma.converter.nhanVienDTOConverter;
+import com.kma.enums.UserType;
 import com.kma.models.nhanVienDTO;
 import com.kma.models.nhanVienRequestDTO;
 import com.kma.models.paginationResponseDTO;
@@ -108,25 +109,28 @@ public class nhanVienServImpl implements nhanVienService{
 
 			// Tạo nhân viên để lưu
 			NhanVien nhanVien = nvDTOConverter.convertNVReqToNV(nvReqDTO, avaFileCode);
+
+			User user = createUserForNV(nvReqDTO.getUserName());
+
+			nhanVien.setUser(user);
+
 			nvRepo.save(nhanVien);
-
-			createUserForNV(nhanVien.getMaNhanVien());
-
 		}else{
 			throw new EntityNotFoundException("Mã nhân viên: " + nvReqDTO.getMaNhanVien() + " đã tồn tại, vui lòng kiểm tra lại!");
 		}
 	}
 
-	private void createUserForNV(String maNhanVien){
+	private User createUserForNV(String userName){
 		// Mã hóa mật khẩu bằng BCrypt
 		BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
-		String encodedPassword = passwordEncoder.encode(maNhanVien);  // Mật khẩu sinh viên sẽ là mã của họ
+		String encodedPassword = passwordEncoder.encode(userName);  // Mật khẩu nhân viên sẽ là userName của họ
 
 		// Tạo user mới với username là mã nhân viên và mật khẩu đã mã hóa
 		User user = new User();
-		user.setUserName(maNhanVien);  // Tên đăng nhập là mã nhân viên
+		user.setUserName(userName);  // Tên đăng nhập là mã nhân viên
 		user.setPassword(encodedPassword);  // Mật khẩu đã mã hóa
 		user.setIsActive(1);  // Set tài khoản ở trạng thái hoạt động (active)
+		user.setUserType(UserType.NHANVIEN);
 
 		// Tạo và gán role EMPLOYEE cho user
 		Role employeeRole = rolerepo.findByRoleName("EMPLOYEE");
@@ -134,6 +138,7 @@ public class nhanVienServImpl implements nhanVienService{
 
 		// Lưu tài khoản người dùng vào cơ sở dữ liệu
 		userrepo.save(user);
+		return user;
 	}
 
 	@Transactional

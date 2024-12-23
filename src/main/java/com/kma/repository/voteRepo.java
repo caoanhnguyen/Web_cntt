@@ -18,6 +18,7 @@ public interface voteRepo extends JpaRepository<Vote, Integer> {
     boolean existsByUser_UserIdAndAnswer_AnswerId(Integer userId, Integer answerId);
 
 
+
     @Query(value = "SELECT " +
             "SUM(CASE WHEN type = 'UP' THEN 1 ELSE 0 END) AS upvote_count, " +
             "SUM(CASE WHEN type = 'DOWN' THEN 1 ELSE 0 END) AS downvote_count " +

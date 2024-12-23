@@ -15,6 +15,15 @@ public class discussionDTO {
     private List<tagDTO> tagDTOList;
     private voteDTO voteDTO;
     private Integer answerQuantity;
+    private boolean isOwner;
+
+    public boolean isOwner() {
+        return isOwner;
+    }
+
+    public void setOwner(boolean owner) {
+        isOwner = owner;
+    }
 
     public Integer getAnswerQuantity() {
         return answerQuantity;

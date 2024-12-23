@@ -7,6 +7,8 @@ import java.util.List;
 
 public interface monHocRepo extends JpaRepository<MonHoc, Integer> {
 
+    List<MonHoc> findAllByOrderByCategory();
+
     List<MonHoc> findByTenMonHocContaining(String tenMonHoc);
 
     List<MonHoc> findBySoTinChi(Integer soTinChi);

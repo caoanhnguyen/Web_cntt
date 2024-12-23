@@ -14,4 +14,6 @@ public interface answerService {
     void updateAnswer(Integer discussionId, Integer answerId, answerRequestDTO ansReqDTO);
 
     void deleteAnswer(Integer discussionId, Integer answerId);
+
+    boolean isOwner(Integer answerId, Integer userId);
 }

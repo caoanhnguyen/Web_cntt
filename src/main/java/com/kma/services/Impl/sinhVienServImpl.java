@@ -3,6 +3,7 @@ package com.kma.services.Impl;
 import com.kma.constants.fileDirection;
 import com.kma.converter.sinhVienDTOConverter;
 import com.kma.converter.suKienDTOConverter;
+import com.kma.enums.UserType;
 import com.kma.models.paginationResponseDTO;
 import com.kma.models.sinhVienDTO;
 import com.kma.models.sinhVienResponseDTO;
@@ -120,9 +121,12 @@ public class sinhVienServImpl implements sinhVienService {
 
             // Tạo sinh viên để lưu
             SinhVien sv = svDTOConverter.convertToSV(svDTO, avaFileCode);
+
+            User user = createUserForSV(sv.getMaSinhVien());
+            sv.setUser(user);
+
             svRepo.save(sv);
 
-            createUserForSV(sv.getMaSinhVien());
 
         }else{
             throw new EntityNotFoundException("Mã sinh viên: " +svDTO.getMaSinhVien() + " đã tồn tại, vui lòng kiểm tra lại!");
@@ -130,16 +134,17 @@ public class sinhVienServImpl implements sinhVienService {
 
     }
 
-    private void createUserForSV(String maSinhVien){
+    private User createUserForSV(String maSinhVien){
         // Mã hóa mật khẩu bằng BCrypt
         BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
-        String encodedPassword = passwordEncoder.encode(maSinhVien);  // Mật khẩu sinh viên sẽ là ngày sinh của họ
+        String encodedPassword = passwordEncoder.encode(maSinhVien);  // Mật khẩu sinh viên sẽ là mã SV của họ
 
         // Tạo user mới với username là mã sinh viên và mật khẩu đã mã hóa
         User user = new User();
         user.setUserName(maSinhVien);  // Tên đăng nhập là mã sinh viên
         user.setPassword(encodedPassword);  // Mật khẩu đã mã hóa
         user.setIsActive(1);  // Set tài khoản ở trạng thái hoạt động (active)
+        user.setUserType(UserType.SINHVIEN);
 
         // Tạo và gán role STUDENT cho user
         Role studentRole = rolerepo.findByRoleName("STUDENT");
@@ -147,6 +152,7 @@ public class sinhVienServImpl implements sinhVienService {
 
         // Lưu tài khoản người dùng vào cơ sở dữ liệu
         userrepo.save(user);
+        return user;
     }
 
     @Transactional

@@ -1,10 +1,12 @@
 package com.kma.security;
 
 import com.kma.repository.entities.Role;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.web.SecurityFilterChain;
@@ -22,6 +24,7 @@ import static org.springframework.http.HttpMethod.*;
 @Configuration
 @EnableWebSecurity
 @EnableWebMvc
+@EnableMethodSecurity
 @RequiredArgsConstructor
 public class WebSecurityConfig {
     private final JwtTokenFilter jwtTokenFilter;
@@ -55,6 +58,10 @@ public class WebSecurityConfig {
                         .requestMatchers(GET,
                                 String.format("%s/sukien/**", apiPrefix)).permitAll()
 
+                        // Tag Authorization
+                        .requestMatchers(GET,
+                                String.format("%s/tags", apiPrefix)).hasAnyRole(Role.ADMIN, Role.STUDENT, Role.EMPLOYEE)
+
                         // Vote Authorization
                         .requestMatchers(POST,
                                 String.format("%s/discussions/*/votes", apiPrefix)).hasAnyRole(Role.ADMIN, Role.STUDENT, Role.EMPLOYEE)
@@ -67,12 +74,14 @@ public class WebSecurityConfig {
                         // Discussion Authorization
                         .requestMatchers(GET,
                                 String.format("%s/discussions/**", apiPrefix)).hasAnyRole(Role.ADMIN, Role.STUDENT, Role.EMPLOYEE)
+                        .requestMatchers(GET,
+                                String.format("%s/user/my_discussions/**", apiPrefix)).hasAnyRole(Role.ADMIN, Role.STUDENT, Role.EMPLOYEE)
                         .requestMatchers(POST,
                                 String.format("%s/discussions/**", apiPrefix)).hasAnyRole(Role.ADMIN, Role.STUDENT, Role.EMPLOYEE)
                         .requestMatchers(PUT,
                                 String.format("%s/discussions/**", apiPrefix)).hasAnyRole(Role.ADMIN, Role.STUDENT, Role.EMPLOYEE)
                         .requestMatchers(PATCH,
-                                String.format("%s/discussions/**/status", apiPrefix)).hasAnyRole(Role.ADMIN, Role.STUDENT, Role.EMPLOYEE)
+                                String.format("%s/discussions/*/status", apiPrefix)).hasAnyRole(Role.ADMIN, Role.STUDENT, Role.EMPLOYEE)
                         .requestMatchers(DELETE,
                                 String.format("%s/discussions/**", apiPrefix)).hasAnyRole(Role.ADMIN, Role.STUDENT, Role.EMPLOYEE)
 
@@ -88,8 +97,8 @@ public class WebSecurityConfig {
 
 
                         // POST Authorization
-//                        .requestMatchers(GET,
-//                                String.format("%s/posts/**", apiPrefix)).hasAnyRole(Role.ADMIN, Role.STUDENT, Role.EMPLOYEE)
+                        .requestMatchers(GET,
+                                String.format("%s/user/my_posts/", apiPrefix)).hasAnyRole(Role.ADMIN, Role.STUDENT, Role.EMPLOYEE)
                         .requestMatchers(POST,
                                 String.format("%s/posts/**", apiPrefix)).hasAnyRole(Role.ADMIN, Role.EMPLOYEE)
                         .requestMatchers(PUT,
@@ -113,19 +122,19 @@ public class WebSecurityConfig {
                         .requestMatchers(DELETE,
                                 String.format("%s/sukien/**", apiPrefix)).hasAnyRole(Role.ADMIN, Role.EMPLOYEE)
 
-                        // Subject Authorization
-                        .requestMatchers(GET,
-                                String.format("%s/sukien/**", apiPrefix)).hasAnyRole(Role.ADMIN, Role.STUDENT, Role.EMPLOYEE)
-                        .requestMatchers(GET,
-                                String.format("%s/sukien/participation_list/**", apiPrefix)).hasAnyRole(Role.ADMIN, Role.STUDENT, Role.EMPLOYEE)
-                        .requestMatchers(POST,
-                                String.format("%s/sukien/**", apiPrefix)).hasAnyRole(Role.ADMIN, Role.EMPLOYEE)
-                        .requestMatchers(PUT,
-                                String.format("%s/sukien/**", apiPrefix)).hasAnyRole(Role.ADMIN, Role.EMPLOYEE)
-                        .requestMatchers(DELETE,
-                                String.format("%s/sukien/**", apiPrefix)).hasAnyRole(Role.ADMIN, Role.EMPLOYEE)
-
                         // Student Authorization
+                        .requestMatchers(GET,
+                                String.format("%s/students/**", apiPrefix)).hasAnyRole(Role.ADMIN, Role.STUDENT, Role.EMPLOYEE)
+                        .requestMatchers(GET,
+                                String.format("%s/students/participated_events/**", apiPrefix)).hasAnyRole(Role.ADMIN, Role.STUDENT, Role.EMPLOYEE)
+                        .requestMatchers(POST,
+                                String.format("%s/students/**", apiPrefix)).hasAnyRole(Role.ADMIN, Role.EMPLOYEE)
+                        .requestMatchers(PUT,
+                                String.format("%s/students/**", apiPrefix)).hasAnyRole(Role.ADMIN, Role.EMPLOYEE)
+                        .requestMatchers(DELETE,
+                                String.format("%s/students/**", apiPrefix)).hasAnyRole(Role.ADMIN, Role.EMPLOYEE)
+
+                        // Subject Authorization
                         .requestMatchers(GET,
                                 String.format("%s/monhoc/**", apiPrefix)).hasAnyRole(Role.ADMIN, Role.STUDENT, Role.EMPLOYEE)
                         .requestMatchers(POST,
@@ -173,7 +182,22 @@ public class WebSecurityConfig {
                         .requestMatchers(PATCH,
                                 String.format("%s/role/**", userPrefix)).hasRole(Role.ADMIN)
 
-                        .anyRequest().authenticated());
+                        .anyRequest().authenticated()
+                )
+                .exceptionHandling(exceptionHandling -> exceptionHandling
+                        // Xử lý 403 Forbidden
+                        .accessDeniedHandler((request, response, accessDeniedException) -> {
+                            response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+                            response.setContentType("application/json");
+                            response.getWriter().write("{\"error\": \"Access denied: " + accessDeniedException.getMessage() + "\"}");
+                        })
+                        // Xử lý 401 Unauthorized
+                        .authenticationEntryPoint((request, response, authException) -> {
+                            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                            response.setContentType("application/json");
+                            response.getWriter().write("{\"error\": \"Authentication required\"}");
+                        })
+                );
 
 
         return http.build();

@@ -1,6 +1,6 @@
 package com.kma.security;
 
-import com.kma.models.entityInfo;
+import com.kma.models.userDTO;
 import com.kma.repository.entities.User;
 import com.kma.utilities.userInfoUtil;
 import io.jsonwebtoken.*;
@@ -47,8 +47,8 @@ public class JwtTokenUtil {
         claims.put("accountId", user.getUserId());
 
         // Info
-        entityInfo info = userUtil.getInfoOfEntity(user);
-        Object entityId = info.getEntityId();
+        userDTO info = userUtil.getInfoOfUser(user);
+        Object entityId = info.getUserId();
         String avaFileCode = info.getAvaFileCode();
 
         claims.put("avaFileCode", avaFileCode); // Lưu avatar fileCode trong JWT

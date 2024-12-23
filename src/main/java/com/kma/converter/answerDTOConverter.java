@@ -31,7 +31,7 @@ public class answerDTOConverter {
 
         // Get info
         User user = answer.getUser();
-        userDTO userDTO = userUtil.getUserInfo(user);
+        userDTO userDTO = userUtil.getInfoOfUser(user);
         ansDTO.setAuthor(userDTO);
 
         // Get votes

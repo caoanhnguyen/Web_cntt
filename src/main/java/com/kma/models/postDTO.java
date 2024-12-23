@@ -1,6 +1,8 @@
 package com.kma.models;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.sql.Date;
 import java.util.List;
@@ -14,8 +16,10 @@ public class postDTO {
 	private Date create_at;
 	private List<fileDTO> file_dto;
 	private String author;
-	
-	
+	@Getter
+	@Setter
+	private boolean isOwner;
+
 	public Integer getPost_id() {
 		return post_id;
 	}

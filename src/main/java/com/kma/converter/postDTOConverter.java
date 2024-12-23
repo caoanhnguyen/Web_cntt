@@ -32,6 +32,9 @@ public class postDTOConverter {
         }else{
             dto.setAuthor(null);
         }
+
+//        dto.setOwner(userName.equals(items.getNhanVien().getMaNhanVien()));
+
         return dto;
     }
 

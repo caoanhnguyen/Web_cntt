@@ -1,5 +1,6 @@
 package com.kma.repository.entities;
 
+import com.kma.enums.SubjectCategory;
 import jakarta.persistence.*;
 
 import java.util.ArrayList;
@@ -21,6 +22,10 @@ public class MonHoc {
     @Column(name = "soTinChi")
     private Integer soTinChi;
 
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private SubjectCategory category;
+
     //Config relation to mon_hoc
     @OneToMany(mappedBy = "monHoc")
     private List<TaiLieuMonHoc> taiLieuMHList = new ArrayList<>();
@@ -33,6 +38,14 @@ public class MonHoc {
             inverseJoinColumns = @JoinColumn(name = "idUser", nullable = false)
     )
     private List<NhanVien> nvList;
+
+    public SubjectCategory getCategory() {
+        return category;
+    }
+
+    public void setCategory(SubjectCategory category) {
+        this.category = category;
+    }
 
     public List<NhanVien> getNvList() {
         return nvList;

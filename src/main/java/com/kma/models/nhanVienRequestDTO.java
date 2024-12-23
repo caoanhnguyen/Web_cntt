@@ -7,6 +7,7 @@ import java.sql.Date;
 public class nhanVienRequestDTO {
 	private String maNhanVien;
 	private String tenNhanVien;
+	private String userName;
 	@JsonFormat(pattern = "yyyy-MM-dd")  // Định dạng ngày tháng năm
 	private Date ngaySinh;
 	private String gioiTinh;
@@ -27,6 +28,14 @@ public class nhanVienRequestDTO {
 	private String fileLyLich;
 	private String maPhongBan;
 
+
+	public String getUserName() {
+		return userName;
+	}
+
+	public void setUserName(String userName) {
+		this.userName = userName;
+	}
 
 	public String getGioiTinh() {
 		return gioiTinh;

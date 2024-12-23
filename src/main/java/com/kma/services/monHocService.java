@@ -1,6 +1,8 @@
 package com.kma.services;
 
+import com.kma.enums.SubjectCategory;
 import com.kma.models.monHocDTO;
+import com.kma.models.monHocResponseDTO;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -9,6 +11,8 @@ import java.util.List;
 import java.util.Map;
 
 public interface monHocService {
+
+    Map<SubjectCategory, List<monHocResponseDTO>> getGroupedSubjects();
 
     monHocDTO getById(Integer idMonHoc);
 

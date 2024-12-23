@@ -11,6 +11,8 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.math.BigDecimal;
+import java.sql.Date;
 import java.util.*;
 
 @Component
@@ -26,12 +28,12 @@ public class discussionDTOConverter {
     @Autowired
     tagRepo tRepo;
 
-    public discussionDTO convertToDiscussDTO(Discussion discussion){
+    public discussionDTO convertToDiscussDTO(Discussion discussion, String userName){
         discussionDTO dto = modelMapper.map(discussion, discussionDTO.class);
 
         // Get info
         User user = discussion.getUser();
-        userDTO userDTO = userUtil.getUserInfo(user);
+        userDTO userDTO = userUtil.getInfoOfUser(user);
         dto.setAuthor(userDTO);
         
         // Get tagDTOList
@@ -51,27 +53,46 @@ public class discussionDTOConverter {
         Integer answers = discussion.getAnswers().size();
         dto.setAnswerQuantity(answers);
 
+        dto.setOwner(userName.equals(user.getUserName()));
+
         return dto;
     }
 
-    public discussionResponseDTO convertToDiscussResDTO(Discussion discussion){
-        discussionResponseDTO discussResDTO = modelMapper.map(discussion, discussionResponseDTO.class);
+    public discussionResponseDTO convertToDiscussResDTO(Object[] row) {
+        // Tạo đối tượng DTO mới
+        discussionResponseDTO discussResDTO = new discussionResponseDTO();
 
-        // Get author name
-        User user = discussion.getUser();
-        String authorName = userUtil.getUserInfo(user).getName();
-        discussResDTO.setAuthorName(authorName);
+        // Gán các giá trị từ Object[] vào DTO
+        discussResDTO.setDiscussionId((Integer) row[0]); // discussionId
+        discussResDTO.setTitle((String) row[1]); // title
+        discussResDTO.setContent((String) row[2]); // content
+        discussResDTO.setCreateAt((Date) row[3]); // createAt
 
-        // Get votes
-        voteDTO voteDTO = voteServ.getVotesOfDiscussion(discussion.getDiscussionId());
-        discussResDTO.setVoteDTO(voteDTO);
+        // Gán thông tin trạng thái thảo luận
+        discussResDTO.setDiscussionStatus((String) row[4]); // status (nếu có)
 
-        // Get answer quantity
-        Integer answers = discussion.getAnswers().size();
-        discussResDTO.setAnswerQuantity(answers);
+        // Gán thông tin người đăng
+        discussResDTO.setAuthor_DTO(new userDTO(
+                row[5],
+                (String) row[6],
+                "/downloadProfile/" + (String) row[7]
+        ));
+
+        // Gán điểm của bài thảo luận
+        discussResDTO.setScore((BigDecimal) row[8]); // score
+
+        // Tính điểm và số lượng upvote, downvote, answers từ Object[]
+        discussResDTO.setVoteDTO(new voteDTO(
+                (Long) row[9], // upVote count
+                (Long) row[10], // downVote count
+                null
+        ));
+
+        discussResDTO.setAnswerQuantity((Long) row[11]); // answer count
 
         return discussResDTO;
     }
+
 
     public Discussion convertToDiscussion(discussionRequestDTO discussReqDTO, List<Integer> tagIdList) {
         // Map các trường thông thường từ DTO sang Entity

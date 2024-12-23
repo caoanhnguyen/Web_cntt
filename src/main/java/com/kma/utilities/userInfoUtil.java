@@ -1,58 +1,53 @@
 package com.kma.utilities;
 
-import com.kma.models.entityInfo;
+import com.kma.enums.UserType;
 import com.kma.models.userDTO;
 import com.kma.repository.entities.NhanVien;
 import com.kma.repository.entities.SinhVien;
 import com.kma.repository.entities.User;
-import com.kma.repository.nhanVienRepo;
-import com.kma.repository.sinhVienRepo;
-import org.springframework.beans.factory.annotation.Autowired;
+import jakarta.persistence.EntityNotFoundException;
 import org.springframework.stereotype.Component;
 
-import java.util.Objects;
 
 @Component
 public class userInfoUtil {
 
-    @Autowired
-    nhanVienRepo nvRepo;
-    @Autowired
-    sinhVienRepo svRepo;
+    public userDTO getInfoOfUser(User user) {
+        // Tạo đối tượng chứa thông tin trả về
+        userDTO info = new userDTO();
 
-    public entityInfo getInfoOfEntity(User user){
-        String userName = user.getUserName();
+        // Lấy thông tin cơ bản của User
         String avaFileCode = "/downloadProfile/";
-        Object entityId = null;
-        NhanVien nv = nvRepo.findByMaNhanVien(userName);
-        if(nv!=null){
-            avaFileCode += nv.getAvaFileCode();
-            entityId = nv.getIdUser();
-        }else{
-            SinhVien sv = svRepo.findById(userName).orElse(null);
-            avaFileCode += Objects.requireNonNull(sv).getAvaFileCode();
-            entityId = sv.getMaSinhVien();
+
+        // Kiểm tra UserType và xử lý thông tin tương ứng
+        if (user.getUserType().equals(UserType.NHANVIEN)) {
+            NhanVien nv = user.getNhanVien();
+            if (nv != null) {
+                // Nếu là nhân viên, lấy thông tin liên quan
+                info.setUserId(nv.getIdUser()); // ID của nhân viên
+                info.setName(nv.getTenNhanVien()); // Tên nhân viên
+                avaFileCode += nv.getAvaFileCode(); // Avatar của nhân viên
+            } else {
+                throw new EntityNotFoundException("Thông tin nhân viên không tồn tại.");
+            }
+        } else if (user.getUserType().equals(UserType.SINHVIEN)) {
+            SinhVien sv = user.getSinhVien();
+            if (sv != null) {
+                // Nếu là sinh viên, lấy thông tin liên quan
+                info.setUserId(sv.getMaSinhVien()); // Mã sinh viên
+                info.setName(sv.getTenSinhVien()); // Tên sinh viên
+                avaFileCode += sv.getAvaFileCode(); // Avatar của sinh viên
+            } else {
+                throw new EntityNotFoundException("Thông tin sinh viên không tồn tại.");
+            }
+        } else {
+            throw new IllegalStateException("User không thuộc loại hợp lệ.");
         }
-        return new entityInfo(entityId, avaFileCode);
+
+        // Set avatar file code vào info
+        info.setAvaFileCode(avaFileCode);
+
+        return info;
     }
 
-    public userDTO getUserInfo(User user){
-        String userName = user.getUserName();
-        String avaFileCode = "/downloadProfile/";
-        Object entityId = null;
-        String name;
-        NhanVien nv = nvRepo.findByMaNhanVien(userName);
-        if(nv!=null){
-            name = nv.getTenNhanVien();
-            avaFileCode += nv.getAvaFileCode();
-            entityId = nv.getIdUser();
-        }else{
-            SinhVien sv = svRepo.findById(userName).orElse(null);
-            assert sv != null;
-            name = sv.getTenSinhVien();
-            avaFileCode += Objects.requireNonNull(sv).getAvaFileCode();
-            entityId = sv.getMaSinhVien();
-        }
-        return new userDTO(entityId, name, avaFileCode);
-    }
 }

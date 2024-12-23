@@ -1,5 +1,6 @@
 package com.kma.repository.entities;
 
+import com.kma.enums.UserType;
 import jakarta.persistence.*;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -27,6 +28,10 @@ public class User implements UserDetails {
     @Column(name="isActive")
     private Integer isActive;
 
+    @Column(name = "userType", nullable = false)
+    @Enumerated(EnumType.STRING)
+    private UserType userType;
+
     // Config relation to role
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
@@ -44,6 +49,38 @@ public class User implements UserDetails {
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private Set<Vote> votes;
+
+    // Quan hệ 1-1 với SinhVien
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private SinhVien sinhVien;
+
+    // Quan hệ 1-1 với NhanVien
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private NhanVien nhanVien;
+
+    public UserType getUserType() {
+        return userType;
+    }
+
+    public void setUserType(UserType userType) {
+        this.userType = userType;
+    }
+
+    public NhanVien getNhanVien() {
+        return nhanVien;
+    }
+
+    public void setNhanVien(NhanVien nhanVien) {
+        this.nhanVien = nhanVien;
+    }
+
+    public SinhVien getSinhVien() {
+        return sinhVien;
+    }
+
+    public void setSinhVien(SinhVien sinhVien) {
+        this.sinhVien = sinhVien;
+    }
 
     public Set<Discussion> getDiscussions() {
         return discussions;

@@ -10,6 +10,10 @@ public class entityInfo {
         this.avaFileCode = avaFileCode;
     }
 
+    public entityInfo() {
+
+    }
+
     // Getter và Setter
     public Object getEntityId() {
         return entityId;

@@ -18,14 +18,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.sql.Date;
 import java.util.List;
-import java.util.Objects;
 
-@Service
+@Service("answerServ")
 @Transactional
 public class answerServImpl implements answerService {
     @Autowired
@@ -82,7 +82,7 @@ public class answerServImpl implements answerService {
 
         // Gửi thông báo đến chủ bài thảo luận
         User author = discussion.getUser();
-        userDTO answer_author = infoUtil.getUserInfo(user);
+        userDTO answer_author = infoUtil.getInfoOfUser(user);
 
         String userId = author.getUserName();
         String title = "Reply discussion!";
@@ -110,5 +110,12 @@ public class answerServImpl implements answerService {
         ansRepo.delete(answer);
     }
 
-
+    @Override
+    public boolean isOwner(Integer answerId, Integer userId) {
+        boolean isOwner = ansRepo.existsByAnswerIdAndUser_UserId(answerId, userId);
+        if (!isOwner) {
+            throw new AccessDeniedException("You do not have permission to modify this discussion.");
+        }
+        return true;
+    }
 }

@@ -11,6 +11,10 @@ public class userDTO {
         this.avaFileCode = avaFileCode;
     }
 
+    public userDTO() {
+        
+    }
+
     public Object getUserId() {
         return userId;
     }

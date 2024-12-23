@@ -6,6 +6,7 @@ import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
@@ -18,6 +19,7 @@ public class AnswerAPI {
     answerService answerServ;
 
     @GetMapping(value="/{discussionId}/answers")
+    @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_EMPLOYEE') or hasRole('ROLE_STUDENT')")
     public ResponseEntity<Object> getAllAnswerOfDiscussion(@PathVariable Integer discussionId,
                                                            @RequestParam(required = false, defaultValue = "0") int page,
                                                            @RequestParam(required = false, defaultValue = "10") int size){
@@ -37,6 +39,7 @@ public class AnswerAPI {
     }
 
     @PostMapping(value = "/{discussionId}/answers")
+    @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_EMPLOYEE') or hasRole('ROLE_STUDENT')")
     public ResponseEntity<Object> addAnswer(@PathVariable Integer discussionId,
                                             @ModelAttribute answerRequestDTO answerReqDTO) {
         try {
@@ -57,6 +60,7 @@ public class AnswerAPI {
     }
 
     @PutMapping(value = "/{discussionId}/answers/{answerId}")
+    @PreAuthorize("@answerServ.isOwner(#answerId, principal.userId) or hasRole('ADMIN')")
     public ResponseEntity<Object> updateAnswer(@PathVariable Integer discussionId,
                                                @PathVariable Integer answerId,
                                                @ModelAttribute answerRequestDTO answerReqDTO) {
@@ -80,6 +84,7 @@ public class AnswerAPI {
 
 
     @DeleteMapping(value = "/{discussionId}/answers/{answerId}")
+    @PreAuthorize("@answerServ.isOwner(#answerId, principal.userId) or hasRole('ADMIN')")
     public ResponseEntity<Object> deleteAnswer(@PathVariable Integer discussionId,
                                                @PathVariable Integer answerId) {
         try {

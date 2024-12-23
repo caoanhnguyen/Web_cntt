@@ -2,6 +2,7 @@ package com.kma.converter;
 
 import com.kma.models.fileDTO;
 import com.kma.models.monHocDTO;
+import com.kma.models.monHocResponseDTO;
 import com.kma.models.nhanVienResponseDTO;
 import com.kma.repository.entities.MonHoc;
 import com.kma.repository.entities.NhanVien;
@@ -36,5 +37,12 @@ public class monHocDTOConverter {
         mhDTO.setTaiLieuMHList(taiLieuMHList);
 
         return mhDTO;
+    }
+
+    public monHocResponseDTO convertToMonHocResDTO(MonHoc mh){
+        monHocResponseDTO dto = new monHocResponseDTO();
+        dto =  modelMapper.map(mh, monHocResponseDTO.class);
+        dto.setDescription(mh.getMoTa());
+        return dto;
     }
 }

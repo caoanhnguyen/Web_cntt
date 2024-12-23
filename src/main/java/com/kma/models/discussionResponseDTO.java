@@ -2,6 +2,7 @@ package com.kma.models;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 
+import java.math.BigDecimal;
 import java.sql.Date;
 
 public class discussionResponseDTO {
@@ -10,15 +11,33 @@ public class discussionResponseDTO {
     private String content;
     @JsonFormat(pattern = "yyyy-MM-dd")  // Định dạng ngày tháng năm
     private Date createAt;
-    private String authorName;
+    private String discussionStatus;
+    private userDTO author_DTO;
+    private BigDecimal score;
     private voteDTO voteDTO;
-    private Integer answerQuantity;
+    private Long answerQuantity;
 
-    public Integer getAnswerQuantity() {
+    public BigDecimal getScore() {
+        return score;
+    }
+
+    public void setScore(BigDecimal score) {
+        this.score = score;
+    }
+
+    public String getDiscussionStatus() {
+        return discussionStatus;
+    }
+
+    public void setDiscussionStatus(String discussionStatus) {
+        this.discussionStatus = discussionStatus;
+    }
+
+    public Long getAnswerQuantity() {
         return answerQuantity;
     }
 
-    public void setAnswerQuantity(Integer answerQuantity) {
+    public void setAnswerQuantity(Long answerQuantity) {
         this.answerQuantity = answerQuantity;
     }
 
@@ -62,11 +81,11 @@ public class discussionResponseDTO {
         this.createAt = createAt;
     }
 
-    public String getAuthorName() {
-        return authorName;
+    public userDTO getAuthor_DTO() {
+        return author_DTO;
     }
 
-    public void setAuthorName(String authorName) {
-        this.authorName = authorName;
+    public void setAuthor_DTO(userDTO author_DTO) {
+        this.author_DTO = author_DTO;
     }
 }

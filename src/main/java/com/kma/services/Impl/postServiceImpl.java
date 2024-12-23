@@ -1,7 +1,6 @@
 package com.kma.services.Impl;
 
 import java.io.IOException;
-import java.security.Principal;
 import java.sql.Date;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -17,13 +16,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.kma.models.postDTO;
 import com.kma.models.postRequestDTO;
-import com.kma.repository.nhanVienRepo;
 import com.kma.repository.postRepo;
 import com.kma.repository.entities.NhanVien;
 import com.kma.repository.entities.Post;
@@ -34,13 +33,11 @@ import com.kma.services.postService;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 
-@Service
+@Service(value = "postServ")
 @Transactional
 public class postServiceImpl implements postService{
 	@Autowired
 	postRepo postRepo;
-	@Autowired
-	nhanVienRepo nvRepo;
 	@Autowired
 	fileService fileServ;
 	@Autowired
@@ -51,7 +48,36 @@ public class postServiceImpl implements postService{
 	NotificationService notiServ;
 
 	@Override
+	public paginationResponseDTO<postResponseDTO> getAllPostOfUser(Integer page, Integer size) {
+
+		User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+
+		// Tạo Pageable
+		Pageable pageable = PageRequest.of(page, size);
+
+		// Lấy dữ liệu từ repository
+		Page<Post> postPage = postRepo.findByNhanVien_IdUser(user.getNhanVien().getIdUser(), pageable);
+
+		// Chuyển đổi Post sang postResponseDTO
+		List<postResponseDTO> postResDTOList = postPage.getContent().stream()
+				.map(dtoConverter::convertToPostResDTO)
+				.toList();
+
+		// Đóng gói dữ liệu và meta vào DTO
+		return new paginationResponseDTO<>(
+				postResDTOList,
+				postPage.getTotalPages(),
+				(int) postPage.getTotalElements(),
+				postPage.isFirst(),
+				postPage.isLast(),
+				postPage.getNumber(),
+				postPage.getSize()
+		);
+	}
+
+	@Override
 	public postDTO getById(Integer post_id) {
+
 		Post post = postRepo.findById(post_id).orElse(null);
 		if(post!=null)
         	return dtoConverter.convertToPostDTO(post);
@@ -89,6 +115,7 @@ public class postServiceImpl implements postService{
 
 	@Override
 	public List<postDTO> getLatestPosts() {
+
 		// Tìm kiếm bài viết mới nhất
 		List<Post> posts = postRepo.findTop6ByOrderByPostIdDesc();
 		return posts.stream()
@@ -98,10 +125,10 @@ public class postServiceImpl implements postService{
 
 	@Override
 	public void addPost(List<MultipartFile> files,
-						postRequestDTO postRequestDTO, Principal principal) throws IOException {
+						postRequestDTO postRequestDTO) throws IOException {
 		User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
-		NhanVien nhanVien = nvRepo.findByMaNhanVien(user.getUserName());
+		NhanVien nhanVien = user.getNhanVien();
 		if(nhanVien == null) {
 			throw new IllegalArgumentException("Invalid Author ID");
 		}
@@ -194,5 +221,14 @@ public class postServiceImpl implements postService{
 		}else {
 			throw new EntityNotFoundException("Post not found with id: " + post_id);
 		}
+	}
+
+	@Override
+	public boolean isOwner(Integer postId, Integer authorId) {
+		boolean isOwner = postRepo.existsByPostIdAndNhanVien_IdUser(postId, authorId);
+		if (!isOwner) {
+			throw new AccessDeniedException("You do not have permission to modify this post.");
+		}
+		return true;
 	}
 }

@@ -38,20 +38,23 @@ public class voteServImpl implements voteService {
 
             // Khởi tạo DTO với giá trị mặc định là 0
             voteDTO dto = new voteDTO();
-            dto.setUpVotes(0);
-            dto.setDownVotes(0);
+            dto.setUpVotes(0L);
+            dto.setDownVotes(0L);
 
             if (outerResult != null && outerResult.length > 0 && outerResult[0] != null) {
                 Object[] result = (Object[]) outerResult[0];
 
                 // Kiểm tra từng phần tử trong result
                 if (result[0] != null) {
-                    dto.setUpVotes(Integer.parseInt(result[0].toString()));
+                    dto.setUpVotes((long) Integer.parseInt(result[0].toString()));
                 }
                 if (result[1] != null) {
-                    dto.setDownVotes(Integer.parseInt(result[1].toString()));
+                    dto.setDownVotes((long) Integer.parseInt(result[1].toString()));
                 }
             }
+
+            // Check isVoted
+            isVoted(dto, discussionId, null);
 
             return dto;
         } else {
@@ -68,24 +71,45 @@ public class voteServImpl implements voteService {
 
             // Khởi tạo DTO với giá trị mặc định là 0
             voteDTO dto = new voteDTO();
-            dto.setUpVotes(0);
-            dto.setDownVotes(0);
+            dto.setUpVotes(0L);
+            dto.setDownVotes(0L);
 
             if (outerResult != null && outerResult.length > 0 && outerResult[0] != null) {
                 Object[] result = (Object[]) outerResult[0];
 
                 // Kiểm tra từng phần tử trong result
                 if (result[0] != null) {
-                    dto.setUpVotes(Integer.parseInt(result[0].toString()));
+                    dto.setUpVotes((long) Integer.parseInt(result[0].toString()));
                 }
                 if (result[1] != null) {
-                    dto.setDownVotes(Integer.parseInt(result[1].toString()));
+                    dto.setDownVotes((long) Integer.parseInt(result[1].toString()));
                 }
             }
+
+            // Check isVoted
+            isVoted(dto, null, answerId);
 
             return dto;
         } else {
             throw new EntityNotFoundException("Answer not found!");
+        }
+    }
+
+    private void isVoted(voteDTO dto, Integer discussionId, Integer answerId){
+
+        // Kiểm tra xem user trong principal đã vote chưa, nếu rồi thì là loại gì
+        User user =  (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        Optional<Vote> existingVote = Optional.empty();
+        if(discussionId!=null){
+            existingVote = voteRepo.findByUser_UserIdAndDiscussion_DiscussionId(user.getUserId(), discussionId);
+        }else if(answerId!=null){
+            existingVote = voteRepo.findByUser_UserIdAndAnswer_AnswerId(user.getUserId(), answerId);
+        }
+
+        if(existingVote.isEmpty()){
+            dto.setVote(VoteType.NONE);
+        }else{
+            dto.setVote(existingVote.get().getType());
         }
     }
 

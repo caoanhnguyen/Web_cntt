@@ -1,6 +1,5 @@
 package com.kma.api;
 
-import java.security.Principal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -9,6 +8,7 @@ import com.kma.models.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -29,7 +29,26 @@ public class PostAPI {
 	@Autowired
 	postService postServ;
 
-	@GetMapping(value = "/api/posts/{post_id}")
+	@GetMapping(value="/user/my_posts")
+	@PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_EMPLOYEE') or hasRole('ROLE_STUDENT')")
+	public ResponseEntity<Object> getAllPostOfUser(@RequestParam(required = false, defaultValue = "0") int page,
+											       @RequestParam(required = false, defaultValue = "10") int size){
+		try {
+			paginationResponseDTO<postResponseDTO> DTO = postServ.getAllPostOfUser(page, size);
+			return new ResponseEntity<>(DTO, HttpStatus.OK);
+		} catch (Exception e) {
+			// TODO: handle exception
+			errorResponseDTO errorDTO = new errorResponseDTO();
+			errorDTO.setError(e.getMessage());
+			List<String> details = new ArrayList<>();
+			details.add("An error occurred!");
+			errorDTO.setDetails(details);
+
+			return new ResponseEntity<>(errorDTO, HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	}
+
+	@GetMapping(value = "/api/public/posts/{post_id}")
 	public ResponseEntity<Object> getById(@PathVariable Integer post_id){
 		try {
 			postDTO DTO = postServ.getById(post_id);
@@ -55,7 +74,7 @@ public class PostAPI {
 		}
 	}
 	
-	@GetMapping(value="/api/posts")
+	@GetMapping(value="/api/public/posts")
 	public ResponseEntity<Object> getAllPost(@RequestParam Map<String,Object> params,
 											 @RequestParam(required = false, defaultValue = "0") int page,
 											 @RequestParam(required = false, defaultValue = "10") int size){
@@ -75,7 +94,7 @@ public class PostAPI {
 		}
 	}
 
-	@GetMapping(value = "/api/posts/latest")
+	@GetMapping(value = "/api/public/posts/latest")
 	public ResponseEntity<Object> getLatestPosts() {
 		try {
 			List<postDTO> posts = postServ.getLatestPosts();
@@ -93,10 +112,11 @@ public class PostAPI {
 	}
 	
 	@PostMapping(value = "/api/posts")
+	@PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_EMPLOYEE')")
 	public ResponseEntity<Object> addPost(@RequestParam(value = "file", required = false) List<MultipartFile> files,
-										  @ModelAttribute postRequestDTO postRequestDTO, Principal principal) {
+										  @ModelAttribute postRequestDTO postRequestDTO) {
 		try {
-			postServ.addPost(files, postRequestDTO, principal);
+			postServ.addPost(files, postRequestDTO);
 			return ResponseEntity.ok("Add successfully!");
 		} catch (IllegalArgumentException e) {
 			// TODO: handle exception
@@ -113,6 +133,7 @@ public class PostAPI {
 	}
 	
 	@PutMapping("/api/posts/{post_id}")
+	@PreAuthorize("@postServ.isOwner(#post_id, principal.nhanVien.idUser) or hasRole('ADMIN')")
 	public ResponseEntity<Object> updatePost(@PathVariable Integer post_id, 
 											 @ModelAttribute postRequestDTO postRequestDTO,
 											 @RequestParam(value = "file", required = false) List<MultipartFile> files,
@@ -136,6 +157,7 @@ public class PostAPI {
 	}
 	
 	@DeleteMapping(value = "/api/posts/{post_id}")
+	@PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_EMPLOYEE') or hasRole('ROLE_STUDENT')")
 	public ResponseEntity<Object> deletePost(@PathVariable Integer post_id) {
 		try {
 			postServ.deletePost(post_id);
