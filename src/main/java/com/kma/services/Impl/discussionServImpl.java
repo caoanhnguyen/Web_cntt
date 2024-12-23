@@ -29,7 +29,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 @Service("discussionServ")
 @Transactional
@@ -43,6 +42,34 @@ public class discussionServImpl implements discussionService {
     tagRepo tRepo;
     @Autowired
     NotificationService notiServ;
+
+    @Override
+    public paginationResponseDTO<discussionResponseDTO> getAllDiscussionByTag(Integer tagId, Integer page, Integer size, String sort, String order) {
+        // Lấy sortCriterial
+        Sort sortCriteria = handleSort(sort,order);
+
+        // Tạo Pageable
+        Pageable pageable = PageRequest.of(page, size, sortCriteria);
+
+        // Lấy dữ liệu từ repository
+        Page<Object[]> discussPage = discussRepo.findByTag(tagId, pageable);
+
+        // Chuyển đổi Post sang postResponseDTO
+        List<discussionResponseDTO> discussResDTOList = discussPage.getContent().stream()
+                .map(discussDTOConverter::convertToDiscussResDTO)
+                .toList();
+
+        // Đóng gói dữ liệu và meta vào DTO
+        return new paginationResponseDTO<>(
+                discussResDTOList,
+                discussPage.getTotalPages(),
+                (int) discussPage.getTotalElements(),
+                discussPage.isFirst(),
+                discussPage.isLast(),
+                discussPage.getNumber(),
+                discussPage.getSize()
+        );
+    }
 
     @Override
     public discussionDTO getById(Integer discussionId) {

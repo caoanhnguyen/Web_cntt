@@ -9,6 +9,8 @@ import java.util.List;
 import java.util.Map;
 
 public interface discussionService {
+    paginationResponseDTO<discussionResponseDTO> getAllDiscussionByTag(Integer tagId, Integer page, Integer size, String sort, String order);
+
     discussionDTO getById(Integer discussionId);
 
     paginationResponseDTO<discussionResponseDTO> getAllDiscussionOfUser(Map<String,Object> params, Integer page, Integer size, String sort, String order);

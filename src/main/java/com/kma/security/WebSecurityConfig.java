@@ -54,7 +54,7 @@ public class WebSecurityConfig {
                         .requestMatchers(GET, "/downloadDocs/**").permitAll()
                         .requestMatchers(POST, "/uploadImg").permitAll()
                         .requestMatchers(GET,
-                                String.format("%s/posts/**", apiPrefix)).permitAll()
+                                String.format("%s/public/**", apiPrefix)).permitAll()
                         .requestMatchers(GET,
                                 String.format("%s/sukien/**", apiPrefix)).permitAll()
 

@@ -7,7 +7,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
@@ -20,6 +19,28 @@ public class DiscussionAPI {
 
     @Autowired
     discussionService discussionServ;
+
+    @GetMapping(value="/discussions/tags/{tagId}")
+    @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_EMPLOYEE') or hasRole('ROLE_STUDENT')")
+    public ResponseEntity<Object> getAllDiscussionByTag(@PathVariable Integer tagId,
+                                                        @RequestParam(defaultValue = "date") String sort,
+                                                        @RequestParam(defaultValue = "desc") String order,
+                                                        @RequestParam(required = false, defaultValue = "0") int page,
+                                                        @RequestParam(required = false, defaultValue = "10") int size){
+        try {
+            paginationResponseDTO<discussionResponseDTO> DTO = discussionServ.getAllDiscussionByTag(tagId, page, size, sort, order);
+            return new ResponseEntity<>(DTO, HttpStatus.OK);
+        } catch (Exception e) {
+            // TODO: handle exception
+            errorResponseDTO errorDTO = new errorResponseDTO();
+            errorDTO.setError(e.getMessage());
+            List<String> details = new ArrayList<>();
+            details.add("An error occurred!");
+            errorDTO.setDetails(details);
+
+            return new ResponseEntity<>(errorDTO, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
 
     @GetMapping(value = "/discussions/{discussionId}")
     @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_EMPLOYEE') or hasRole('ROLE_STUDENT')")
