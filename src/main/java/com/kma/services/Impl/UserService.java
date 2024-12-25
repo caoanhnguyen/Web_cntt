@@ -1,6 +1,9 @@
 package com.kma.services.Impl;
 
+import com.kma.converter.accountDTOConverter;
+import com.kma.models.accountDTO;
 import com.kma.models.changePasswordDTO;
+import com.kma.models.paginationResponseDTO;
 import com.kma.repository.entities.Role;
 import com.kma.repository.entities.User;
 import com.kma.repository.roleRepo;
@@ -10,6 +13,9 @@ import com.kma.services.IUserService;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -17,6 +23,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 
 @RequiredArgsConstructor
@@ -29,6 +36,7 @@ public class UserService implements IUserService {
     private final PasswordEncoder passwordEncoder;  // final
     private final JwtTokenUtil jwtTokenUtil;  // final
     private final AuthenticationManager authenticationManager;  // final
+    private final accountDTOConverter accountConverter;
 
     @Override
     public String login(String userName, String password) throws Exception {
@@ -118,6 +126,32 @@ public class UserService implements IUserService {
     }
 
     @Override
+    public void removeRole(Integer accountId, Integer roleId) throws Exception {
+        // Lấy người dùng từ cơ sở dữ liệu
+        User user = userRepo.findById(accountId)
+                .orElseThrow(() -> new Exception("User not found"));
+
+        // Kiểm tra xem Role có tồn tại không
+        Role newRole = rolerepo.findById(roleId).orElse(null);
+        if (newRole == null) {
+            throw new Exception("Role not found");
+        }
+
+        // Tránh thêm trùng Role cho User
+        if (user.getRoleList().contains(newRole)) {
+            // Xóa Role cho User và User vào Role
+            user.getRoleList().remove(newRole);
+            newRole.getUserList().remove(user);
+
+            // Lưu lại thông tin vào cơ sở dữ liệu
+            userRepo.save(user);
+            rolerepo.save(newRole);
+        }else{
+            throw new Exception("User doesn't have this role");
+        }
+    }
+
+    @Override
     public void updateAccountLockStatus(Integer userId, boolean isLocked) {
         User user = userRepo.findById(userId)
                 .orElseThrow(() -> new EntityNotFoundException("User not found with ID: " + userId));
@@ -125,4 +159,55 @@ public class UserService implements IUserService {
         user.setLocked(isLocked);
         userRepo.save(user);
     }
+
+    @Override
+    public paginationResponseDTO<accountDTO> getAllUser_NhanVienAccount(String searchTerm, Integer page, Integer size) {
+        // Tạo Pageable
+        Pageable pageable = PageRequest.of(page, size);
+
+        // Lấy dữ liệu từ repository
+        Page<Object[]> accountDetailsPage = userRepo.findUser_NhanVienDetails(searchTerm, pageable);
+
+        // Chuyển đổi Post sang postResponseDTO
+        List<accountDTO> accDTOList = accountDetailsPage.getContent().stream()
+                .map(accountConverter::convertToAccDTO)
+                .toList();
+
+        // Đóng gói dữ liệu và meta vào DTO
+        return new paginationResponseDTO<>(
+                accDTOList,
+                accountDetailsPage.getTotalPages(),
+                (int) accountDetailsPage.getTotalElements(),
+                accountDetailsPage.isFirst(),
+                accountDetailsPage.isLast(),
+                accountDetailsPage.getNumber(),
+                accountDetailsPage.getSize()
+        );
+    }
+
+    @Override
+    public paginationResponseDTO<accountDTO> getAllUser_SinhVienAccount(String searchTerm, Integer page, Integer size) {
+        // Tạo Pageable
+        Pageable pageable = PageRequest.of(page, size);
+
+        // Lấy dữ liệu từ repository
+        Page<Object[]> accountDetailsPage = userRepo.findUser_SinhVienDetails(searchTerm, pageable);
+
+        // Chuyển đổi Post sang postResponseDTO
+        List<accountDTO> accDTOList = accountDetailsPage.getContent().stream()
+                .map(accountConverter::convertToAccDTO)
+                .toList();
+
+        // Đóng gói dữ liệu và meta vào DTO
+        return new paginationResponseDTO<>(
+                accDTOList,
+                accountDetailsPage.getTotalPages(),
+                (int) accountDetailsPage.getTotalElements(),
+                accountDetailsPage.isFirst(),
+                accountDetailsPage.isLast(),
+                accountDetailsPage.getNumber(),
+                accountDetailsPage.getSize()
+        );
+    }
+
 }

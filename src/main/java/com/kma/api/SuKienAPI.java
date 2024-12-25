@@ -37,10 +37,11 @@ public class SuKienAPI {
     @GetMapping(value = "/sukien/participation_list/{eventId}")
     @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_EMPLOYEE') or hasRole('ROLE_STUDENT')")
     public ResponseEntity<Object> getAllSVInEvent(@PathVariable Integer eventId,
+                                                  @RequestParam(value = "searchTerm", required = false, defaultValue = "") String searchTerm,
                                                   @RequestParam(required = false, defaultValue = "0") int page,
                                                   @RequestParam(required = false, defaultValue = "5") int size){
         try {
-            paginationResponseDTO<sinhVienResponseDTO> DTO = skServ.getAllSVInEvent(eventId, page, size);
+            paginationResponseDTO<sinhVienResponseDTO> DTO = skServ.getAllSVInEvent(eventId, searchTerm, page, size);
             return new ResponseEntity<>(DTO, HttpStatus.OK);
         } catch (EntityNotFoundException e) {
             errorResponseDTO errorDTO = buildErrorResUtil.buildErrorRes(e, "Event not found!");

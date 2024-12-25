@@ -159,7 +159,7 @@ public class discussionServImpl implements discussionService {
         );
     }
 
-    private Sort handleSort(String sort, String order){
+    private Sort handleSort(String sort, String order) {
         // Xử lý Sort theo tiêu chí và thứ tự
         Sort.Direction direction = "desc".equalsIgnoreCase(order) ? Sort.Direction.DESC : Sort.Direction.ASC;
 

@@ -21,5 +21,5 @@ public interface suKienService {
 
     void updateEvent(Integer eventId, suKienResponseDTO skResDTO, List<MultipartFile> files, List<Integer> deleteFileIds) throws IOException;
 
-    paginationResponseDTO<sinhVienResponseDTO> getAllSVInEvent(Integer eventId, Integer page, Integer size);
+    paginationResponseDTO<sinhVienResponseDTO> getAllSVInEvent(Integer eventId, String searchTerm, Integer page, Integer size);
 }

@@ -175,11 +175,17 @@ public class WebSecurityConfig {
 //                                ("/downloadFile/**")).hasAnyRole(Role.ADMIN, Role.STUDENT, Role.EMPLOYEE)
 
                         // Special Authorization for ADMIN
+                        .requestMatchers(GET,
+                                String.format("%s/accounts/employees/**", userPrefix)).hasAnyRole(Role.ADMIN)
+                        .requestMatchers(GET,
+                                String.format("%s/accounts/students/**", userPrefix)).hasAnyRole(Role.ADMIN)
                         .requestMatchers(PUT,
                                 String.format("%s/change_password/**", userPrefix)).hasAnyRole(Role.ADMIN, Role.STUDENT, Role.EMPLOYEE)
                         .requestMatchers(PUT,
                                 String.format("%s/admin/reset_password/**", userPrefix)).hasAnyRole(Role.ADMIN)
                         .requestMatchers(PATCH,
+                                String.format("%s/role/**", userPrefix)).hasRole(Role.ADMIN)
+                        .requestMatchers(DELETE,
                                 String.format("%s/role/**", userPrefix)).hasRole(Role.ADMIN)
                         .requestMatchers(PATCH,
                                 String.format("%s/admin/**", userPrefix)).hasRole(Role.ADMIN)

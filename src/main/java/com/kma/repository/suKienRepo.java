@@ -17,4 +17,23 @@ public interface suKienRepo extends JpaRepository<SuKien, Integer> {
             "AND sk.organizedBy LIKE %:organizedBy% " +
             "ORDER BY sk.eventId DESC")
     Page<SuKien> findByAllCondition(@Param("eventName") String eventName, @Param("location") String location, @Param("organizedBy") String organizedBy, Pageable pageable);
+
+    //SQL Native
+    @Query(value = """
+        SELECT\s
+            sv.maSinhVien AS maSinhVien,
+            sv.tenSinhVien AS tenSinhVien,
+            sv.gioiTinh AS gioiTinh,
+            sv.ngaySinh AS ngaySinh,
+            sv.queQuan AS queQuan,
+            sv.khoa AS khoa,
+            l.tenLop AS tenLop
+        FROM dang_ky_su_kien dksk
+        INNER JOIN sinh_vien sv ON dksk.maSinhVien = sv.maSinhVien
+        INNER JOIN lop l ON l.idLop = sv.idLop
+        WHERE dksk.eventId = :eventId
+        AND (:searchTerm IS NULL OR sv.maSinhVien LIKE CONCAT('%', :searchTerm, '%') OR sv.tenSinhVien LIKE CONCAT('%', :searchTerm, '%'))
+        ORDER BY tenLop ASC, tenSinhVien ASC;
+       \s""", nativeQuery = true)
+    Page<Object[]> findSinhVienByEventId(@Param("searchTerm") String searchTerm, @Param("eventId") Integer eventId, Pageable pageable);
 }

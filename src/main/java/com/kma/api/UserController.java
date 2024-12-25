@@ -1,9 +1,7 @@
 package com.kma.api;
 
 
-import com.kma.models.UserLoginDTO;
-import com.kma.models.changePasswordDTO;
-import com.kma.models.errorResponseDTO;
+import com.kma.models.*;
 import com.kma.security.JwtTokenUtil;
 import com.kma.services.IUserService;
 import com.kma.utilities.buildErrorResUtil;
@@ -29,6 +27,44 @@ public class UserController {
     IUserService userService;
     @Autowired
     buildErrorResUtil buildErrorResUtil;
+
+    @GetMapping("/accounts/employees")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    public ResponseEntity<Object> getAllNhanVienAccount(@RequestParam(value = "searchTerm", required = false, defaultValue = "") String searchTerm,
+                                                        @RequestParam(required = false, defaultValue = "0") int page,
+                                                        @RequestParam(required = false, defaultValue = "10") int size) {
+        // Kiểm tra thông tin đăng nhập và sinh token
+        try {
+            paginationResponseDTO<accountDTO> DTO = userService.getAllUser_NhanVienAccount(searchTerm, page, size);
+            // Trả về token trong response
+            return new ResponseEntity<>(DTO, HttpStatus.OK);
+        } catch (ExpiredJwtException e){
+            errorResponseDTO errorDTO = buildErrorResUtil.buildErrorRes(e, "Token expired. Please log in again.");
+            return new ResponseEntity<>(errorDTO, HttpStatus.UNAUTHORIZED);
+        } catch (Exception e) {
+            errorResponseDTO errorDTO = buildErrorResUtil.buildErrorRes(e, "An error occurred!");
+            return new ResponseEntity<>(errorDTO, HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    @GetMapping("/accounts/students")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    public ResponseEntity<Object> getAllSinhVienAccount(@RequestParam(value = "searchTerm", required = false, defaultValue = "") String searchTerm,
+                                                        @RequestParam(required = false, defaultValue = "0") int page,
+                                                        @RequestParam(required = false, defaultValue = "10") int size) {
+        // Kiểm tra thông tin đăng nhập và sinh token
+        try {
+            paginationResponseDTO<accountDTO> DTO = userService.getAllUser_SinhVienAccount(searchTerm, page, size);
+            // Trả về token trong response
+            return new ResponseEntity<>(DTO, HttpStatus.OK);
+        } catch (ExpiredJwtException e){
+            errorResponseDTO errorDTO = buildErrorResUtil.buildErrorRes(e, "Token expired. Please log in again.");
+            return new ResponseEntity<>(errorDTO, HttpStatus.UNAUTHORIZED);
+        } catch (Exception e) {
+            errorResponseDTO errorDTO = buildErrorResUtil.buildErrorRes(e, "An error occurred!");
+            return new ResponseEntity<>(errorDTO, HttpStatus.BAD_REQUEST);
+        }
+    }
 
     @PostMapping("/login")
     public ResponseEntity<Object> login(@Valid @ModelAttribute UserLoginDTO userLoginDTO) {
@@ -85,6 +121,24 @@ public class UserController {
             userService.addRole(accountId, roleId);
 
             return ResponseEntity.ok("Add role successfully!");
+        } catch (IllegalArgumentException e) {
+            errorResponseDTO errorDTO = buildErrorResUtil.buildErrorRes(e, "Token expired. Please log in again.");
+            return new ResponseEntity<>(errorDTO, HttpStatus.UNAUTHORIZED);
+        }  catch (Exception e) {
+            errorResponseDTO errorDTO = buildErrorResUtil.buildErrorRes(e, "An error occurred!");
+            return new ResponseEntity<>(errorDTO, HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    @DeleteMapping("/role/{accountId}")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    public ResponseEntity<Object> removeRole(@PathVariable Integer accountId,
+                                             @RequestParam Integer roleId) {
+        // Kiểm tra thông tin đăng nhập và sinh token
+        try {
+            userService.removeRole(accountId, roleId);
+
+            return ResponseEntity.ok("Remove role successfully!");
         } catch (IllegalArgumentException e) {
             errorResponseDTO errorDTO = buildErrorResUtil.buildErrorRes(e, "Token expired. Please log in again.");
             return new ResponseEntity<>(errorDTO, HttpStatus.UNAUTHORIZED);

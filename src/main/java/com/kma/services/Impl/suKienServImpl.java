@@ -3,10 +3,7 @@ package com.kma.services.Impl;
 import com.kma.constants.fileDirection;
 import com.kma.converter.sinhVienDTOConverter;
 import com.kma.converter.suKienDTOConverter;
-import com.kma.models.paginationResponseDTO;
-import com.kma.models.sinhVienResponseDTO;
-import com.kma.models.suKienDTO;
-import com.kma.models.suKienResponseDTO;
+import com.kma.models.*;
 import com.kma.repository.entities.*;
 import com.kma.repository.suKienRepo;
 import com.kma.repository.taiNguyenRepo;
@@ -23,6 +20,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.sql.Date;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -70,37 +68,40 @@ public class suKienServImpl implements suKienService {
     }
 
     @Override
-    public paginationResponseDTO<sinhVienResponseDTO> getAllSVInEvent(Integer eventId, Integer page, Integer size) {
+    public paginationResponseDTO<sinhVienResponseDTO> getAllSVInEvent(Integer eventId, String searchTerm, Integer page, Integer size) {
         // Kiểm tra sự kiện có tồn tại không
         SuKien event = skRepo.findById(eventId).orElse(null);
 
         if(event!=null){
             // Tạo Pageable từ page và size
             Pageable pageable = PageRequest.of(page, size);
-            List<DangKySuKien> dkskList = event.getDkskList();
 
-            // Tính toán phân trang
-            int start = pageable.getPageNumber() * pageable.getPageSize();
-            int end = Math.min((start + pageable.getPageSize()), dkskList.size());
+            // Lấy dữ liệu từ repository
+            Page<Object[]> svPage = skRepo.findSinhVienByEventId(searchTerm, eventId, pageable);
 
-            List<sinhVienResponseDTO> content = dkskList.subList(start, end).stream()
-                    .map(i -> svDTOConverter.convertToSVResDTO(i.getSinhVien()))
-                    .collect(Collectors.toList());
+            // Chuyển đổi Post sang postResponseDTO
+            List<sinhVienResponseDTO> svResDTOList = new ArrayList<>();
+            for (Object[] row : svPage) {
+               sinhVienResponseDTO dto = new sinhVienResponseDTO();
+                dto.setMaSinhVien((String) row[0]);
+                dto.setTenSinhVien((String) row[1]);
+                dto.setGioiTinh((String) row[2]);
+                dto.setNgaySinh((Date) row[3]);
+                dto.setQueQuan((String) row[4]);
+                dto.setKhoa((String) row[5]);
+                dto.setTenLop((String) row[6]);
+                svResDTOList.add(dto);
+            }
 
-            // Tính toán các thông tin phân trang
-            int totalElements = dkskList.size();
-            int totalPages = (int) Math.ceil((double) totalElements / pageable.getPageSize());
-            boolean isFirst = pageable.getPageNumber() == 0;
-            boolean isLast = pageable.getPageNumber() + 1 == totalPages;
-
+            // Đóng gói dữ liệu và meta vào DTO
             return new paginationResponseDTO<>(
-                    content,
-                    totalPages,
-                    totalElements,
-                    isFirst,
-                    isLast,
-                    pageable.getPageNumber(),
-                    pageable.getPageSize()
+                    svResDTOList,
+                    svPage.getTotalPages(),
+                    (int) svPage.getTotalElements(),
+                    svPage.isFirst(),
+                    svPage.isLast(),
+                    svPage.getNumber(),
+                    svPage.getSize()
             );
         }else{
             throw new EntityNotFoundException("Event not found!");
