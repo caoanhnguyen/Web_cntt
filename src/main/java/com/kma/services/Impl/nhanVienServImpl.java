@@ -129,7 +129,7 @@ public class nhanVienServImpl implements nhanVienService{
 		User user = new User();
 		user.setUserName(userName);  // Tên đăng nhập là mã nhân viên
 		user.setPassword(encodedPassword);  // Mật khẩu đã mã hóa
-		user.setIsActive(1);  // Set tài khoản ở trạng thái hoạt động (active)
+		user.setLocked(false);  // Set tài khoản ở trạng thái hoạt động (active)
 		user.setUserType(UserType.NHANVIEN);
 
 		// Tạo và gán role EMPLOYEE cho user

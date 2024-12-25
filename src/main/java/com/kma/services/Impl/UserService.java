@@ -7,6 +7,7 @@ import com.kma.repository.roleRepo;
 import com.kma.repository.userRepo;
 import com.kma.security.JwtTokenUtil;
 import com.kma.services.IUserService;
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -116,4 +117,12 @@ public class UserService implements IUserService {
         rolerepo.save(newRole);
     }
 
+    @Override
+    public void updateAccountLockStatus(Integer userId, boolean isLocked) {
+        User user = userRepo.findById(userId)
+                .orElseThrow(() -> new EntityNotFoundException("User not found with ID: " + userId));
+
+        user.setLocked(isLocked);
+        userRepo.save(user);
+    }
 }

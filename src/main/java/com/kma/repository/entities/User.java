@@ -25,8 +25,8 @@ public class User implements UserDetails {
     @Column(name="password")
     private String password;
 
-    @Column(name="isActive")
-    private Integer isActive;
+    @Column(name="isLocked")
+    private boolean isLocked;
 
     @Column(name = "userType", nullable = false)
     @Enumerated(EnumType.STRING)
@@ -137,30 +137,31 @@ public class User implements UserDetails {
     }
 
     @Override
-    public boolean isAccountNonLocked() {
-        return true;
-    }
-
-    @Override
     public boolean isCredentialsNonExpired() {
         return true;
     }
 
     @Override
-    public boolean isEnabled() {
-        return true;
+    public boolean isAccountNonLocked() {
+        return !this.isLocked; // Tài khoản chỉ được phép truy cập nếu isActive = 1
     }
+
+    @Override
+    public boolean isEnabled() {
+        return !this.isLocked; // Tương tự, kiểm tra xem tài khoản có được kích hoạt hay không
+    }
+
 
     public void setPassword(String password) {
         this.password = password;
     }
 
-    public Integer getIsActive() {
-        return isActive;
+    public boolean isLocked() {
+        return isLocked;
     }
 
-    public void setIsActive(Integer isActive) {
-        this.isActive = isActive;
+    public void setLocked(boolean locked) {
+        isLocked = locked;
     }
 
     public Integer getUserId() {

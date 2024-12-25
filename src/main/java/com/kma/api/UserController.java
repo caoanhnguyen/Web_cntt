@@ -8,6 +8,7 @@ import com.kma.security.JwtTokenUtil;
 import com.kma.services.IUserService;
 import com.kma.utilities.buildErrorResUtil;
 import io.jsonwebtoken.ExpiredJwtException;
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -108,6 +109,32 @@ public class UserController {
         } catch (Exception e) {
             errorResponseDTO errorDTO = buildErrorResUtil.buildErrorRes(e, "An error occurred!");
             return new ResponseEntity<>(errorDTO, HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    @PatchMapping("admin/{userId}/lock")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    public ResponseEntity<Object> lockAccount(@PathVariable Integer userId) {
+        try {
+            userService.updateAccountLockStatus(userId, true); // Lock tài khoản
+            return ResponseEntity.ok("Account locked successfully!");
+        } catch (EntityNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found!");
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An error occurred!");
+        }
+    }
+
+    @PatchMapping("admin/{userId}/unlock")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    public ResponseEntity<Object> unlockAccount(@PathVariable Integer userId) {
+        try {
+            userService.updateAccountLockStatus(userId, false); // Unlock tài khoản
+            return ResponseEntity.ok("Account unlocked successfully!");
+        } catch (EntityNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found!");
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An error occurred!");
         }
     }
 }

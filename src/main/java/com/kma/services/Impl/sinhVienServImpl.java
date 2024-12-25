@@ -143,7 +143,7 @@ public class sinhVienServImpl implements sinhVienService {
         User user = new User();
         user.setUserName(maSinhVien);  // Tên đăng nhập là mã sinh viên
         user.setPassword(encodedPassword);  // Mật khẩu đã mã hóa
-        user.setIsActive(1);  // Set tài khoản ở trạng thái hoạt động (active)
+        user.setLocked(false);  // Set tài khoản ở trạng thái hoạt động (active)
         user.setUserType(UserType.SINHVIEN);
 
         // Tạo và gán role STUDENT cho user

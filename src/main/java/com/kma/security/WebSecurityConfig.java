@@ -181,6 +181,8 @@ public class WebSecurityConfig {
                                 String.format("%s/admin/reset_password/**", userPrefix)).hasAnyRole(Role.ADMIN)
                         .requestMatchers(PATCH,
                                 String.format("%s/role/**", userPrefix)).hasRole(Role.ADMIN)
+                        .requestMatchers(PATCH,
+                                String.format("%s/admin/**", userPrefix)).hasRole(Role.ADMIN)
 
                         .anyRequest().authenticated()
                 )

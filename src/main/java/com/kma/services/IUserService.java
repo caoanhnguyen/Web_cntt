@@ -11,4 +11,6 @@ public interface IUserService {
 
     void addRole(Integer accountId, Integer roleId) throws Exception;
 
+    void updateAccountLockStatus(Integer userId, boolean isLocked);
+
 }
