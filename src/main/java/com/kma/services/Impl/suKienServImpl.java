@@ -15,7 +15,6 @@ import com.kma.services.suKienService;
 import com.kma.utilities.taiNguyenUtil;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
-import org.antlr.v4.runtime.misc.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -108,7 +107,7 @@ public class suKienServImpl implements suKienService {
         }
     }
 
-    private Page<SuKien> fetchSuKien(@NotNull Map<String, Object> params, Pageable pageable){
+    private Page<SuKien> fetchSuKien(Map<String, Object> params, Pageable pageable){
         // Lấy giá trị từ params
         String eventName = (params.get("eventName") != null ? params.get("eventName").toString() : "");
         String location = (params.get("location") != null ? params.get("location").toString() : "");
