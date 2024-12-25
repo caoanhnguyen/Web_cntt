@@ -3,6 +3,7 @@ package com.kma.models;
 import com.fasterxml.jackson.annotation.JsonFormat;
 
 import java.sql.Date;
+import java.util.List;
 
 public class suKienResponseDTO {
     private Integer eventId;
@@ -16,6 +17,15 @@ public class suKienResponseDTO {
     @JsonFormat(pattern = "yyyy-MM-dd")  // Định dạng ngày tháng năm
     private Date createAt;
     private String organizedBy;
+    private List<fileDTO> fileDTOList;
+
+    public List<fileDTO> getFileDTOList() {
+        return fileDTOList;
+    }
+
+    public void setFileDTOList(List<fileDTO> fileDTOList) {
+        this.fileDTOList = fileDTOList;
+    }
 
     public Integer getEventId() {
         return eventId;

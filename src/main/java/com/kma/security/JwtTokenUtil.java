@@ -50,7 +50,9 @@ public class JwtTokenUtil {
         userDTO info = userUtil.getInfoOfUser(user);
         Object entityId = info.getUserId();
         String avaFileCode = info.getAvaFileCode();
+        String name = info.getName();
 
+        claims.put("full name", name);
         claims.put("avaFileCode", avaFileCode); // Lưu avatar fileCode trong JWT
         claims.put("entityId", entityId); // Lưu entityId trong JWT
         try {

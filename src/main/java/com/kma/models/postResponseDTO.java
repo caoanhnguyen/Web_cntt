@@ -3,15 +3,24 @@ package com.kma.models;
 import com.fasterxml.jackson.annotation.JsonFormat;
 
 import java.sql.Date;
+import java.util.List;
 
 public class postResponseDTO {
     private Integer postId;
     private String title;
     private String content;
-
     @JsonFormat(pattern = "yyyy-MM-dd")  // Định dạng ngày tháng năm
     private Date createAt;
+    private List<fileDTO> file_dto;
     private String authorName;
+
+    public List<fileDTO> getFile_dto() {
+        return file_dto;
+    }
+
+    public void setFile_dto(List<fileDTO> file_dto) {
+        this.file_dto = file_dto;
+    }
 
     public Integer getPostId() {
         return postId;

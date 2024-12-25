@@ -183,6 +183,7 @@ public class sinhVienServImpl implements sinhVienService {
         if(sv != null){
             // Xử lí xóa bỏ profile
             fileServ.deleteFile(maSinhVien, 3);
+            userrepo.deleteById(sv.getUser().getUserId());
             svRepo.delete(sv);
         }else{
             throw new EntityNotFoundException("Student not found with id: " + maSinhVien);

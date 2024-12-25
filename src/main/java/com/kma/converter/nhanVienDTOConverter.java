@@ -20,6 +20,8 @@ public class nhanVienDTOConverter {
 	monHocRepo mhRepo;
 	@Autowired
 	phongBanRepo pbRepo;
+	@Autowired
+	monHocDTOConverter mhConverter;
 
     public nhanVienDTO convertToNhanVienDTO(NhanVien nv) {
 		nhanVienDTO dto =  modelMapper.map(nv, nhanVienDTO.class);
@@ -33,13 +35,14 @@ public class nhanVienDTOConverter {
 		monHocResponseDTO monHocResDTO;
 		if(monGiangDayChinh!=null){
 			monHocResDTO = modelMapper.map(monGiangDayChinh, monHocResponseDTO.class);
+			monHocResDTO.setDescription(monGiangDayChinh.getMoTa());
 			dto.setMonGiangDayChinh(monHocResDTO);
 		}else{
 			dto.setMonGiangDayChinh(null);
 		}
 		// Set các môn liên quan
 		List<monHocResponseDTO> monHocResponseDTOs = nv.getMonHocList().stream()
-				.map(mh -> modelMapper.map(mh, monHocResponseDTO.class))
+				.map(mhConverter::convertToMonHocResDTO)
 				.toList();
 		dto.setCacMonLienQuan(monHocResponseDTOs);
 		// Set phòng ban

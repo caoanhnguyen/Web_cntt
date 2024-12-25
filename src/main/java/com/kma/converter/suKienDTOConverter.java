@@ -20,7 +20,13 @@ public class suKienDTOConverter {
     fileService fileServ;
 
     public suKienResponseDTO convertToSKResDTO(SuKien sk){
-        return modelMapper.map(sk, suKienResponseDTO.class);
+        suKienResponseDTO dto = modelMapper.map(sk, suKienResponseDTO.class);
+
+        // Lấy danh sách tài nguyên liên quan
+        List<fileDTO> fileDTOList = fileServ.getListFileDTO(sk.getTaiNguyenList());
+        dto.setFileDTOList(fileDTOList);
+
+        return dto;
     }
 
     public suKienDTO convertToSKDTO(SuKien sk){

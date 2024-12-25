@@ -40,8 +40,7 @@ public class monHocDTOConverter {
     }
 
     public monHocResponseDTO convertToMonHocResDTO(MonHoc mh){
-        monHocResponseDTO dto = new monHocResponseDTO();
-        dto =  modelMapper.map(mh, monHocResponseDTO.class);
+        monHocResponseDTO dto =  modelMapper.map(mh, monHocResponseDTO.class);
         dto.setDescription(mh.getMoTa());
         return dto;
     }

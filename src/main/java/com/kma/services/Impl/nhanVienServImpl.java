@@ -218,11 +218,11 @@ public class nhanVienServImpl implements nhanVienService{
 
 	@Override
 	public void deleteNhanVien(Integer idUser) {
-		// TODO Auto-generated method stub
 		NhanVien existedNV = nvRepo.findById(idUser).orElse(null);
 		if(existedNV != null) {
 			// Xử lí xóa bỏ profile
 			fileServ.deleteFile(idUser, 4);
+			userrepo.deleteById(existedNV.getUser().getUserId());
 			nvRepo.delete(existedNV);
 		}else {
 			throw new EntityNotFoundException("Employee not found with id: " + idUser);

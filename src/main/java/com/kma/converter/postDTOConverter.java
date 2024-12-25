@@ -40,6 +40,9 @@ public class postDTOConverter {
 
     public postResponseDTO convertToPostResDTO(Post item){
         postResponseDTO postResDTO = modelMapper.map(item, postResponseDTO.class);
+        List<TaiNguyen> tnList = item.getTaiNguyenList();
+        List<fileDTO> fileDTO = fileServ.getListFileDTO(tnList);
+        postResDTO.setFile_dto(fileDTO);
         if(item.getNhanVien()!=null){
             postResDTO.setAuthorName(item.getNhanVien().getTenNhanVien());
         }else{
