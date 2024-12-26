@@ -1,6 +1,5 @@
 package com.kma.repository;
 
-import com.kma.models.accountDTO;
 import com.kma.repository.entities.User;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;

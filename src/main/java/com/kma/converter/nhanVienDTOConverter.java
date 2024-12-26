@@ -25,7 +25,10 @@ public class nhanVienDTOConverter {
 
     public nhanVienDTO convertToNhanVienDTO(NhanVien nv) {
 		nhanVienDTO dto =  modelMapper.map(nv, nhanVienDTO.class);
-		String gioiTinh = nv.getGioiTinh().getDisplayName();
+		String gioiTinh = null;
+		if(nv.getGioiTinh()!=null){
+			gioiTinh = nv.getGioiTinh().getDisplayName();
+		}
 		dto.setGioiTinh(gioiTinh);
 		// Set môn giảng dạy chính
 		MonHoc monGiangDayChinh = null;
@@ -46,8 +49,12 @@ public class nhanVienDTOConverter {
 				.toList();
 		dto.setCacMonLienQuan(monHocResponseDTOs);
 		// Set phòng ban
-		phongBanResponseDTO pbResDTO = modelMapper.map(nv.getPhongBan(), phongBanResponseDTO.class);
-		dto.setPhongBan(pbResDTO);
+		if(nv.getPhongBan()!=null){
+			phongBanResponseDTO pbResDTO = modelMapper.map(nv.getPhongBan(), phongBanResponseDTO.class);
+			dto.setPhongBan(pbResDTO);
+		}else{
+			dto.setPhongBan(null);
+		}
 
 		dto.setAvaFileCode("/downloadProfile/"+nv.getAvaFileCode());
 		return dto;

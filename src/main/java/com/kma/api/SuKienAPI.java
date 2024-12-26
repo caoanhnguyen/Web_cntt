@@ -22,7 +22,7 @@ public class SuKienAPI {
     com.kma.utilities.buildErrorResUtil buildErrorResUtil;
 
     @GetMapping(value = "/public/sukien")
-    public ResponseEntity<Object> getAllSuKien(@RequestParam Map<String,Object> params,
+    public ResponseEntity<Object> getAllSuKien(@RequestParam(defaultValue = "") Map<String,Object> params,
                                                @RequestParam(required = false, defaultValue = "0") int page,
                                                @RequestParam(required = false, defaultValue = "10") int size){
         try {

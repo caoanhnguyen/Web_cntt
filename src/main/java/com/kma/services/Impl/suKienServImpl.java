@@ -1,7 +1,6 @@
 package com.kma.services.Impl;
 
 import com.kma.constants.fileDirection;
-import com.kma.converter.sinhVienDTOConverter;
 import com.kma.converter.suKienDTOConverter;
 import com.kma.models.*;
 import com.kma.repository.entities.*;
@@ -24,7 +23,6 @@ import java.sql.Date;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 @Service
 @Transactional
@@ -38,8 +36,6 @@ public class suKienServImpl implements suKienService {
     fileService fileServ;
     @Autowired
     taiNguyenRepo tnRepo;
-    @Autowired
-    sinhVienDTOConverter svDTOConverter;
     @Autowired
     NotificationService notiServ;
 
