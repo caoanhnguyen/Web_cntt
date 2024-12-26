@@ -52,7 +52,7 @@ public class JwtTokenUtil {
         String avaFileCode = info.getAvaFileCode();
         String name = info.getName();
 
-        claims.put("full name", name);
+        claims.put("fullName", name);
         claims.put("avaFileCode", avaFileCode); // Lưu avatar fileCode trong JWT
         claims.put("entityId", entityId); // Lưu entityId trong JWT
         try {
