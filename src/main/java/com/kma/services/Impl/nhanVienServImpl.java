@@ -33,7 +33,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
-@Service
+@Service("nvServ")
 @Transactional
 public class nhanVienServImpl implements nhanVienService{
 	@Autowired
@@ -95,28 +95,29 @@ public class nhanVienServImpl implements nhanVienService{
 	}
 
 	@Override
-	public void addNhanVien(MultipartFile file, nhanVienRequestDTO nvReqDTO) throws IOException {
-		// Kiểm tra mã nhân viên
-		NhanVien nv = nvRepo.findByMaNhanVien(nvReqDTO.getMaNhanVien());
-		if(nv==null){
+	public void addNhanVien(MultipartFile file, nhanVienRequestDTO nvReqDTO, String userName) throws IOException {
+		// Kiểm tra mã nv đã tồn tại
+		if (nvRepo.existsByMaNhanVien(nvReqDTO.getMaNhanVien())) {
+			throw new IllegalArgumentException("Mã nhân viên: " + nvReqDTO.getMaNhanVien() + " đã tồn tại, vui lòng kiểm tra lại!");
+		}
 
-			// Lưu avaFile, lấy avaFileCode
-			String avaFileCode = "";
-			if(file!=null){
-				String fileDirec = fileDirection.pathForProfile_NV + "/" + nvReqDTO.getMaPhongBan() + "/" + nvReqDTO.getMaNhanVien();
-				avaFileCode = fileServ.uploadFile(file, fileDirec);
-			}
+		// Lưu avaFile, lấy avaFileCode
+		String avaFileCode = "";
+		if(file!=null){
+			String fileDirec = fileDirection.pathForProfile_NV + "/" + nvReqDTO.getMaPhongBan() + "/" + nvReqDTO.getMaNhanVien();
+			avaFileCode = fileServ.uploadFile(file, fileDirec);
+		}
 
-			// Tạo nhân viên để lưu
-			NhanVien nhanVien = nvDTOConverter.convertNVReqToNV(nvReqDTO, avaFileCode);
+		User user = createUserForNV(userName);
 
-			User user = createUserForNV(nvReqDTO.getUserName());
+		// Tạo nhân viên để lưu
+		NhanVien nv = new NhanVien();
+		nvDTOConverter.convertNVReqToNV(nvReqDTO, nv, avaFileCode);
+		nv.setUser(user);
 
-			nhanVien.setUser(user);
-
-			nvRepo.save(nhanVien);
-		}else{
-			throw new EntityNotFoundException("Mã nhân viên: " + nvReqDTO.getMaNhanVien() + " đã tồn tại, vui lòng kiểm tra lại!");
+		nvRepo.save(nv);
+		if(avaFileCode!=null){
+			System.out.println("hihi");
 		}
 	}
 
@@ -144,29 +145,31 @@ public class nhanVienServImpl implements nhanVienService{
 	@Transactional
 	@Override
 	public void updateNhanVien(Integer idUser, nhanVienRequestDTO nvReqDTO, MultipartFile file) throws IOException {
+
+		// Kiểm tra nhân viên có tồn tại
 		NhanVien nv = nvRepo.findById(idUser).orElse(null);
-		if(nv != null){
-			String avaFileCode = nv.getAvaFileCode();
-			if(file!=null){
-				// Xử lí xóa bỏ file cũ
-				fileServ.deleteFile(idUser, 4);
-
-				// Xử lí lưu avaFile mới
-				String fileDirec = fileDirection.pathForProfile_NV + "/" + nvReqDTO.getMaPhongBan() + "/" + nvReqDTO.getMaNhanVien();
-				avaFileCode = fileServ.uploadFile(file, fileDirec);
-			}
-			// Update dữ liệu
-			Integer idMonGiangDayChinh = nv.getIdMonGiangDayChinh();
-			List<MonHoc> cacMonLienQuan = nv.getMonHocList();
-
-			nv = nvDTOConverter.convertNVReqToNV(nvReqDTO, avaFileCode);
-			nv.setIdUser(idUser);
-			nv.setIdMonGiangDayChinh(idMonGiangDayChinh);
-			nv.setMonHocList(cacMonLienQuan);
-			nvRepo.save(nv);
-		}else{
+		if (nv == null) {
 			throw new EntityNotFoundException("Employee not found with id: " + idUser);
 		}
+
+		// xử lí file ava
+		String avaFileCode = nv.getAvaFileCode();
+		if(file!=null){
+			if(!avaFileCode.isEmpty()) {
+				// Xử lí xóa bỏ file cũ
+				fileServ.deleteFile(idUser, 4);
+			}
+
+			// Xử lí lưu avaFile mới
+			String fileDirec = fileDirection.pathForProfile_NV + "/" + nvReqDTO.getMaPhongBan() + "/" + nvReqDTO.getMaNhanVien();
+			avaFileCode = fileServ.uploadFile(file, fileDirec);
+		}
+
+		// Cập nhật các trường từ DTO
+		nvDTOConverter.convertNVReqToNV(nvReqDTO, nv, avaFileCode);
+
+		// Lưu lại vào cơ sở dữ liệu
+		nvRepo.save(nv);
 	}
 
 	@Override
@@ -220,12 +223,18 @@ public class nhanVienServImpl implements nhanVienService{
 	public void deleteNhanVien(Integer idUser) {
 		NhanVien existedNV = nvRepo.findById(idUser).orElse(null);
 		if(existedNV != null) {
-			// Xử lí xóa bỏ profile
-			fileServ.deleteFile(idUser, 4);
-			userrepo.deleteById(existedNV.getUser().getUserId());
+			if(!existedNV.getAvaFileCode().isEmpty() & existedNV.getPhongBan() != null) {
+				// Xử lí xóa bỏ profile
+				fileServ.deleteFile(idUser, 4);
+			}
 			nvRepo.delete(existedNV);
 		}else {
 			throw new EntityNotFoundException("Employee not found with id: " + idUser);
 		}
+	}
+
+	@Override
+	public boolean isOwner(Integer idUser, Integer nvId) {
+		return (Objects.equals(idUser, nvId));
 	}
 }

@@ -83,9 +83,10 @@ public class UserController {
     }
 
 
-    @PutMapping("/change_password")
-    @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_EMPLOYEE') or hasRole('ROLE_STUDENT')")
-    public ResponseEntity<Object> changePassword(@ModelAttribute changePasswordDTO changePasswordDTO) {
+    @PutMapping("/{userId}/change_password")
+    @PreAuthorize("@userService.isOwner(#userId, principal.userId)")
+    public ResponseEntity<Object> changePassword(@PathVariable Integer userId,
+                                                 @ModelAttribute changePasswordDTO changePasswordDTO) {
         // Kiểm tra thông tin đăng nhập và sinh token
         try {
             userService.changePassword(changePasswordDTO);
@@ -99,7 +100,24 @@ public class UserController {
         }
     }
 
-    @PutMapping("/admin/reset_password/{userId}")
+    @PatchMapping("/{userId}/username")
+    @PreAuthorize("@userService.isOwner(#userId, principal.userId)")
+    public ResponseEntity<Object> updateUserName(@PathVariable Integer userId,
+                                                 @RequestParam(value = "username") String userName) {
+        // Kiểm tra thông tin đăng nhập và sinh token
+        try {
+            userService.updateUserName(userId, userName);
+            return ResponseEntity.ok("Change successfully!");
+        } catch (IllegalArgumentException e) {
+            errorResponseDTO errorDTO = buildErrorResUtil.buildErrorRes(e, "Token expired. Please log in again.");
+            return new ResponseEntity<>(errorDTO, HttpStatus.UNAUTHORIZED);
+        }  catch (Exception e) {
+            errorResponseDTO errorDTO = buildErrorResUtil.buildErrorRes(e, "An error occurred!");
+            return new ResponseEntity<>(errorDTO, HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    @PutMapping("/{userId}/reset_password/")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<Object> resetPassword(@PathVariable Integer userId) {
         // Kiểm tra thông tin đăng nhập và sinh token

@@ -31,8 +31,9 @@ import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
-@Service
+@Service("svServ")
 @Transactional
 public class sinhVienServImpl implements sinhVienService {
     @Autowired
@@ -108,29 +109,27 @@ public class sinhVienServImpl implements sinhVienService {
 
     @Override
     public void addSinhVien(MultipartFile file, sinhVienDTO svDTO) throws IOException {
-        // Kiểm tra mã sinh viên
-        SinhVien svien = svRepo.findById(svDTO.getMaSinhVien()).orElse(null);
-        if(svien==null){
-
-            // Lưu avaFile, lấy avaFileCode
-            String avaFileCode = "";
-            if(file!=null){
-                String fileDirec = fileDirection.pathForProfile_SV + "/" + svDTO.getTenLop() + "/" + svDTO.getMaSinhVien();
-                avaFileCode = fileServ.uploadFile(file, fileDirec);
-            }
-
-            // Tạo sinh viên để lưu
-            SinhVien sv = svDTOConverter.convertToSV(svDTO, avaFileCode);
-
-            User user = createUserForSV(sv.getMaSinhVien());
-            sv.setUser(user);
-
-            svRepo.save(sv);
-
-
-        }else{
-            throw new EntityNotFoundException("Mã sinh viên: " +svDTO.getMaSinhVien() + " đã tồn tại, vui lòng kiểm tra lại!");
+        // Kiểm tra xem mã sinh viên tồn tại
+        if(svRepo.existsById(svDTO.getMaSinhVien())){
+            throw new IllegalArgumentException("Mã sinh viên: " +svDTO.getMaSinhVien() + " đã tồn tại, vui lòng kiểm tra lại!");
         }
+
+        // Lưu avaFile, lấy avaFileCode
+        String avaFileCode = "";
+        if(file!=null){
+            String fileDirec = fileDirection.pathForProfile_SV + "/" + svDTO.getTenLop() + "/" + svDTO.getMaSinhVien();
+            avaFileCode = fileServ.uploadFile(file, fileDirec);
+        }
+
+        // Tạo sinh viên mới
+        SinhVien sv = new SinhVien();
+        svDTOConverter.convertToSV(svDTO, sv, avaFileCode);
+
+        // Tạo tài khoản cho sinh viên
+        User user = createUserForSV(sv.getMaSinhVien());
+        sv.setUser(user);
+
+        svRepo.save(sv);
 
     }
 
@@ -158,35 +157,45 @@ public class sinhVienServImpl implements sinhVienService {
     @Transactional
     @Override
     public void updateSinhVien(String maSinhVien, sinhVienDTO svDTO, MultipartFile file) throws IOException {
+        // Kiểm tra xem sinh viên tồn tại
         SinhVien sv = svRepo.findById(maSinhVien).orElse(null);
-        if(sv != null){
-            String avaFileCode = sv.getAvaFileCode();
-            if(file!=null){
+        if(sv==null){
+            throw new EntityNotFoundException("Student with id: " + svDTO.getMaSinhVien() + "not found!");
+        }
+
+        // Xử lí ava
+        String avaFileCode = sv.getAvaFileCode();
+        if(file!=null){
+            if(!avaFileCode.isEmpty()) {
                 // Xử lí xóa bỏ file cũ
                 fileServ.deleteFile(maSinhVien, 3);
-
-                // Xử lí lưu avaFile mới
-                String fileDirec = fileDirection.pathForProfile_SV + "/" + svDTO.getTenLop() + "/" + svDTO.getMaSinhVien();
-                avaFileCode = fileServ.uploadFile(file, fileDirec);
             }
-            // Update dữ liệu
-            sv = svDTOConverter.convertToSV(svDTO, avaFileCode);
-            svRepo.save(sv);
-        }else{
-            throw new EntityNotFoundException("Student not found with id: " + maSinhVien);
+            // Xử lí lưu avaFile mới
+            String fileDirec = fileDirection.pathForProfile_SV + "/" + svDTO.getTenLop() + "/" + svDTO.getMaSinhVien();
+            avaFileCode = fileServ.uploadFile(file, fileDirec);
         }
+
+        // Update
+        svDTOConverter.convertToSV(svDTO, sv, avaFileCode);
+        svRepo.save(sv);
     }
 
     @Override
     public void deleteSinhVien(String maSinhVien) {
         SinhVien sv = svRepo.findById(maSinhVien).orElse(null);
         if(sv != null){
-            // Xử lí xóa bỏ profile
-            fileServ.deleteFile(maSinhVien, 3);
-            userrepo.deleteById(sv.getUser().getUserId());
+            if(!sv.getAvaFileCode().isEmpty() & sv.getLop() != null){
+                // Xử lí xóa bỏ profile
+                fileServ.deleteFile(maSinhVien, 3);
+            }
             svRepo.delete(sv);
         }else{
             throw new EntityNotFoundException("Student not found with id: " + maSinhVien);
         }
+    }
+
+    @Override
+    public boolean isOwner(String maSinhVien, String maSV) {
+        return (Objects.equals(maSinhVien, maSV));
     }
 }

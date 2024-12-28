@@ -51,11 +51,11 @@ public class User implements UserDetails {
     private Set<Vote> votes;
 
     // Quan hệ 1-1 với SinhVien
-    @OneToOne(mappedBy = "user", cascade = CascadeType.REMOVE, orphanRemoval = true, fetch = FetchType.LAZY)
+    @OneToOne(mappedBy = "user", cascade = CascadeType.REMOVE, fetch = FetchType.LAZY)
     private SinhVien sinhVien;
 
     // Quan hệ 1-1 với NhanVien
-    @OneToOne(mappedBy = "user", cascade = CascadeType.REMOVE, orphanRemoval = true, fetch = FetchType.LAZY)
+    @OneToOne(mappedBy = "user", cascade = CascadeType.REMOVE, fetch = FetchType.LAZY)
     private NhanVien nhanVien;
 
     public UserType getUserType() {

@@ -7,6 +7,7 @@ import com.kma.models.*;
 import com.kma.utilities.buildErrorResUtil;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -56,10 +57,14 @@ public class NhanVienAPI {
 	@PostMapping(value = "")
 	@PreAuthorize("hasRole('ROLE_ADMIN')")
 	public 	ResponseEntity<Object> addNhanVien(@RequestParam(value = "file", required = false) MultipartFile file,
-											   @ModelAttribute nhanVienRequestDTO nvReqDTO){
+											   @ModelAttribute nhanVienRequestDTO nvReqDTO,
+											   @RequestParam(value = "userName") String userName){
 		try {
-			nvServ.addNhanVien(file, nvReqDTO);
-			return ResponseEntity.ok("Add successful!");
+			nvServ.addNhanVien(file, nvReqDTO, userName);
+			return ResponseEntity.ok("Add successfully!");
+		} catch (IllegalArgumentException | DataIntegrityViolationException e) {
+				errorResponseDTO errorDTO = buildErrorResUtil.buildErrorRes(e, "Mã nhân viên hoặc tên đăng nhập đã tồn tại!");
+				return new ResponseEntity<>(errorDTO, HttpStatus.CONFLICT);
 		} catch (Exception e) {
 			errorResponseDTO errorDTO = buildErrorResUtil.buildErrorRes(e, "Employee not found!");
 			return new ResponseEntity<>(errorDTO, HttpStatus.NOT_FOUND);
@@ -67,7 +72,7 @@ public class NhanVienAPI {
 	}
 
 	@PutMapping(value = "/{idUser}")
-	@PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_EMPLOYEE')")
+	@PreAuthorize("@nvServ.isOwner(#idUser, principal.nhanVien.idUser) OR hasRole('ROLE_ADMIN')")
 	public ResponseEntity<Object> updateNhanVien(@PathVariable Integer idUser,
 												 @ModelAttribute nhanVienRequestDTO nvReqDTO,
 												 @RequestParam(value = "file", required = false) MultipartFile file) {
@@ -84,7 +89,7 @@ public class NhanVienAPI {
 	}
 
 	@PatchMapping(value = "/main_subject/{idUser}")
-	@PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_EMPLOYEE')")
+	@PreAuthorize("@nvServ.isOwner(#idUser, principal.nhanVien.idUser) OR hasRole('ROLE_ADMIN')")
 	public ResponseEntity<Object> updateMGDC(@PathVariable Integer idUser,
 											 @RequestParam Integer idMGDC) {
 		try {
@@ -100,7 +105,7 @@ public class NhanVienAPI {
 	}
 
 	@PatchMapping(value = "/related_subject/{idUser}")
-	@PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_EMPLOYEE')")
+	@PreAuthorize("@nvServ.isOwner(#idUser, principal.nhanVien.idUser) OR hasRole('ROLE_ADMIN')")
 	public ResponseEntity<Object> updateMonHocLienQuan(@PathVariable Integer idUser,
 											 		   @RequestParam(value = "idMonHoc") List<Integer> idMonHocList) {
 		try {

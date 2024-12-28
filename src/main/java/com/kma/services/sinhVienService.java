@@ -23,4 +23,6 @@ public interface sinhVienService {
 
     List<suKienResponseDTO> getAllParicipatedEvent(String maSinhVien);
 
+    boolean isOwner(String maSinhVien, String maSV);
+
 }

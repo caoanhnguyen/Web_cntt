@@ -15,7 +15,7 @@ public interface nhanVienService {
 
 	paginationResponseDTO<nhanVienDTO> getAllNhanVien(Map<String, Object> params, int page, int size);
 
-	void addNhanVien(MultipartFile file, nhanVienRequestDTO nvReqDTO) throws IOException;
+	void addNhanVien(MultipartFile file, nhanVienRequestDTO nvReqDTO, String userName) throws IOException;
 
 	void updateNhanVien(Integer idUser, nhanVienRequestDTO nvReqDTO, MultipartFile file) throws IOException;
 
@@ -24,4 +24,6 @@ public interface nhanVienService {
 	void updateMonHocLienQuan(Integer idUser, List<Integer> idMonHocList);
 
 	void deleteNhanVien(Integer idUser);
+
+	boolean isOwner(Integer idUser, Integer nvId);
 }

@@ -9,6 +9,8 @@ import org.springframework.data.repository.query.Param;
 
 public interface nhanVienRepo extends JpaRepository<NhanVien, Integer> {
 
+	boolean existsByMaNhanVien(String maNhanVien);
+
 	NhanVien findByAvaFileCode(String avaFileCode);
 
 	NhanVien findByMaNhanVien(String maNhanVien);

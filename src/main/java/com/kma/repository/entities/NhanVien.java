@@ -66,9 +66,6 @@ public class NhanVien {
     @Column(name = "chiNhanh")
     private String chiNhanh;
 
-    @Column(name = "fileLyLich")
-    private String fileLyLich;
-
     @Column(name = "idMonGiangDayChinh")
     private Integer idMonGiangDayChinh;
 
@@ -93,9 +90,21 @@ public class NhanVien {
 	private PhongBan phongBan;
 
 	// Quan hệ 1-1 với User
-	@OneToOne
-	@JoinColumn(name = "userId", referencedColumnName = "userId")
+	@OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
+	@JoinColumn(name = "userId", referencedColumnName = "userId") // Khoá ngoại trỏ về User
 	private User user;
+
+	// Quan hệ 1-1 với CV
+	@OneToOne(mappedBy = "nhanVien", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+	private CV cv;
+
+	public CV getCv() {
+		return cv;
+	}
+
+	public void setCv(CV cv) {
+		this.cv = cv;
+	}
 
 	public User getUser() {
 		return user;
@@ -247,14 +256,6 @@ public class NhanVien {
 
 	public void setChiNhanh(String chiNhanh) {
 		this.chiNhanh = chiNhanh;
-	}
-
-	public String getFileLyLich() {
-		return fileLyLich;
-	}
-
-	public void setFileLyLich(String fileLyLich) {
-		this.fileLyLich = fileLyLich;
 	}
 
 	public Integer getIdMonGiangDayChinh() {

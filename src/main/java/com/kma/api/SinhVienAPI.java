@@ -8,6 +8,7 @@ import com.kma.services.sinhVienService;
 import com.kma.utilities.buildErrorResUtil;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -74,9 +75,9 @@ public class SinhVienAPI {
 		try {
 			svServ.addSinhVien(file, svDTO);
 			return ResponseEntity.ok("Add successfully!");
-		} catch (EntityNotFoundException e) {
+		} catch (IllegalArgumentException | DataIntegrityViolationException e) {
 			errorResponseDTO errorDTO = buildErrorResUtil.buildErrorRes(e, "Student id already exists!");
-			return new ResponseEntity<>(errorDTO, HttpStatus.BAD_REQUEST);
+			return new ResponseEntity<>(errorDTO, HttpStatus.CONFLICT);
 		} catch (Exception e) {
 			errorResponseDTO errorDTO = buildErrorResUtil.buildErrorRes(e, "An error occurred!");
 			return new ResponseEntity<>(errorDTO, HttpStatus.INTERNAL_SERVER_ERROR);
@@ -84,13 +85,16 @@ public class SinhVienAPI {
 	}
 
 	@PutMapping(value = "/{maSinhVien}")
-	@PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_EMPLOYEE') or hasRole('ROLE_STUDENT')")
+	@PreAuthorize("hasRole('ROLE_ADMIN') OR @svServ.isOwner(#maSinhVien, principal.sinhVien.maSinhVien) OR hasRole('ROLE_EMPLOYEE')")
 	public ResponseEntity<Object> updateSinhVien(@PathVariable String maSinhVien,
 												 @ModelAttribute sinhVienDTO svDTO,
 												 @RequestParam(value = "file", required = false) MultipartFile file) {
 		try {
 			svServ.updateSinhVien(maSinhVien.toUpperCase(), svDTO, file);
 			return ResponseEntity.ok("Update successfully!");
+		} catch (IllegalArgumentException | DataIntegrityViolationException e) {
+			errorResponseDTO errorDTO = buildErrorResUtil.buildErrorRes(e, "Mã sinh viên hoặc CCCD đã tồn tại!");
+			return new ResponseEntity<>(errorDTO, HttpStatus.CONFLICT);
 		} catch (EntityNotFoundException e) {
 			errorResponseDTO errorDTO = buildErrorResUtil.buildErrorRes(e, "Student not found!");
 			return new ResponseEntity<>(errorDTO, HttpStatus.NOT_FOUND);

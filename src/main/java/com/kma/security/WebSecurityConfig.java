@@ -128,7 +128,7 @@ public class WebSecurityConfig {
                         .requestMatchers(POST,
                                 String.format("%s/students/**", apiPrefix)).hasAnyRole(Role.ADMIN, Role.EMPLOYEE)
                         .requestMatchers(PUT,
-                                String.format("%s/students/**", apiPrefix)).hasAnyRole(Role.ADMIN, Role.EMPLOYEE)
+                                String.format("%s/students/**", apiPrefix)).hasAnyRole(Role.ADMIN, Role.EMPLOYEE, Role.STUDENT)
                         .requestMatchers(DELETE,
                                 String.format("%s/students/**", apiPrefix)).hasAnyRole(Role.ADMIN, Role.EMPLOYEE)
 
@@ -180,15 +180,17 @@ public class WebSecurityConfig {
                         .requestMatchers(GET,
                                 String.format("%s/accounts/students/**", userPrefix)).hasAnyRole(Role.ADMIN)
                         .requestMatchers(PUT,
-                                String.format("%s/change_password/**", userPrefix)).hasAnyRole(Role.ADMIN, Role.STUDENT, Role.EMPLOYEE)
+                                String.format("%s/*/change_password/**", userPrefix)).hasAnyRole(Role.ADMIN, Role.STUDENT, Role.EMPLOYEE)
                         .requestMatchers(PUT,
-                                String.format("%s/admin/reset_password/**", userPrefix)).hasAnyRole(Role.ADMIN)
+                                String.format("%s/*/reset_password/**", userPrefix)).hasAnyRole(Role.ADMIN)
                         .requestMatchers(PATCH,
                                 String.format("%s/role/**", userPrefix)).hasRole(Role.ADMIN)
                         .requestMatchers(DELETE,
                                 String.format("%s/role/**", userPrefix)).hasRole(Role.ADMIN)
                         .requestMatchers(PATCH,
                                 String.format("%s/admin/**", userPrefix)).hasRole(Role.ADMIN)
+                        .requestMatchers(PATCH,
+                                String.format("%s/*/username/**", userPrefix)).hasAnyRole(Role.ADMIN, Role.STUDENT, Role.EMPLOYEE)
 
                         .anyRequest().authenticated()
                 )

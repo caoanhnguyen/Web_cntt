@@ -10,6 +10,8 @@ public interface IUserService {
 
     void changePassword(changePasswordDTO changePasswordDTO) throws Exception;
 
+    void updateUserName(Integer userId, String userName);
+
     void resetPasswordForUser(Integer userId) throws Exception;
 
     void addRole(Integer accountId, Integer roleId) throws Exception;
@@ -21,5 +23,7 @@ public interface IUserService {
     paginationResponseDTO<accountDTO> getAllUser_NhanVienAccount(String searchTerm, Integer page, Integer size);
 
     paginationResponseDTO<accountDTO> getAllUser_SinhVienAccount(String searchTerm, Integer page, Integer size);
+
+    boolean isOwner(Integer userId, Integer accountId);
 
 }

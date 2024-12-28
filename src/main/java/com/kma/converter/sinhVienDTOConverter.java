@@ -48,8 +48,8 @@ public class sinhVienDTOConverter {
         return dto;
     }
 
-    public SinhVien convertToSV(sinhVienDTO svDTO, String avaFileCode){
-        SinhVien sv = modelMapper.map(svDTO, SinhVien.class);
+    public void convertToSV(sinhVienDTO svDTO, SinhVien sv, String avaFileCode){
+        modelMapper.map(svDTO, sv);
         if(svDTO.getGioiTinh()!= null){
             sv.setGioiTinh(GioiTinh.fromDisplayName(svDTO.getGioiTinh()));
         }
@@ -60,7 +60,5 @@ public class sinhVienDTOConverter {
             sv.setLop(null);
         }
         sv.setAvaFileCode(avaFileCode);
-        sv.setDkskList(null);   // tạm thời để null
-        return sv;
     }
 }

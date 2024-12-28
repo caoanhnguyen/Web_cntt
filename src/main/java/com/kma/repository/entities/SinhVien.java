@@ -59,8 +59,8 @@ public class SinhVien {
     private List<DangKySuKien> dkskList = new ArrayList<>();
 
     // Quan hệ 1-1 với User
-    @OneToOne
-    @JoinColumn(name = "userId", referencedColumnName = "userId")
+    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
+    @JoinColumn(name = "userId", referencedColumnName = "userId") // Khoá ngoại trỏ về User
     private User user;
 
     public User getUser() {

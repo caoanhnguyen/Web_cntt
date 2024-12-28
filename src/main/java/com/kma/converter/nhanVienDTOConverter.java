@@ -64,8 +64,8 @@ public class nhanVienDTOConverter {
 		return modelMapper.map(nv, nhanVienResponseDTO.class);
 	}
 
-	public NhanVien convertNVReqToNV(nhanVienRequestDTO nvReqDTO, String avaFileCode){
-		NhanVien nv = modelMapper.map(nvReqDTO, NhanVien.class);
+	public void convertNVReqToNV(nhanVienRequestDTO nvReqDTO, NhanVien nv, String avaFileCode){
+		modelMapper.map(nvReqDTO, nv);
 		if(nvReqDTO.getGioiTinh()!= null){
 			nv.setGioiTinh(GioiTinh.fromDisplayName(nvReqDTO.getGioiTinh()));
 		}
@@ -77,6 +77,5 @@ public class nhanVienDTOConverter {
 			nv.setPhongBan(null);
 		}
 		nv.setAvaFileCode(avaFileCode);
-		return nv;
 	}
 }

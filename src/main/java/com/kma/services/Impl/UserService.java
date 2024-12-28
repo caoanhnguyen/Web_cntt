@@ -13,6 +13,7 @@ import com.kma.services.IUserService;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -24,10 +25,11 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 @RequiredArgsConstructor
-@Service
+@Service("userService")
 @Transactional
 public class UserService implements IUserService {
 
@@ -37,6 +39,27 @@ public class UserService implements IUserService {
     private final JwtTokenUtil jwtTokenUtil;  // final
     private final AuthenticationManager authenticationManager;  // final
     private final accountDTOConverter accountConverter;
+
+    @Override
+    public boolean isOwner(Integer userId, Integer accountId) {
+        return (Objects.equals(userId, accountId));
+    }
+
+    @Override
+    public void updateUserName(Integer userId, String userName) {
+        // Kiểm tra nhân viên có tồn tại
+        Optional<User> user = userRepo.findById(userId);
+        if(user.isEmpty()){
+            throw new EntityNotFoundException("Account not found!");
+        }
+
+        if(userRepo.findByUserName(userName).isPresent()){
+            throw new DataIntegrityViolationException("Tên đăng nhập đã tồn tại!");
+        }
+
+        user.get().setUserName(userName);
+        userRepo.save(user.get());
+    }
 
     @Override
     public String login(String userName, String password) throws Exception {
