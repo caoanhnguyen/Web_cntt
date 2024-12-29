@@ -132,13 +132,13 @@ public class DiscussionAPI {
         }
     }
 
-    @PatchMapping(value = "/discussions/{discussionId}/status")
+    @PatchMapping(value = "/discussions/status")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<Object> updateDiscussionStatus(@PathVariable Integer discussionId,
+    public ResponseEntity<Object> updateDiscussionStatus(@RequestParam(value = "discussionId") List<Integer> discussionIds,
                                                          @RequestParam(value = "discussionStatus") String discussionStatus) {
 
         try {
-            discussionServ.updateDiscussionStatus(discussionId, discussionStatus);
+            discussionServ.updateDiscussionStatus(discussionIds, discussionStatus);
             return ResponseEntity.ok("Update successfully!");
         } catch (EntityNotFoundException | IllegalArgumentException e) {
             errorResponseDTO errorDTO = buildErrorResUtil.buildErrorRes(e, "Discussion not found!");

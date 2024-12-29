@@ -263,35 +263,39 @@ public class discussionServImpl implements discussionService {
     }
 
     @Override
-    public void updateDiscussionStatus(Integer discussionId, String discussionStatus) {
-        // Kiểm tra xem discussion có tồn tại không
-        Discussion discussion = discussRepo.findById(discussionId).orElse(null);
-        if(discussion!=null){
-            // Chuyển đổi discussionStatus từ String sang Enum
-            DiscussionStatus status;
-            try {
-                status = DiscussionStatus.valueOf(discussionStatus.toUpperCase());
-            } catch (IllegalArgumentException e) {
-                throw new IllegalArgumentException("Invalid discussion status: " + discussionStatus);
+    public void updateDiscussionStatus(List<Integer> discussionIds, String discussionStatus) {
+        for(Integer discussionId: discussionIds) {
+
+            // Kiểm tra xem discussion có tồn tại không
+            Discussion discussion = discussRepo.findById(discussionId).orElse(null);
+            if (discussion != null) {
+                // Chuyển đổi discussionStatus từ String sang Enum
+                DiscussionStatus status;
+                try {
+                    status = DiscussionStatus.valueOf(discussionStatus.toUpperCase());
+                } catch (IllegalArgumentException e) {
+                    throw new IllegalArgumentException("Invalid discussion status: " + discussionStatus);
+                }
+
+                if (status.equals(DiscussionStatus.REJECTED)) {
+                    // Xóa bài thảo luận khỏi DB
+                    discussRepo.delete(discussion);
+
+                    // Thông báo đến user đó là discussion bị reject
+                    User user = discussion.getUser();
+                    String userId = user.getUserName();
+                    String title = "Bài thảo luận bị từ chối!";
+                    String content = "Bài thảo luận với tiêu đề: " + discussion.getTitle() + " của bạn đã bị từ chối!";
+                    notiServ.sendNotificationByUserId(userId, title, content);
+                } else if (status.equals(DiscussionStatus.APPROVED)) {
+                    // Duyệt bài thảo luận
+                    discussion.setStatus(DiscussionStatus.APPROVED);
+                    discussRepo.save(discussion);
+                }
+
+            } else {
+                throw new EntityNotFoundException("Discussion not found!");
             }
-
-            if(status.equals(DiscussionStatus.REJECTED)){
-                // Xóa bài thảo luận khỏi DB
-                discussRepo.delete(discussion);
-
-                // Thông báo đến user đó là discussion bị reject
-                User user = discussion.getUser();
-                String userId = user.getUserName();
-                String title = "Bài thảo luận bị từ chối!";
-                String content = "Bài thảo luận với tiêu đề: " + discussion.getTitle() + " của bạn đã bị từ chối!";
-                notiServ.sendNotificationByUserId(userId, title, content);
-            }else if(status.equals(DiscussionStatus.APPROVED)){
-                // Duyệt bài thảo luận
-                discussion.setStatus(DiscussionStatus.APPROVED);
-            }
-
-        }else{
-            throw new EntityNotFoundException("Discussion not found!");
         }
     }
 

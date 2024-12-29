@@ -101,6 +101,7 @@ public class JwtTokenFilter extends OncePerRequestFilter {
                 Pair.of("/api/store-fcm-token", "POST"),
                 Pair.of(String.format("%s/home", userPrefix), "GET"),
                 Pair.of("/uploadImg", "POST"),
+                Pair.of("/image", "DELETE"),
                 Pair.of("/downloadFile", "GET"),
                 Pair.of("/downloadProfile", "GET"),
                 Pair.of("/downloadDocs", "GET"),

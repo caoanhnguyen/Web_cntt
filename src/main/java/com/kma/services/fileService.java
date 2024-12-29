@@ -13,6 +13,8 @@ import com.kma.repository.entities.TaiNguyen;
 public interface fileService {
 	String uploadFile(MultipartFile multipartFile, String fileDirec) throws IOException;
 
+	void deleteImg(Integer imgId);
+
 	fileDTO uploadImg(MultipartFile file) throws IOException;
 	
 	List<fileDTO> getListFileDTO(List<TaiNguyen> tnList);

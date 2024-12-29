@@ -41,6 +41,14 @@ public class fileServImpl implements fileService{
 	nhanVienRepo nvRepo;
 
 	@Override
+	public void deleteImg(Integer imgId) {
+		if(tnRepo.existsById(imgId)){
+			deleteFile(imgId, 1);
+			tnRepo.deleteById(imgId);
+		}
+	}
+
+	@Override
 	public String uploadFile(MultipartFile multipartFile, String fileDirec) throws IOException {
 		// TODO Auto-generated method stub
 		String fileName = StringUtils.cleanPath(Objects.requireNonNull(multipartFile.getOriginalFilename()));

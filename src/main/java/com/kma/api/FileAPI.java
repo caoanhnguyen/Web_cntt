@@ -37,6 +37,16 @@ public class FileAPI {
 	@Autowired
 	buildErrorResUtil buildErrorResUtil;
 
+	@DeleteMapping("/image/{imgId}")
+	public ResponseEntity<?> uploadImg(@PathVariable Integer imgId) {
+		try{
+			fileServ.deleteImg(imgId);
+			return new ResponseEntity<>("Delete successfully!", HttpStatus.OK);
+		} catch (Exception e){
+			errorResponseDTO errorDTO = buildErrorResUtil.buildErrorRes(e, "An error occurred!");
+			return new ResponseEntity<>(errorDTO, HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	}
 
 	@PostMapping("/uploadImg")
 	public ResponseEntity<?> uploadImg(@RequestParam(value = "file", required = false) MultipartFile multipartFile) {

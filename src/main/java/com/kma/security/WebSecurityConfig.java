@@ -53,6 +53,7 @@ public class WebSecurityConfig {
                         .requestMatchers(GET, "/downloadProfile/**").permitAll()
                         .requestMatchers(GET, "/downloadDocs/**").permitAll()
                         .requestMatchers(POST, "/uploadImg").permitAll()
+                        .requestMatchers(DELETE, "/image/**").permitAll()
                         .requestMatchers(GET,
                                 String.format("%s/public/**", apiPrefix)).permitAll()
 
@@ -79,7 +80,7 @@ public class WebSecurityConfig {
                         .requestMatchers(PUT,
                                 String.format("%s/discussions/**", apiPrefix)).hasAnyRole(Role.ADMIN, Role.STUDENT, Role.EMPLOYEE)
                         .requestMatchers(PATCH,
-                                String.format("%s/discussions/*/status", apiPrefix)).hasAnyRole(Role.ADMIN, Role.STUDENT, Role.EMPLOYEE)
+                                String.format("%s/discussions/status", apiPrefix)).hasRole(Role.ADMIN)
                         .requestMatchers(DELETE,
                                 String.format("%s/discussions/**", apiPrefix)).hasAnyRole(Role.ADMIN, Role.STUDENT, Role.EMPLOYEE)
 

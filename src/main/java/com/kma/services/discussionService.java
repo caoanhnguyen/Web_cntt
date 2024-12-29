@@ -23,7 +23,7 @@ public interface discussionService {
 
     void updateDiscussion(Integer discussionId, discussionRequestDTO discussReqDTO, List<Integer> tagIdList);
 
-    void updateDiscussionStatus(Integer discussionId, String discussionStatus);
+    void updateDiscussionStatus(List<Integer> discussionIds, String discussionStatus);
 
     void deleteDiscussion(Integer discussionId);
 
