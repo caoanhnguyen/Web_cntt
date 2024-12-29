@@ -15,7 +15,7 @@ public interface suKienRepo extends JpaRepository<SuKien, Integer> {
             "WHERE (sk.eventName LIKE %:eventName% OR :eventName IS NULL OR sk.eventName IS NULL)" +
             "AND (sk.location LIKE %:location% OR :location IS NULL OR sk.location IS NULL)" +
             "AND (sk.organizedBy LIKE %:organizedBy% OR :organizedBy IS NULL OR sk.organizedBy IS NULL)" +
-            "ORDER BY sk.eventId DESC")
+            "ORDER BY sk.createAt DESC")
     Page<SuKien> findByAllCondition(@Param("eventName") String eventName, @Param("location") String location, @Param("organizedBy") String organizedBy, Pageable pageable);
 
     //SQL Native

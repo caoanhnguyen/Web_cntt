@@ -56,7 +56,7 @@ public class postServiceImpl implements postService{
 		Pageable pageable = PageRequest.of(page, size);
 
 		// Lấy dữ liệu từ repository
-		Page<Post> postPage = postRepo.findByNhanVien_IdUser(user.getNhanVien().getIdUser(), pageable);
+		Page<Post> postPage = postRepo.findByNhanVien_IdUserOrderByCreateAtDesc(user.getNhanVien().getIdUser(), pageable);
 
 		// Chuyển đổi Post sang postResponseDTO
 		List<postResponseDTO> postResDTOList = postPage.getContent().stream()
@@ -117,7 +117,7 @@ public class postServiceImpl implements postService{
 	public List<postDTO> getLatestPosts() {
 
 		// Tìm kiếm bài viết mới nhất
-		List<Post> posts = postRepo.findTop6ByOrderByPostIdDesc();
+		List<Post> posts = postRepo.findTop6ByOrderByCreateAtDesc();
 		return posts.stream()
 				.map(i->dtoConverter.convertToPostDTO(i))
 				.collect(Collectors.toList());

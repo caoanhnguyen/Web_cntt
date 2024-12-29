@@ -28,10 +28,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 
 @Service("svServ")
 @Transactional
@@ -83,8 +80,9 @@ public class sinhVienServImpl implements sinhVienService {
         if(sv!=null){
             List<DangKySuKien> dkskList = sv.getDkskList();
             return dkskList.stream()
-                    .map(i->(skDTOConverter.convertToSKResDTO(i.getEvent())))
-                    .toList();
+                           .sorted(Comparator.comparing(i->i.getEvent().getCreateAt()))
+                           .map(i->(skDTOConverter.convertToSKResDTO(i.getEvent())))
+                           .toList().reversed();
         }else{
             throw new EntityNotFoundException("Student not found with id: " + maSinhVien);
         }

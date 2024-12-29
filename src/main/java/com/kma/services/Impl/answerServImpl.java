@@ -48,7 +48,7 @@ public class answerServImpl implements answerService {
         Pageable pageable = PageRequest.of(page, size);
 
         // Lấy dữ liệu từ repository
-        Page<Answer> answerPage = ansRepo.findByDiscussion_DiscussionId(discussionId, pageable);
+        Page<Answer> answerPage = ansRepo.findByDiscussion_DiscussionIdOrderByCreateAtDesc(discussionId, pageable);
 
         // Chuyển đổi Post sang postResponseDTO
         List<answerDTO> answerDTOList = answerPage.getContent().stream()

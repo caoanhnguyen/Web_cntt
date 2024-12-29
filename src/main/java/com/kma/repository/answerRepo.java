@@ -11,7 +11,7 @@ import java.util.Optional;
 
 public interface answerRepo extends JpaRepository<Answer, Integer> {
 
-    Page<Answer> findByDiscussion_DiscussionId(Integer discussionId, Pageable pageable);
+    Page<Answer> findByDiscussion_DiscussionIdOrderByCreateAtDesc(Integer discussionId, Pageable pageable);
 
     Optional<Answer> findByAnswerIdAndDiscussion_DiscussionId(Integer answerId, Integer discussionId);
 
