@@ -76,7 +76,8 @@ public class answerServImpl implements answerService {
                 .orElseThrow(() -> new EntityNotFoundException("Discussion not found!"));
 
         // Tạo answer
-        Answer answer = ansDTOConverter.convertToAnswer(discussion, ansReqDTO);
+        Answer answer = new Answer();
+        ansDTOConverter.convertToAnswer(discussion, answer, ansReqDTO);
         answer.setUser(user);
         ansRepo.save(answer);
 

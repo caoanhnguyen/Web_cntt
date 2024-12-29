@@ -6,6 +6,7 @@ import com.kma.models.phongBanResponseDTO;
 import com.kma.repository.entities.PhongBan;
 import com.kma.repository.phongBanRepo;
 import com.kma.services.phongBanService;
+import jakarta.persistence.EntityExistsException;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -70,14 +71,11 @@ public class phongBanServImpl implements phongBanService {
     @Override
     public void addPhongBan(phongBanResponseDTO pbResDTO) {
         // Kiểm tra mã phòng ban
-        PhongBan pb = pbRepo.findById(pbResDTO.getMaPhongBan()).orElse(null);
-        if(pb==null){
-            // Tạo phòng ban để lưu
-            PhongBan phongBan = pbDTOConverter.convertToPB(pbResDTO);
-            pbRepo.save(phongBan);
-        }else{
-            throw new EntityNotFoundException("Department found with id: " + pbResDTO.getMaPhongBan());
-        }
+        if(pbRepo.existsById(pbResDTO.getMaPhongBan()))
+            throw new EntityExistsException("Department with id: " + pbResDTO.getMaPhongBan() + " already exists!");
+        PhongBan phongBan = new PhongBan();
+        pbDTOConverter.convertToPB(pbResDTO, phongBan);
+        pbRepo.save(phongBan);
     }
 
     @Transactional

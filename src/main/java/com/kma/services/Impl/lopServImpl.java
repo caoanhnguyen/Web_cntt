@@ -74,14 +74,13 @@ public class lopServImpl implements lopService {
     @Override
     public void addLop(lopDTO DTO) {
         String tenLop = DTO.getTenLop();
-
         // Kiểm tra tên lớp đã tồn tại hay chưa
-        Lop lop = loprepo.findByTenLop(tenLop.toUpperCase());
-        if(lop==null){
-            loprepo.save(lDTOConverter.convertToLop(DTO));
-        }else{
+        if(loprepo.existsByTenLop(tenLop))
             throw new EntityExistsException("Class name already exists!");
-        }
+
+        Lop lop = new Lop();
+        lDTOConverter.convertToLop(DTO, lop);
+        loprepo.save(lop);
     }
 
     @Override

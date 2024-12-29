@@ -10,6 +10,8 @@ import org.springframework.data.repository.query.Param;
 public interface lopRepo extends JpaRepository<Lop, Integer> {
     Lop findByTenLop(String tenLop);
 
+    boolean existsByTenLop(String tenLop);
+
     //JPQL
     @Query("SELECT lop FROM Lop lop LEFT JOIN lop.chuNhiem cn " +
             "WHERE lop.tenLop LIKE %:tenLop% " +

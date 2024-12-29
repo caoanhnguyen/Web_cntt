@@ -221,7 +221,8 @@ public class discussionServImpl implements discussionService {
         // Lấy thông tin người đăng
         User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
-        Discussion discussion = discussDTOConverter.convertToDiscussion(discussReqDTO, tagIdList);
+        Discussion discussion = new Discussion();
+        discussDTOConverter.convertToDiscussion(discussReqDTO, discussion, tagIdList);
         discussion.setUser(user);
 
         discussion.setStatus(DiscussionStatus.PENDING);

@@ -27,9 +27,8 @@ public class lopDTOConverter {
         return dto;
     }
 
-    public Lop convertToLop(lopDTO dto){
-        Lop lop = modelMapper.map(dto, Lop.class);
+    public void convertToLop(lopDTO dto, Lop lop){
+        modelMapper.map(dto, lop);
         lop.setChuNhiem(null);
-        return lop;
     }
 }

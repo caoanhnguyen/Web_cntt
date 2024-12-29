@@ -75,7 +75,7 @@ public class discussionDTOConverter {
         discussResDTO.setAuthor_DTO(new userDTO(
                 row[5],
                 (String) row[6],
-                "/downloadProfile/" + (String) row[7]
+                "/downloadProfile/" + row[7]
         ));
 
         // Gán điểm của bài thảo luận
@@ -94,9 +94,9 @@ public class discussionDTOConverter {
     }
 
 
-    public Discussion convertToDiscussion(discussionRequestDTO discussReqDTO, List<Integer> tagIdList) {
+    public void convertToDiscussion(discussionRequestDTO discussReqDTO, Discussion discussion, List<Integer> tagIdList) {
         // Map các trường thông thường từ DTO sang Entity
-        Discussion discussion = modelMapper.map(discussReqDTO, Discussion.class);
+        modelMapper.map(discussReqDTO, discussion);
 
         // Khởi tạo Set<Tag>
         Set<Tag> tags = new HashSet<>();
@@ -109,7 +109,6 @@ public class discussionDTOConverter {
         // Set tags vào discussion
         discussion.setTags(tags);
 
-        return discussion;
     }
 
 }

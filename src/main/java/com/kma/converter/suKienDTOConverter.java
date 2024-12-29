@@ -39,10 +39,8 @@ public class suKienDTOConverter {
         return dto;
     }
 
-    public SuKien convertResDTOToSuKien(suKienResponseDTO skResDTO){
-        SuKien event = modelMapper.map(skResDTO, SuKien.class);
+    public void convertResDTOToSuKien(suKienResponseDTO skResDTO, SuKien event){
+        modelMapper.map(skResDTO, event);
         event.setCreateAt(new Date(System.currentTimeMillis()));
-
-        return event;
     }
 }

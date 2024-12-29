@@ -125,7 +125,8 @@ public class suKienServImpl implements suKienService {
     @Override
     public void addEvent(List<MultipartFile> files, suKienResponseDTO skResDTO) throws IOException {
         // Tạo sự kiện để lưu
-        SuKien event = skDTOConverter.convertResDTOToSuKien(skResDTO);
+        SuKien event = new SuKien();
+        skDTOConverter.convertResDTOToSuKien(skResDTO, event);
         List<TaiNguyen> tnList = new ArrayList<>();
 
         // Lưu file nếu cần
@@ -150,7 +151,7 @@ public class suKienServImpl implements suKienService {
             List<TaiNguyen> tnList = event.getTaiNguyenList();
             List<DangKySuKien> dkskList = event.getDkskList();
 
-            event = skDTOConverter.convertResDTOToSuKien(skResDTO);
+            skDTOConverter.convertResDTOToSuKien(skResDTO, event);
 
             // Xử lí file thêm mới
             saveNewFile(files, event, tnList);

@@ -4,7 +4,6 @@ import com.kma.models.answerDTO;
 import com.kma.models.answerRequestDTO;
 import com.kma.models.userDTO;
 import com.kma.models.voteDTO;
-import com.kma.repository.discussionRepo;
 import com.kma.repository.entities.Answer;
 import com.kma.repository.entities.Discussion;
 import com.kma.repository.entities.User;
@@ -23,8 +22,6 @@ public class answerDTOConverter {
     userInfoUtil userUtil;
     @Autowired
     voteService voteServ;
-    @Autowired
-    discussionRepo discussRepo;
 
     public answerDTO convertToAnswerDTO(Answer answer, String userName){
         answerDTO ansDTO = modelMapper.map(answer, answerDTO.class);
@@ -42,10 +39,9 @@ public class answerDTOConverter {
         return ansDTO;
     }
 
-    public Answer convertToAnswer(Discussion discussion, answerRequestDTO answerReqDTO){
-        Answer answer = modelMapper.map(answerReqDTO, Answer.class);
+    public void convertToAnswer(Discussion discussion, Answer answer, answerRequestDTO answerReqDTO){
+        modelMapper.map(answerReqDTO, answer);
         answer.setDiscussion(discussion);
 
-        return answer;
     }
 }

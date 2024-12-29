@@ -15,7 +15,7 @@ public class phongBanDTOConverter {
         return modelMapper.map(fb, phongBanResponseDTO.class);
     }
 
-    public PhongBan convertToPB(phongBanResponseDTO pbResDTO){
-        return modelMapper.map(pbResDTO, PhongBan.class);
+    public void convertToPB(phongBanResponseDTO pbResDTO, PhongBan pb){
+        modelMapper.map(pbResDTO, pb);
     }
 }
