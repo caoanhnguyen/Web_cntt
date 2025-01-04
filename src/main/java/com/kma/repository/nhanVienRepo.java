@@ -13,7 +13,7 @@ public interface nhanVienRepo extends JpaRepository<NhanVien, Integer> {
 
 	NhanVien findByAvaFileCode(String avaFileCode);
 
-	NhanVien findByMaNhanVien(String maNhanVien);
+//	NhanVien findByMaNhanVien(String maNhanVien);
 
 	// Tìm nhân viên theo tên và môn học
 	//JPQL

@@ -6,6 +6,7 @@ import java.util.Map;
 
 import com.kma.models.nhanVienDTO;
 import com.kma.models.nhanVienRequestDTO;
+import com.kma.models.nhanVienResponseDTO;
 import com.kma.models.paginationResponseDTO;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -14,6 +15,8 @@ public interface nhanVienService {
 	nhanVienDTO getById(Integer idUser);
 
 	paginationResponseDTO<nhanVienDTO> getAllNhanVien(Map<String, Object> params, int page, int size);
+
+	paginationResponseDTO<nhanVienResponseDTO> getAllNhanVienSummary(Map<String, Object> params, int page, int size);
 
 	void addNhanVien(MultipartFile file, nhanVienRequestDTO nvReqDTO, String userName) throws IOException;
 

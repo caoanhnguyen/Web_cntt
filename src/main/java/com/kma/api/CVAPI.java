@@ -1,8 +1,9 @@
 package com.kma.api;
 
-import com.kma.models.CVDTO;
-import com.kma.models.errorResponseDTO;
+import com.kma.models.*;
+import com.kma.repository.nhanVienRepo;
 import com.kma.services.CVService;
+import com.kma.services.nhanVienService;
 import com.kma.utilities.buildErrorResUtil;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,6 +12,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Map;
+
 @RestController
 @RequestMapping("/api")
 public class CVAPI {
@@ -18,6 +21,21 @@ public class CVAPI {
     buildErrorResUtil buildErrorResUtil;
     @Autowired
     CVService cvServ;
+    @Autowired
+    nhanVienService nvServ;
+
+    @GetMapping(value="/public/nhanvien")
+    public ResponseEntity<Object> getAllNhanVienSummary(@RequestParam Map<String, Object> params,
+                                                        @RequestParam(required = false, defaultValue = "0") int page,
+                                                        @RequestParam(required = false, defaultValue = "10") int size){
+        try {
+            paginationResponseDTO<nhanVienResponseDTO> DTO = nvServ.getAllNhanVienSummary(params, page, size);
+            return new ResponseEntity<>(DTO, HttpStatus.OK);
+        } catch (Exception e) {
+            errorResponseDTO errorDTO = buildErrorResUtil.buildErrorRes(e, "An error occurred!");
+            return new ResponseEntity<>(errorDTO, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
 
     @GetMapping(value = "/public/nhanvien/{idUser}/cv")
     public ResponseEntity<Object> getById(@PathVariable Integer idUser){

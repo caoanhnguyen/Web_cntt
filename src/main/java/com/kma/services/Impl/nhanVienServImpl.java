@@ -5,6 +5,7 @@ import com.kma.converter.nhanVienDTOConverter;
 import com.kma.enums.UserType;
 import com.kma.models.nhanVienDTO;
 import com.kma.models.nhanVienRequestDTO;
+import com.kma.models.nhanVienResponseDTO;
 import com.kma.models.paginationResponseDTO;
 import com.kma.repository.entities.MonHoc;
 import com.kma.repository.entities.NhanVien;
@@ -68,6 +69,32 @@ public class nhanVienServImpl implements nhanVienService{
 		// Chuyển đổi sang DTO
 		List<nhanVienDTO> nvDTOList = nvPage.getContent().stream()
 				.map(nvDTOConverter::convertToNhanVienDTO)
+				.toList();
+
+
+		// Đóng gói dữ liệu và meta vào DTO
+		return new paginationResponseDTO<>(
+				nvDTOList,
+				nvPage.getTotalPages(),
+				(int) nvPage.getTotalElements(),
+				nvPage.isFirst(),
+				nvPage.isLast(),
+				nvPage.getNumber(),
+				nvPage.getSize()
+		);
+	}
+
+	@Override
+	public paginationResponseDTO<nhanVienResponseDTO> getAllNhanVienSummary(Map<String, Object> params, int page, int size) {
+		// Tạo Pageable
+		Pageable pageable = PageRequest.of(page, size);
+
+		// Lấy dữ liệu từ repository
+		Page<NhanVien> nvPage = fetchNhanViens(params, pageable);
+
+		// Chuyển đổi sang DTO
+		List<nhanVienResponseDTO> nvDTOList = nvPage.getContent().stream()
+				.map(nvDTOConverter::convertToNVResDTO)
 				.toList();
 
 
