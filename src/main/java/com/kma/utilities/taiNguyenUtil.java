@@ -1,5 +1,6 @@
 package com.kma.utilities;
 
+import com.kma.repository.entities.Article;
 import com.kma.repository.entities.Post;
 import com.kma.repository.entities.SuKien;
 import com.kma.repository.entities.TaiNguyen;
@@ -21,6 +22,12 @@ public class taiNguyenUtil {
                 resource.setCreateAt(new Date(System.currentTimeMillis()));
                 resource.setFileCode(fileCode);
                 resource.setEvent((SuKien) object);
+            }
+            if(object instanceof Article){
+                resource.setDescription(((Article) object).getTitle());
+                resource.setCreateAt(new Date(System.currentTimeMillis()));
+                resource.setFileCode(fileCode);
+                resource.setArticle((Article) object);
             }
 
             return resource;

@@ -37,6 +37,16 @@ public class TaiNguyen {
 	@JoinColumn(name = "eventId")
 	private SuKien event;
 
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "articleId")
+	private Article article;
+
+	public Article getArticle() {
+		return article;
+	}
+	public void setArticle(Article article) {
+		this.article = article;
+	}
 	public Post getPost() {
 		return post;
 	}

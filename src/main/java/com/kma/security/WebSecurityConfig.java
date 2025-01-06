@@ -61,6 +61,24 @@ public class WebSecurityConfig {
                         .requestMatchers(GET,
                                 String.format("%s/tags", apiPrefix)).hasAnyRole(Role.ADMIN, Role.STUDENT, Role.EMPLOYEE)
 
+                        // Article Authorization
+                        .requestMatchers(POST,
+                                String.format("%s/articles", apiPrefix)).hasRole(Role.ADMIN)
+                        .requestMatchers(PUT,
+                                String.format("%s/articles", apiPrefix)).hasRole(Role.ADMIN)
+                        .requestMatchers(DELETE,
+                                String.format("%s/articles", apiPrefix)).hasRole(Role.ADMIN)
+
+                        // Menu Item Authorization
+                        .requestMatchers(POST,
+                                String.format("%s/menu_items", apiPrefix)).hasRole(Role.ADMIN)
+                        .requestMatchers(PUT,
+                                String.format("%s/menu_items/**", apiPrefix)).hasRole(Role.ADMIN)
+                        .requestMatchers(PATCH,
+                                String.format("%s/menu_items/**", apiPrefix)).hasRole(Role.ADMIN)
+                        .requestMatchers(DELETE,
+                                String.format("%s/menu_items/**", apiPrefix)).hasRole(Role.ADMIN)
+
                         // Vote Authorization
                         .requestMatchers(POST,
                                 String.format("%s/discussions/*/votes", apiPrefix)).hasAnyRole(Role.ADMIN, Role.STUDENT, Role.EMPLOYEE)

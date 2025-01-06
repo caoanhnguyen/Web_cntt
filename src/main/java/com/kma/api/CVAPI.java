@@ -1,7 +1,6 @@
 package com.kma.api;
 
 import com.kma.models.*;
-import com.kma.repository.nhanVienRepo;
 import com.kma.services.CVService;
 import com.kma.services.nhanVienService;
 import com.kma.utilities.buildErrorResUtil;
