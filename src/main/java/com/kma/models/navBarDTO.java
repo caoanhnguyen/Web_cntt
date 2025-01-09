@@ -3,10 +3,19 @@ package com.kma.models;
 import java.util.List;
 
 public class navBarDTO {
-    private Integer id;
-    private String title;
+        private Integer id;
+        private String title;
     private String slug;
+    private Boolean isDeleted;
     private List<navBarDTO> children;
+
+    public Boolean getDeleted() {
+        return isDeleted;
+    }
+
+    public void setDeleted(Boolean deleted) {
+        isDeleted = deleted;
+    }
 
     public Integer getId() {
         return id;

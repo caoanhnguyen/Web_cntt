@@ -5,8 +5,11 @@ import com.kma.models.menuItemResDTO;
 import com.kma.models.navBarDTO;
 
 import java.util.List;
+import java.util.Map;
 
 public interface menuItemService {
+
+    List<navBarDTO> getAllMenuItemForAdmin(Map<String, Object> params);
 
     List<navBarDTO> getAllMenuItem();
 
@@ -14,7 +17,7 @@ public interface menuItemService {
 
     void updateMenuItem(Integer menuItemId, menuItemResDTO menuItemResDTO);
 
-    void softDeleteMenuItem(Integer menuItemId);
+    void updateMenuItemStatus(Integer menuItemId, Boolean statusUpdate);
 
-    void restoreMenuItem(Integer menuItemId);
+    void deleteMenuItem(Integer menuItemId);
 }

@@ -10,6 +10,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api")
@@ -24,6 +25,18 @@ public class MenuItemAPI {
     public ResponseEntity<Object> getAllMenuItem(){
         try {
             List<navBarDTO> navBarDTOList = menuItemServ.getAllMenuItem();
+            return new ResponseEntity<>(navBarDTOList, HttpStatus.OK);
+        } catch (Exception e) {
+            errorResponseDTO errorDTO = buildErrorResUtil.buildErrorRes(e, "An error occurred!");
+            return new ResponseEntity<>(errorDTO, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @GetMapping(value="/menu_items")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    public ResponseEntity<Object> getAllMenuItemForAdmin(@RequestParam Map<String, Object> params){
+        try {
+            List<navBarDTO> navBarDTOList = menuItemServ.getAllMenuItemForAdmin(params);
             return new ResponseEntity<>(navBarDTOList, HttpStatus.OK);
         } catch (Exception e) {
             errorResponseDTO errorDTO = buildErrorResUtil.buildErrorRes(e, "An error occurred!");
@@ -46,7 +59,7 @@ public class MenuItemAPI {
     @PutMapping("/menu_items/{menuItemId}")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Object> updateMenuItem(@PathVariable Integer menuItemId,
-                                             @ModelAttribute menuItemResDTO menuItemResDTO) {
+                                                 @ModelAttribute menuItemResDTO menuItemResDTO) {
 
         try {
             menuItemServ.updateMenuItem(menuItemId, menuItemResDTO);
@@ -60,12 +73,14 @@ public class MenuItemAPI {
         }
     }
 
-    @DeleteMapping(value = "/menu_items/{menuItemId}")
+
+    @PatchMapping(value = "/menu_items/{menuItemId}")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
-    public ResponseEntity<Object> softDeleteMenuItem(@PathVariable Integer menuItemId) {
+    public ResponseEntity<Object>updateMenuItemStatus(@PathVariable Integer menuItemId,
+                                                      @ModelAttribute(value = "isDeleted") Boolean statusUpdate) {
         try {
-            menuItemServ.softDeleteMenuItem(menuItemId);
-            return ResponseEntity.ok("Delete successfully!");
+            menuItemServ.updateMenuItemStatus(menuItemId, statusUpdate);
+            return ResponseEntity.ok("Update successfully!");
         } catch (EntityNotFoundException e) {
             errorResponseDTO errorDTO = buildErrorResUtil.buildErrorRes(e, "Menu Item not found!");
             return new ResponseEntity<>(errorDTO, HttpStatus.NOT_FOUND);
@@ -75,12 +90,12 @@ public class MenuItemAPI {
         }
     }
 
-    @PatchMapping(value = "/menu_items/{menuItemId}")
+    @DeleteMapping(value = "/menu_items/{menuItemId}")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
-    public ResponseEntity<Object>restoreMenuItem(@PathVariable Integer menuItemId) {
+    public ResponseEntity<Object> deleteMenuItem(@PathVariable Integer menuItemId) {
         try {
-            menuItemServ.restoreMenuItem(menuItemId);
-            return ResponseEntity.ok("Restore successfully!");
+            menuItemServ.deleteMenuItem(menuItemId);
+            return ResponseEntity.ok("Delete successfully!");
         } catch (EntityNotFoundException e) {
             errorResponseDTO errorDTO = buildErrorResUtil.buildErrorRes(e, "Menu Item not found!");
             return new ResponseEntity<>(errorDTO, HttpStatus.NOT_FOUND);

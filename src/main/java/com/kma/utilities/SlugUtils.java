@@ -9,6 +9,9 @@ public class SlugUtils {
         String normalized = Normalizer.normalize(title, Normalizer.Form.NFD)
                 .replaceAll("\\p{InCombiningDiacriticalMarks}+", "");
 
+        // Thay thế chữ "Đ" và "đ" thành "D" và "d"
+        normalized = normalized.replaceAll("Đ", "D").replaceAll("đ", "d");
+
         // Thay thế khoảng trắng và các ký tự đặc biệt bằng dấu "-"
         String slug = normalized.toLowerCase()
                 .replaceAll("[^a-z0-9\\s-]", "")
@@ -17,5 +20,10 @@ public class SlugUtils {
 
         // Loại bỏ dấu "-" ở đầu hoặc cuối (nếu có)
         return slug.replaceAll("^-|-$", "");
+    }
+
+    public static void main(String[] args) {
+        String title = "Đăng Tú";
+        System.out.println(toSlug(title)); // Kết quả: dang-tu
     }
 }

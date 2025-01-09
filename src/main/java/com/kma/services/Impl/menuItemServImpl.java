@@ -7,13 +7,13 @@ import com.kma.models.navBarDTO;
 import com.kma.repository.entities.MenuItem;
 import com.kma.repository.menuItemRepo;
 import com.kma.services.menuItemService;
-import com.kma.utilities.SlugUtils;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Map;
 
 @Service
 @Transactional
@@ -24,22 +24,31 @@ public class menuItemServImpl implements menuItemService {
     menuItemDTOConverter menuItemDTOConverter;
 
     @Override
+    public List<navBarDTO> getAllMenuItemForAdmin(Map<String, Object> params) {
+        // Lấy giá trị từ params
+        String title = ( params.get("title") != null ? (String) params.get("title") : "");
+        Boolean isDeleted = ( params.get("isDeleted") != null ? Boolean.valueOf(params.get("isDeleted").toString()) : null);
+
+        List<MenuItem> rootMenuItems = menuIRepo.findRootMenuItemsForAdmin(title, isDeleted);
+        return menuItemDTOConverter.mapToTree(rootMenuItems); // Bao gồm cả mục bị ẩn
+    }
+
+    @Override
     public List<navBarDTO> getAllMenuItem() {
-        List<MenuItem> rootMenuItems = menuIRepo.findRootMenuItems();
-        return menuItemDTOConverter.mapToTree(rootMenuItems);
+        List<MenuItem> menuItems = menuIRepo.findRootMenuItems();
+        return menuItemDTOConverter.mapToTree(menuItems); // Loại bỏ mục bị ẩn
     }
 
     @Override
     public void addMenuItem(menuItemReqDTO menuItemReqDTO) {
         // Kiểm tra parent có tồn tại không
-        if(!menuIRepo.existsById(menuItemReqDTO.getParentId()))
+        if(menuItemReqDTO.getParentId()!=null && !menuIRepo.existsById(menuItemReqDTO.getParentId()))
             throw new EntityNotFoundException("Parent menu item not found!");
 
         // Tạo menuItem mới
         MenuItem menuItem = new MenuItem();
         menuItem.setTitle(menuItemReqDTO.getTitle());
-        String slug = SlugUtils.toSlug(menuItemReqDTO.getTitle());
-        menuItem.setSlug(slug);
+        menuItem.setSlug(menuItemReqDTO.getSlug());
         menuItem.setParentId(menuItemReqDTO.getParentId());
 
         menuIRepo.save(menuItem);
@@ -65,26 +74,24 @@ public class menuItemServImpl implements menuItemService {
     }
 
     @Override
-    public void softDeleteMenuItem(Integer menuItemId) {
+    public void updateMenuItemStatus(Integer menuItemId, Boolean statusUpdate) {
         // Kiểm tra có tồn tại không
         MenuItem menuItem = menuIRepo.findById(menuItemId).orElse(null);
         if(menuItem == null)
             throw new EntityNotFoundException("Menu item not found!");
 
-        // Soft delete
-        menuItem.setDeleted(true);
+        menuItem.setDeleted(statusUpdate);
         menuIRepo.save(menuItem);
     }
 
     @Override
-    public void restoreMenuItem(Integer menuItemId) {
+    public void deleteMenuItem(Integer menuItemId) {
         // Kiểm tra có tồn tại không
         MenuItem menuItem = menuIRepo.findById(menuItemId).orElse(null);
         if(menuItem == null)
             throw new EntityNotFoundException("Menu item not found!");
 
         // Soft delete
-        menuItem.setDeleted(false);
-        menuIRepo.save(menuItem);
+        menuIRepo.delete(menuItem);
     }
 }

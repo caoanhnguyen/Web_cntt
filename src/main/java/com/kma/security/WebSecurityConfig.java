@@ -70,6 +70,8 @@ public class WebSecurityConfig {
                                 String.format("%s/articles", apiPrefix)).hasRole(Role.ADMIN)
 
                         // Menu Item Authorization
+                        .requestMatchers(GET,
+                                String.format("%s/menu_items", apiPrefix)).hasRole(Role.ADMIN)
                         .requestMatchers(POST,
                                 String.format("%s/menu_items", apiPrefix)).hasRole(Role.ADMIN)
                         .requestMatchers(PUT,
