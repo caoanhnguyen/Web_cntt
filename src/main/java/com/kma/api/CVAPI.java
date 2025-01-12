@@ -64,7 +64,7 @@ public class CVAPI {
     }
 
     @PutMapping(value = "/nhanvien/cv/{CVId}")
-    @PreAuthorize("@cvServ.isOwner(#CVId, principal.nhanVien.idUser) OR hasRole('ROLE_ADMIN')")
+    @PreAuthorize("hasRole('ROLE_ADMIN') OR @cvServ.isOwner(#CVId, principal.nhanVien.idUser)")
     public ResponseEntity<Object> updateCV(@PathVariable Integer CVId,
                                             @ModelAttribute CVDTO cvDTO){
         try {
@@ -77,7 +77,7 @@ public class CVAPI {
     }
 
     @DeleteMapping(value = "/nhanvien/cv/{CVId}")
-    @PreAuthorize("@cvServ.isOwner(#CVId, principal.nhanVien.idUser) OR hasRole('ROLE_ADMIN')")
+    @PreAuthorize("hasRole('ROLE_ADMIN') OR @cvServ.isOwner(#CVId, principal.nhanVien.idUser)")
     public ResponseEntity<Object> deleteCV(@PathVariable Integer CVId){
         try {
             cvServ.deleteCV(CVId);

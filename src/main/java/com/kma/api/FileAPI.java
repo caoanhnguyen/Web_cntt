@@ -38,7 +38,7 @@ public class FileAPI {
 	buildErrorResUtil buildErrorResUtil;
 
 	@DeleteMapping("/image/{imgId}")
-	public ResponseEntity<?> uploadImg(@PathVariable Integer imgId) {
+	public ResponseEntity<?> deleteImg(@PathVariable Integer imgId) {
 		try{
 			fileServ.deleteImg(imgId);
 			return new ResponseEntity<>("Delete successfully!", HttpStatus.OK);
