@@ -52,7 +52,7 @@ public class CVAPI {
 
     @PostMapping(value = "/nhanvien/{idUser}/cv")
     @PreAuthorize("hasRole('ROLE_ADMIN') OR hasRole('ROLE_EMPLOYEE')")
-    public 	ResponseEntity<Object> addCV(@PathVariable Integer idUser,
+    public ResponseEntity<Object> addCV(@PathVariable Integer idUser,
                                          @ModelAttribute CVDTO cvDTO){
         try {
             cvServ.addCV(cvDTO, idUser);
@@ -65,7 +65,7 @@ public class CVAPI {
 
     @PutMapping(value = "/nhanvien/cv/{CVId}")
     @PreAuthorize("@cvServ.isOwner(#CVId, principal.nhanVien.idUser) OR hasRole('ROLE_ADMIN')")
-    public 	ResponseEntity<Object> updateCV(@PathVariable Integer CVId,
+    public ResponseEntity<Object> updateCV(@PathVariable Integer CVId,
                                             @ModelAttribute CVDTO cvDTO){
         try {
             cvServ.updateCV(CVId, cvDTO);
@@ -78,7 +78,7 @@ public class CVAPI {
 
     @DeleteMapping(value = "/nhanvien/cv/{CVId}")
     @PreAuthorize("@cvServ.isOwner(#CVId, principal.nhanVien.idUser) OR hasRole('ROLE_ADMIN')")
-    public 	ResponseEntity<Object> deleteCV(@PathVariable Integer CVId){
+    public ResponseEntity<Object> deleteCV(@PathVariable Integer CVId){
         try {
             cvServ.deleteCV(CVId);
             return ResponseEntity.ok("Delete successfully!");

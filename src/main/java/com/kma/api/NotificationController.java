@@ -2,7 +2,6 @@ package com.kma.api;
 
 import com.kma.models.errorResponseDTO;
 import com.kma.services.Impl.NotificationService;
-import com.kma.utilities.buildErrorResUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -17,16 +16,15 @@ public class NotificationController {
 
     @Autowired
     NotificationService notificationService;
-    @Autowired
-    com.kma.utilities.buildErrorResUtil buildErrorResUtil;
 
     // API gửi thông báo tới một userId cụ thể
     @PostMapping("/send")
     public ResponseEntity<Object> sendNotificationByUserId(@RequestParam String userId,
                                                            @RequestParam String title,
-                                                           @RequestParam String body) {
+                                                           @RequestParam String body,
+                                                           @RequestParam String url) {
         try {
-            String result = notificationService.sendNotificationByUserId(userId, title, body);
+            String result = notificationService.sendNotificationByUserId(userId, title, body, url);
             return new ResponseEntity<>(result, HttpStatus.OK);
         } catch (Exception e) {
             return buildErrorResponse(e, "Failed to send notification to userId: " + userId);
@@ -36,10 +34,11 @@ public class NotificationController {
     // API gửi thông báo tới toàn bộ user
     @PostMapping("/send-to-all")
     public ResponseEntity<Object> sendNotificationToAllUsers(@RequestParam String title,
-                                                             @RequestParam String body) {
+                                                             @RequestParam String body,
+                                                             @RequestParam String url) {
         try {
             // Gửi thông báo đến tất cả user
-            String result = notificationService.sendNotificationToAllUsers(title, body);
+            String result = notificationService.sendNotificationToAllUsers(title, body, url);
             return new ResponseEntity<>(result, HttpStatus.OK);
         } catch (Exception e) {
             return buildErrorResponse(e, "Failed to send notification to all users");

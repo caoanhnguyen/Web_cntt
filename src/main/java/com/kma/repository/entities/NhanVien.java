@@ -95,7 +95,7 @@ public class NhanVien {
 	private User user;
 
 	// Quan hệ 1-1 với CV
-	@OneToOne(mappedBy = "nhanVien", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+	@OneToOne(mappedBy = "nhanVien", cascade = CascadeType.REMOVE, fetch = FetchType.LAZY)
 	private CV cv;
 
 	public CV getCv() {

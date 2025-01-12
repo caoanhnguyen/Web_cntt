@@ -159,7 +159,8 @@ public class postServiceImpl implements postService{
 		// Gửi thông báo bài viết mới
 		String title = "Có bài viết mới. Xem ngay!";
 		String content = nhanVien.getTenNhanVien() + " vừa tạo 1 bài viết mới!\n" + post.getTitle();
-		notiServ.sendNotificationToAllUsers(title, content);
+		String url = "api/public/posts/" + post.getPost_id();
+		notiServ.sendNotificationToAllUsers(title, content, url);
 	}
 	
 

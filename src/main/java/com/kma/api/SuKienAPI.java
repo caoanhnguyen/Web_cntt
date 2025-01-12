@@ -54,7 +54,7 @@ public class SuKienAPI {
 
 
     @GetMapping(value = "/public/sukien/{eventId}")
-    public ResponseEntity<Object> findById(@PathVariable Integer eventId){
+    public ResponseEntity<Object> getById(@PathVariable Integer eventId){
         try {
             suKienDTO DTO = skServ.findById(eventId);
             return new ResponseEntity<>(DTO, HttpStatus.OK);

@@ -18,7 +18,7 @@ public class NotificationService {
 
     // Gửi thông báo trực tiếp bằng FCM token
     @Async("notificationExecutor")
-    public void sendNotification(TokenRequest tokenRequest, String title, String body) {
+    public void sendNotification(TokenRequest tokenRequest, String title, String body, String url) {
         try {
             // Tạo thông báo
             Notification notification = Notification.builder()
@@ -29,6 +29,7 @@ public class NotificationService {
             // Tạo message
             Message message = Message.builder()
                     .setNotification(notification)
+                    .putData("url", "http://localhost:8084/"+url)  // URL hoặc hành động cần thực hiện
                     .setToken(tokenRequest.getFcmToken())
                     .build();
 
@@ -46,7 +47,7 @@ public class NotificationService {
     }
 
     // Gửi thông báo tới tất cả token của một userId
-    public String sendNotificationByUserId(String userId, String title, String body) {
+    public String sendNotificationByUserId(String userId, String title, String body, String url) {
         try {
             // Lấy tất cả token từ Redis
             Set<String> fcmTokens = fcmServ.getTokenByUserId(userId);
@@ -58,7 +59,7 @@ public class NotificationService {
             // Gửi thông báo tới từng token
             for (String token : fcmTokens) {
                 tokenRequest = new TokenRequest(userId, token);
-                sendNotification(tokenRequest, title, body);
+                sendNotification(tokenRequest, title, body, url);
             }
 
             return "Notification sent to all devices for userId: " + userId;
@@ -70,7 +71,7 @@ public class NotificationService {
     }
 
     // Gửi thông báo tới tất cả user
-    public String sendNotificationToAllUsers(String title, String body) {
+    public String sendNotificationToAllUsers(String title, String body, String url) {
         try {
             // Lấy danh sách tất cả userId và token từ Redis
             Map<String, Set<String>> userTokens = fcmServ.getAllUserTokens();
@@ -85,7 +86,7 @@ public class NotificationService {
                 TokenRequest tokenRequest;
                 for (String token : entry.getValue()) {
                     tokenRequest = new TokenRequest(userId, token);
-                    sendNotification(tokenRequest, title, body);
+                    sendNotification(tokenRequest, title, body, url);
                 }
             }
 

@@ -88,7 +88,8 @@ public class answerServImpl implements answerService {
         String userId = author.getUserName();
         String title = "Reply discussion!";
         String body =  answer_author.getName() + " đã trả lời bài thảo luận của bạn!";
-        notiServ.sendNotificationByUserId(userId, title, body);
+        String url = "api/discussions/"+ discussionId;
+        notiServ.sendNotificationByUserId(userId, title, body, url);
     }
 
     @Override

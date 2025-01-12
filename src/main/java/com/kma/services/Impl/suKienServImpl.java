@@ -139,7 +139,8 @@ public class suKienServImpl implements suKienService {
         // Gửi thông báo bài viết mới
         String title = "Có sự kiện mới. Xem ngay!";
         String content = event.getEventName();
-        notiServ.sendNotificationToAllUsers(title, content);
+        String url = "api/public/sukien/"+ event.getEventId();
+        notiServ.sendNotificationToAllUsers(title, content, url);
     }
 
     @Override

@@ -6,6 +6,7 @@ import com.kma.repository.entities.CV;
 import com.kma.repository.entities.NhanVien;
 import com.kma.repository.nhanVienRepo;
 import com.kma.services.CVService;
+import jakarta.persistence.EntityExistsException;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import org.modelmapper.ModelMapper;
@@ -47,6 +48,8 @@ public class CVServImpl implements CVService {
         // Kiểm tra mã nhân viên
         NhanVien nv = nvRepo.findById(idUser).orElse(null);
         if(nv!=null){
+            if(nv.getCv()!=null)
+                throw new EntityExistsException("This employee already have a CV!");
             CV cv = modelMapper.map(cvDTO, CV.class);
             cv.setNhanVien(nv);
             cvRepo.save(cv);
@@ -68,6 +71,7 @@ public class CVServImpl implements CVService {
     }
 
     @Override
+    @Transactional
     public void deleteCV(Integer CVId) {
         // Kiểm tra xem CV có tồn tại hay không
         CV cv = cvRepo.findById(CVId).orElse(null);

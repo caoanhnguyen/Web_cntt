@@ -13,4 +13,5 @@ public interface FcmService {
     Set<String> getTokenByUserId(String userId); // Lấy tất cả token của user
 
     Map<String, Set<String>> getAllUserTokens();
+
 }

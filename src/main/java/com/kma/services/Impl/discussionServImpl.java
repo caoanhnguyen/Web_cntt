@@ -228,11 +228,6 @@ public class discussionServImpl implements discussionService {
         discussion.setStatus(DiscussionStatus.PENDING);
 
         discussRepo.save(discussion);
-
-        // Gửi thông báo bài viết mới
-        String title = "Có bài thảo luận mới. Xem ngay!";
-        String content = discussReqDTO.getTitle();
-        notiServ.sendNotificationToAllUsers(title, content);
     }
 
     @Override
@@ -277,20 +272,27 @@ public class discussionServImpl implements discussionService {
                     throw new IllegalArgumentException("Invalid discussion status: " + discussionStatus);
                 }
 
+                User user = discussion.getUser();
+                String userId = user.getUserName();
+
                 if (status.equals(DiscussionStatus.REJECTED)) {
                     // Xóa bài thảo luận khỏi DB
                     discussRepo.delete(discussion);
 
                     // Thông báo đến user đó là discussion bị reject
-                    User user = discussion.getUser();
-                    String userId = user.getUserName();
                     String title = "Bài thảo luận bị từ chối!";
                     String content = "Bài thảo luận với tiêu đề: " + discussion.getTitle() + " của bạn đã bị từ chối!";
-                    notiServ.sendNotificationByUserId(userId, title, content);
+                    notiServ.sendNotificationByUserId(userId, title, content, "");
                 } else if (status.equals(DiscussionStatus.APPROVED)) {
                     // Duyệt bài thảo luận
                     discussion.setStatus(DiscussionStatus.APPROVED);
                     discussRepo.save(discussion);
+
+                    // Thông báo đến user đó là discussion đã được duyệt
+                    String title = "Bài thảo luận của bạn đã được duyệt!";
+                    String content = "Bài thảo luận với tiêu đề: " + discussion.getTitle() + " của bạn đã được duyệt!";
+                    String url = "/api/discussions/"+discussionId;
+                    notiServ.sendNotificationByUserId(userId, title, content, url);
                 }
 
             } else {
