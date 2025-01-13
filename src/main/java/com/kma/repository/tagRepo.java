@@ -9,4 +9,6 @@ public interface tagRepo extends JpaRepository<Tag, Integer> {
 
     List<Tag> findAllByOrderByCategory();
 
+    boolean existsByName(String tagName);
+
 }

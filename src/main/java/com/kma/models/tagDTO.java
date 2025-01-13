@@ -4,6 +4,15 @@ public class tagDTO {
     private Integer tagId;
     private String tagName;
     private String description;
+    private String category;
+
+    public String getCategory() {
+        return category;
+    }
+
+    public void setCategory(String category) {
+        this.category = category;
+    }
 
     public String getDescription() {
         return description;

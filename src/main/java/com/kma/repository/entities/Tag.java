@@ -10,7 +10,7 @@ import java.util.Set;
 public class Tag {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long tagId;
+    private Integer tagId;
 
     @Column(nullable = false, unique = true)
     private String name;
@@ -41,11 +41,11 @@ public class Tag {
         this.description = description;
     }
 
-    public Long getTagId() {
+    public Integer getTagId() {
         return tagId;
     }
 
-    public void setTagId(Long tagId) {
+    public void setTagId(Integer tagId) {
         this.tagId = tagId;
     }
 

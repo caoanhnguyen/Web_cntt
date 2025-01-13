@@ -60,6 +60,12 @@ public class WebSecurityConfig {
                         // Tag Authorization
                         .requestMatchers(GET,
                                 String.format("%s/tags", apiPrefix)).hasAnyRole(Role.ADMIN, Role.STUDENT, Role.EMPLOYEE)
+                        .requestMatchers(POST,
+                                String.format("%s/tags", apiPrefix)).hasRole(Role.ADMIN)
+                        .requestMatchers(PUT,
+                                String.format("%s/tags", apiPrefix)).hasRole(Role.ADMIN)
+                        .requestMatchers(DELETE,
+                                String.format("%s/tags", apiPrefix)).hasRole(Role.ADMIN)
 
                         // Article Authorization
                         .requestMatchers(POST,

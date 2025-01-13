@@ -4,9 +4,12 @@ import com.kma.converter.tagDTOConverter;
 import com.kma.enums.TagCategory;
 import com.kma.models.paginationResponseDTO;
 import com.kma.models.tagDTO;
+import com.kma.models.tagRequestDTO;
 import com.kma.repository.entities.Tag;
 import com.kma.repository.tagRepo;
 import com.kma.services.tagService;
+import jakarta.persistence.EntityExistsException;
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -70,5 +73,60 @@ public class tagServImpl implements tagService {
                 tagPage.getNumber(),
                 tagPage.getSize()
         );
+    }
+
+    @Override
+    public tagDTO getById(Integer tagId) {
+        // Kiểm tra tag có tồn tại hay không
+        Tag tag = tRepo.findById(tagId).orElse(null);
+        if(tag==null)
+            throw new EntityNotFoundException("Tag not found!");
+
+        return tagConverter.convertToTagDTO(tag);
+    }
+
+    @Override
+    public void addTag(tagRequestDTO tagReqDTO) {
+        // Kiểm tra tên tag đã tồn tại hay chưa
+        String tagName = tagReqDTO.getTagName();
+        if(tRepo.existsByName(tagName)){
+            throw new EntityExistsException("Tag name already exists!");
+        }
+        Tag tag = new Tag();
+        tag.setName(tagReqDTO.getTagName());
+        tag.setDescription(tagReqDTO.getDescription());
+        tag.setCategory(tagReqDTO.getCategory());
+
+        tRepo.save(tag);
+    }
+
+    @Override
+    public void updateTag(Integer tagId, tagRequestDTO tagReqDTO) {
+        // Kiểm tra tag có tồn tại hay không
+        Tag tag = tRepo.findById(tagId).orElse(null);
+        if(tag==null)
+            throw new EntityNotFoundException("Tag not found!");
+
+        String tagName = tagReqDTO.getTagName();
+        if(tRepo.existsByName(tagName)){
+            throw new EntityExistsException("Tag name already exists!");
+        }
+
+        // Update
+        tag.setName(tagReqDTO.getTagName());
+        tag.setDescription(tagReqDTO.getDescription());
+        tag.setCategory(tagReqDTO.getCategory());
+
+        tRepo.save(tag);
+    }
+
+    @Override
+    public void deleteTag(Integer tagId) {
+        // Kiểm tra tag có tồn tại hay không
+        Tag tag = tRepo.findById(tagId).orElse(null);
+        if(tag==null)
+            throw new EntityNotFoundException("Tag not found!");
+
+        tRepo.delete(tag);
     }
 }
