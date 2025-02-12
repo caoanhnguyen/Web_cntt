@@ -22,8 +22,4 @@ public class SlugUtils {
         return slug.replaceAll("^-|-$", "");
     }
 
-    public static void main(String[] args) {
-        String title = "Đăng Tú";
-        System.out.println(toSlug(title)); // Kết quả: dang-tu
-    }
 }

@@ -47,7 +47,7 @@ public class ArticleAPI {
             articleServ.addArticle(files, articleRequestDTO);
             return ResponseEntity.ok("Add successfully!");
         } catch (IllegalArgumentException e) {
-            errorResponseDTO errorDTO = buildErrorResUtil.buildErrorRes(e, "Article not found!");
+            errorResponseDTO errorDTO = buildErrorResUtil.buildErrorRes(e, "Menu Item not found!");
             return new ResponseEntity<>(errorDTO, HttpStatus.NOT_FOUND);
         } catch (Exception e) {
             errorResponseDTO errorDTO = buildErrorResUtil.buildErrorRes(e, "An error occurred!");

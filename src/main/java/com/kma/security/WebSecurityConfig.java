@@ -75,6 +75,14 @@ public class WebSecurityConfig {
                         .requestMatchers(DELETE,
                                 String.format("%s/articles", apiPrefix)).hasRole(Role.ADMIN)
 
+                        // Slider Authorization
+                        .requestMatchers(POST,
+                                String.format("%s/sliders", apiPrefix)).hasRole(Role.ADMIN)
+                        .requestMatchers(PUT,
+                                String.format("%s/sliders/**", apiPrefix)).hasRole(Role.ADMIN)
+                        .requestMatchers(DELETE,
+                                String.format("%s/sliders/**", apiPrefix)).hasRole(Role.ADMIN)
+
                         // Menu Item Authorization
                         .requestMatchers(GET,
                                 String.format("%s/menu_items", apiPrefix)).hasRole(Role.ADMIN)
