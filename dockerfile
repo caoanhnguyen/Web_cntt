@@ -1,25 +1,22 @@
-# Sử dụng OpenJDK 21 để build ứng dụng
+# Build Stage
 FROM openjdk:21-jdk-slim AS build
-
-# Đặt thư mục làm việc
 WORKDIR /app
 
-# Copy toàn bộ source code vào container
+# Copy toàn bộ project
 COPY . .
 
-RUN mvn clean package -DskipTests
+# Chỉ chạy chmod nếu có mvnw
+RUN if [ -f mvnw ]; then chmod +x mvnw; fi
 
-# Tạo container runtime chỉ chứa file JAR
+# Build với Maven Wrapper (hoặc dùng mvn nếu không có mvnw)
+RUN ./mvnw clean package -DskipTests || mvn clean package -DskipTests
+
+# Runtime Stage
 FROM openjdk:21-jdk-slim
-
-# Đặt thư mục làm việc
 WORKDIR /app
 
-# Copy file JAR từ giai đoạn build sang container runtime
+# Copy file JAR từ giai đoạn build
 COPY --from=build /app/target/web_cntt-0.0.1-SNAPSHOT.jar app.jar
 
-# Mở cổng 8080 (hoặc cổng bạn dùng)
 EXPOSE 8080
-
-# Chạy ứng dụng Spring Boot
 ENTRYPOINT ["java", "-jar", "app.jar"]
