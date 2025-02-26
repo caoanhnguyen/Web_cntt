@@ -20,7 +20,7 @@ WORKDIR /app
 COPY --from=build /app/target/web_cntt-0.0.1-SNAPSHOT.jar app.jar
 
 # Mở cổng 8080
-EXPOSE 8080
+EXPOSE 8084
 
 # Chạy ứng dụng Spring Boot
 ENTRYPOINT ["java", "-jar", "app.jar"]
