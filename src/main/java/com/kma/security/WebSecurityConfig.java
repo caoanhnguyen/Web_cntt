@@ -251,7 +251,7 @@ public class WebSecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(List.of("http://localhost:8083", "https://fond-frank-goose.ngrok-free.app"));
+        configuration.setAllowedOrigins(List.of("http://localhost:8083", "https://fe-webcntt.onrender.com"));
         configuration.setAllowedMethods(List.of("*"));
         configuration.setAllowedHeaders(List.of("*"));
         configuration.setAllowCredentials(true);

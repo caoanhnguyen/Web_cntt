@@ -9,7 +9,7 @@ public class webConfig implements WebMvcConfigurer {
     @Override
     public void addCorsMappings(CorsRegistry registry) {
         registry.addMapping("/**")
-                .allowedOrigins("http://172.20.10.18:8083", "http://localhost:8083", "http://127.0.0.1:5501") // Địa chỉ front-end
+                .allowedOrigins("http://172.20.10.18:8083", "http://localhost:8083", "https://fe-webcntt.onrender.com") // Địa chỉ front-end
                 .allowedMethods("*")
                 .allowedHeaders("*") // Cho phép tất cả các header
                 .allowCredentials(true); // Nếu cần thiết
