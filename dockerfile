@@ -7,6 +7,10 @@ WORKDIR /app
 # Copy toàn bộ source code vào container
 COPY . .
 
+# Copy file .env vào container
+COPY .env /app/.env
+
+
 # Build project bằng Maven, bỏ qua test để build nhanh hơn
 RUN mvn clean package -DskipTests
 

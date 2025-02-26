@@ -4,12 +4,18 @@ import io.github.cdimascio.dotenv.Dotenv;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
+import java.nio.file.Paths;
 import java.util.TimeZone;
 
 @SpringBootApplication
 public class Application {
     static {
-        Dotenv dotenv = Dotenv.load();
+        // Load file `.env` từ thư mục hệ thống
+        Dotenv dotenv = Dotenv.configure()
+                .directory(Paths.get("").toAbsolutePath().toString()) // Load từ thư mục hiện tại
+                .ignoreIfMissing() // Không báo lỗi nếu thiếu
+                .load();
+
         dotenv.entries().forEach(entry -> System.setProperty(entry.getKey(), entry.getValue()));
     }
     public static void main(String[] args) {
