@@ -1,11 +1,11 @@
 # Sử dụng OpenJDK 21
 FROM openjdk:21-jdk-slim
 
-# Đặt thư mục làm việc
+# Đặt thư mục làm việc trong container
 WORKDIR /app
 
 # Copy file JAR từ target/ vào container
-COPY target/*.jar app.jar
+COPY target/web_cntt-0.0.1-SNAPSHOT.jar app.jar
 
 # Mở cổng 8080
 EXPOSE 8080
