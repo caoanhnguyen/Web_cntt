@@ -12,16 +12,16 @@ import java.io.IOException;
 @Configuration
 public class FirebaseConfig {
 
-    @Bean
-    public FirebaseApp firebaseApp() throws IOException {
-        // Đường dẫn tới file firebase-adminsdk.json
-        FileInputStream serviceAccount =
-                new FileInputStream("src/main/resources/webcnttkma-firebase-adminsdk-mpsu6-ac2c4a48ff.json");
-
-        FirebaseOptions options = FirebaseOptions.builder()
-                .setCredentials(GoogleCredentials.fromStream(serviceAccount))
-                .build();
-
-        return FirebaseApp.initializeApp(options);
-    }
+//    @Bean
+//    public FirebaseApp firebaseApp() throws IOException {
+//        // Đường dẫn tới file firebase-adminsdk.json
+//        FileInputStream serviceAccount =
+//                new FileInputStream("src/main/resources/webcnttkma-firebase-adminsdk-mpsu6-ac2c4a48ff.json");
+//
+//        FirebaseOptions options = FirebaseOptions.builder()
+//                .setCredentials(GoogleCredentials.fromStream(serviceAccount))
+//                .build();
+//
+//        return FirebaseApp.initializeApp(options);
+//    }
 }
