@@ -7,11 +7,7 @@ WORKDIR /app
 # Copy toàn bộ source code vào container
 COPY . .
 
-# Cấp quyền thực thi cho Maven Wrapper (nếu có)
-RUN chmod +x mvnw
-
-# Build project bằng Maven (bỏ qua test để build nhanh hơn)
-RUN ./mvnw clean package -DskipTests
+RUN mvn clean package -DskipTests
 
 # Tạo container runtime chỉ chứa file JAR
 FROM openjdk:21-jdk-slim
