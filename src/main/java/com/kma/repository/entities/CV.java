@@ -3,7 +3,7 @@ package com.kma.repository.entities;
 import jakarta.persistence.*;
 
 @Entity
-@Table(name="CV")
+@Table(name="cv")
 public class CV {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
