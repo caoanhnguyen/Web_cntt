@@ -10,8 +10,8 @@ COPY . .
 # Copy file .env vào container
 COPY .env /app/.env
 
-# Copy Firebase config file vào container
-COPY src/main/resources/webcnttkma-firebase-adminsdk-mpsu6-ac2c4a48ff.json /app/src/main/resources/webcnttkma-firebase-adminsdk-mpsu6-ac2c4a48ff.json
+# Copy file JSON vào thư mục chính xác
+COPY src/main/resources/webcnttkma-firebase-adminsdk-mpsu6-ac2c4a48ff.json /app/firebase-config.json
 
 # Build project bằng Maven, bỏ qua test để build nhanh hơn
 RUN mvn clean package -DskipTests
