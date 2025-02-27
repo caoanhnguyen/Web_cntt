@@ -23,5 +23,9 @@ public class Application {
         // Set timezone mặc định là UTC
         TimeZone.setDefault(TimeZone.getTimeZone("UTC"));
         SpringApplication.run(Application.class, args);
+
+        System.out.println("SPRING_REDIS_HOST: " + System.getenv("SPRING_REDIS_HOST"));
+        System.out.println("SPRING_REDIS_PORT: " + System.getenv("SPRING_REDIS_PORT"));
+        System.out.println("SPRING_REDIS_PASSWORD: " + System.getenv("SPRING_REDIS_PASSWORD"));
     }
 }
