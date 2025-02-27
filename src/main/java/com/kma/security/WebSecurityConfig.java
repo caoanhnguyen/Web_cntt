@@ -56,6 +56,8 @@ public class WebSecurityConfig {
                         .requestMatchers(DELETE, "/image/**").permitAll()
                         .requestMatchers(GET,
                                 String.format("%s/public/**", apiPrefix)).permitAll()
+                        .requestMatchers(GET,
+                                String.format("%s/redis/**", apiPrefix)).permitAll()
 
                         // Tag Authorization
                         .requestMatchers(GET,

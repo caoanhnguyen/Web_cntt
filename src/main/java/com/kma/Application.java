@@ -1,8 +1,11 @@
 package com.kma;
 
+import com.google.api.client.util.Value;
 import io.github.cdimascio.dotenv.Dotenv;
+import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.stereotype.Component;
 
 import java.nio.file.Paths;
 import java.util.TimeZone;
@@ -24,8 +27,21 @@ public class Application {
         TimeZone.setDefault(TimeZone.getTimeZone("UTC"));
         SpringApplication.run(Application.class, args);
 
-        System.out.println("SPRING_REDIS_HOST: " + System.getenv("SPRING_REDIS_HOST"));
-        System.out.println("SPRING_REDIS_PORT: " + System.getenv("SPRING_REDIS_PORT"));
-        System.out.println("SPRING_REDIS_PASSWORD: " + System.getenv("SPRING_REDIS_PASSWORD"));
+    }
+
+    @Component
+     class RedisConfigChecker implements CommandLineRunner {
+
+        @Value("${spring.redis.host}")
+        private String redisHost;
+
+        @Value("${spring.redis.port}")
+        private String redisPort;
+
+        @Override
+        public void run(String... args) throws Exception {
+            System.out.println("✅ Redis Host: " + redisHost);
+            System.out.println("✅ Redis Port: " + redisPort);
+        }
     }
 }
