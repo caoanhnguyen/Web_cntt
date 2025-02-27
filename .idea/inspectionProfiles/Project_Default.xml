@@ -11,15 +11,21 @@
       <option name="ignoredModules">
         <list>
           <option value="web_cntt" />
+          <option value="web_cntt" />
+          <option value="web_cntt" />
         </list>
       </option>
       <option name="ignoredPackages">
         <list>
           <option value="ch.qos.logback:logback-classic:1.4.8" />
+          <option value="com.jayway.jsonpath:json-path:2.8.0" />
+          <option value="ch.qos.logback:logback-core:1.4.8" />
         </list>
       </option>
       <option name="ignoredReasons">
         <list>
+          <option value="Not exploitable" />
+          <option value="Not exploitable" />
           <option value="Not exploitable" />
         </list>
       </option>
