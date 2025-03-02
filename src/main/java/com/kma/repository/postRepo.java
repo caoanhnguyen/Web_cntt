@@ -15,7 +15,8 @@ public interface postRepo extends JpaRepository<Post, Integer>, postRepoCustom {
     @Query("SELECT p FROM Post p LEFT JOIN p.nhanVien nv " +
             "WHERE p.title LIKE %:title% " +
             "AND (nv.tenNhanVien LIKE %:authorName% OR nv IS NULL) " +
-            "ORDER BY p.createAt DESC")
+            "ORDER BY p.createAt DESC" +
+            ", p.postId DESC")
     Page<Post> findByAllCondition(@Param("title") String title,@Param("authorName") String authorName, Pageable pageable);
 
     List<Post> findTop6ByOrderByCreateAtDesc();
