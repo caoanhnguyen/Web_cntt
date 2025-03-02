@@ -24,8 +24,9 @@ public class NotificationController {
                                                            @RequestParam String body,
                                                            @RequestParam String url) {
         try {
-            String result = notificationService.sendNotificationByUserId(userId, title, body, url);
-            return new ResponseEntity<>(result, HttpStatus.OK);
+//            String result = notificationService.sendNotificationByUserId(userId, title, body, url);
+//            return new ResponseEntity<>(result, HttpStatus.OK);
+            return null;
         } catch (Exception e) {
             return buildErrorResponse(e, "Failed to send notification to userId: " + userId);
         }
@@ -38,8 +39,9 @@ public class NotificationController {
                                                              @RequestParam String url) {
         try {
             // Gửi thông báo đến tất cả user
-            String result = notificationService.sendNotificationToAllUsers(title, body, url);
-            return new ResponseEntity<>(result, HttpStatus.OK);
+//            String result = notificationService.sendNotificationToAllUsers(title, body, url);
+//            return new ResponseEntity<>(result, HttpStatus.OK);
+            return null;
         } catch (Exception e) {
             return buildErrorResponse(e, "Failed to send notification to all users");
         }

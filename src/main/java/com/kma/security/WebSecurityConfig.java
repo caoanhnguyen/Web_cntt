@@ -58,6 +58,8 @@ public class WebSecurityConfig {
                                 String.format("%s/public/**", apiPrefix)).permitAll()
                         .requestMatchers(GET,
                                 String.format("%s/redis/**", apiPrefix)).permitAll()
+                        .requestMatchers(POST,
+                                String.format("%s/redis/**", apiPrefix)).permitAll()
 
                         // Tag Authorization
                         .requestMatchers(GET,

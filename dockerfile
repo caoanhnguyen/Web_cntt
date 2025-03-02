@@ -25,7 +25,7 @@ WORKDIR /app
 # Copy file JAR từ giai đoạn build
 COPY --from=build /app/target/web_cntt-0.0.1-SNAPSHOT.jar app.jar
 
-# Mở cổng 8080
+# Mở cổng 8084
 EXPOSE 8084
 
 # Chạy ứng dụng Spring Boot

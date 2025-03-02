@@ -106,7 +106,8 @@ public class JwtTokenFilter extends OncePerRequestFilter {
                 Pair.of("/downloadProfile", "GET"),
                 Pair.of("/downloadDocs", "GET"),
                 Pair.of(String.format("%s/public", apiPrefix), "GET"),
-                Pair.of(String.format("%s/redis", apiPrefix), "GET")
+                Pair.of(String.format("%s/redis", apiPrefix), "GET"),
+                Pair.of(String.format("%s/redis", apiPrefix), "POST")
 
         );
         for(Pair<String, String> bypassToken: bypassTokens) {

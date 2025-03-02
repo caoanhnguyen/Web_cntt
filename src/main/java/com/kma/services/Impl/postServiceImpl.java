@@ -157,10 +157,10 @@ public class postServiceImpl implements postService{
 		postRepo.save(post);
 
 		// Gửi thông báo bài viết mới
-		String title = "Có bài viết mới. Xem ngay!";
-		String content = nhanVien.getTenNhanVien() + " vừa tạo 1 bài viết mới!\n" + post.getTitle();
-		String url = "api/public/posts/" + post.getPost_id();
-		notiServ.sendNotificationToAllUsers(title, content, url);
+//		String title = "Có bài viết mới. Xem ngay!";
+//		String content = nhanVien.getTenNhanVien() + " vừa tạo 1 bài viết mới!\n" + post.getTitle();
+//		String url = "api/public/posts/" + post.getPost_id();
+//		notiServ.sendNotificationToAllUsers(title, content, url);
 	}
 	
 
