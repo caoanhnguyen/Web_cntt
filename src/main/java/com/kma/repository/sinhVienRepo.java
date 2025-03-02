@@ -17,6 +17,6 @@ public interface sinhVienRepo extends JpaRepository<SinhVien, String> {
             "WHERE sv.maSinhVien LIKE %:maSinhVien% " +
             "AND sv.tenSinhVien LIKE %:tenSinhVien% " +
             "AND (l.tenLop LIKE %:tenLop% OR l.idLop IS NULL) " +
-            "ORDER BY sv.maSinhVien ASC")
+            "ORDER BY sv.maSinhVien, SUBSTRING_INDEX(sv.tenSinhVien, ' ', -1) ASC")
     Page<SinhVien> findByAllCondition(@Param("tenSinhVien") String tenSinhVien, @Param("maSinhVien") String maSinhVien, @Param("tenLop") String tenLop, Pageable pageable);
 }

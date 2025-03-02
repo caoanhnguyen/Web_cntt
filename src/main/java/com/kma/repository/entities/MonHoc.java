@@ -33,7 +33,7 @@ public class MonHoc {
     //Config relation to nhan_vien
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
-            name = "giangVien_monHoc",
+            name = "giang_vien_mon_hoc",
             joinColumns = @JoinColumn(name = "monHocId", nullable = false),
             inverseJoinColumns = @JoinColumn(name = "idUser", nullable = false)
     )
